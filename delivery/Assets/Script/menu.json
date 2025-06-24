@@ -1,0 +1,16 @@
+[{
+    "name":"xxSandwich",
+    "pickle":"O",
+    "mustard":"O",
+    "cabbage":"O",
+    "chili":"O",
+    "tuna":"O"
+},
+{
+    "name":"yySandwich",
+    "pickle":"O",
+    "mustard":"X",
+    "cabbage":"O",
+    "chili":"O",
+    "tuna":"X"
+}]
