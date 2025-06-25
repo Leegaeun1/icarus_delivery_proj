@@ -1,31 +1,38 @@
-using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CheckMenu : MonoBehaviour
 {
-    Image image;
+    public static List<string> selectedNames = new List<string>();
+    private Image image;
+    private bool isSelect = false;
+    public GameObject selectMenu;
+
     private void Awake()
     {
         image = GetComponent<Image>();
     }
-    bool isSelect= false;
-    public GameObject selectMenu;
 
     public void player_select()
     {
-        if (isSelect) {
+        string thisname = transform.GetChild(0).name;
+
+        if (isSelect)
+        {
             isSelect = false;
-            image.color = new Color32(255, 255, 255, 255);
+            selectedNames.Remove(thisname);
+            image.color = new Color32(255, 255, 255, 255); // 원래 색
         }
         else
         {
             isSelect = true;
-            print(gameObject.name);
-            image.color = new Color32(220, 200, 200, 255);
+            selectedNames.Add(thisname);
+            image.color = new Color32(220, 200, 200, 255); // 선택된 색
         }
+
+        Debug.Log("선택된 목록: " + string.Join(", ", selectedNames));
     }
 
     public void completeBtn()

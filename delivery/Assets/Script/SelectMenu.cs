@@ -9,7 +9,7 @@ public class SelectMenu : MonoBehaviour
 
     public void OnClick()
     {
-        string label = GetComponentInChildren<TextMeshProUGUI>().text;
+        string label = gameObject.transform.name;
         manager.OnMenuSelect(label);
     }
 }
