@@ -2,6 +2,7 @@
   "sandwiches": [
     {
       "name": "xxSandwich",
+      "image": "sandwich1.png",
       "ingredients": [
         { "key": "pickle", "value": "O" },
         { "key": "mustard", "value": "O" },
@@ -12,6 +13,7 @@
     },
     {
       "name": "yySandwich",
+      "image": "sandwich2.png",
       "ingredients": [
         { "key": "pickle", "value": "O" },
         { "key": "mustard", "value": "X" },
@@ -22,6 +24,7 @@
     },
     {
       "name": "zzSandwich",
+      "image": "sandwich3.png",
       "ingredients": [
         { "key": "pickle", "value": "O" },
         { "key": "mustard", "value": "X" },

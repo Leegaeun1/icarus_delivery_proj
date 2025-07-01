@@ -2,12 +2,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.UI;
+using System.Collections;
 
 
 public class UIManager : MonoBehaviour
 {
     public GameObject menuPanel;
     List<string> names;
+    public Image targetImage; // UI에 띄울 Image
 
     // 제한시간동안 고르고, 확인 누르면 넘어가도록 만들어봅시다
 
@@ -57,6 +60,7 @@ public class UIManager : MonoBehaviour
     public class Sandwich
     {
         public string name;
+        public string image; // 이미지 파일 이름
         public List<Ingredient> ingredients;
     }
 
@@ -65,7 +69,7 @@ public class UIManager : MonoBehaviour
     {
         public List<Sandwich> sandwiches;
     }
-    public void LoadSandwiches()
+    public void LoadSandwiches() // Json 파일 읽어와서 알맞은 샌드위치를 불러와야함.
     {
         string path = Path.Combine(Application.streamingAssetsPath, "menu.json");
         int cnt = names.Count;
@@ -102,4 +106,5 @@ public class UIManager : MonoBehaviour
             Debug.LogWarning("menu.json 파일이 없습니다.");
         }
     }
+
 }
