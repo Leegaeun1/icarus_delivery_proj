@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class SelectMenu : MonoBehaviour
 {
-    public UIManager manager;
+    //public UIManager manager;
 
-    public void OnClick()
-    {
-        string label = gameObject.transform.name;
-        manager.OnMenuSelect(label);
-    }
+    //public void OnClick()
+    //{
+    //    string label = gameObject.transform.name;
+    //    manager.OnMenuSelect(label);
+    //}
 }
