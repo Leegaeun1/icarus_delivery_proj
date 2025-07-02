@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 680778972507634323}
   - component: {fileID: 1924797209895397868}
   m_Layer: 5
-  m_Name: jellyfish
+  m_Name: "\uD574\uD30C\uB9AC"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class MenuManager : MonoBehaviour
@@ -9,6 +10,7 @@ public class MenuManager : MonoBehaviour
     public GameObject select_menu;
     public GameObject[] special_menus; // 카드 프리팹들
     public RectTransform canvasRectTransform; // Canvas의 RectTransform
+    public GameObject correctIngredient;
 
     [Header("카드 배치 설정")]
     public int cardsToDisplay = 3; // 현재 스테이지에서 표시할 카드 수
@@ -17,12 +19,14 @@ public class MenuManager : MonoBehaviour
     private int[] num; // 올바른 메뉴(craken)가 아닌 카드들의 인덱스
     private int krakenIndex = -1; // craken 카드의 실제 special_menus 내 인덱스
 
-    string correctmenu = "craken";
+    string correctmenu ;
 
     void Start()
     {
         check_menu.gameObject.SetActive(true);
         select_menu.gameObject.SetActive(false);
+
+        correctmenu = special_menus[Random.Range(0,special_menus.Length)].name; //  얜 추후에 메뉴에 알맞게 바뀌도록 해야함. 지금은 랜덤임
 
         List<int> tempNumList = new List<int>();
         for (int i = 0; i < special_menus.Length; i++)
@@ -44,6 +48,7 @@ public class MenuManager : MonoBehaviour
         {
             Debug.LogError($"'{correctmenu}' 카드를 special_menus 배열에서 찾을 수 없습니다. 이름 또는 배열 인덱스를 확인해주세요.");
         }
+        correctIngredient.GetComponent<TextMeshProUGUI>().text = correctmenu;
     }
 
     public void random_card()
