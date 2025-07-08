@@ -21,6 +21,7 @@ public class MenuManager : MonoBehaviour
 
     string correctmenu ;
 
+
     void Start()
     {
         check_menu.gameObject.SetActive(true);
@@ -126,6 +127,19 @@ public class MenuManager : MonoBehaviour
 
             GameObject instantiatedMenu = Instantiate(special_menus[cardPrefabIndex]);
             instantiatedMenu.transform.SetParent(canvasRectTransform, false);
+
+            CardGo cardGoComponent = instantiatedMenu.GetComponent<CardGo>();
+
+            // 2. CardGo 컴포넌트가 존재한다면 해당 인스턴스의 Flip 메서드를 호출합니다.
+            if (cardGoComponent != null)
+            {
+                cardGoComponent.Invoke("Flip", 1f);  // 이제 각 카드 인스턴스의 Flip 메서드가 호출됩니다.
+                print("Filp실행");
+            }
+            else
+            {
+                Debug.LogWarning($"경고: {instantiatedMenu.name} 오브젝트에 CardGo 컴포넌트가 없습니다.");
+            }
 
             RectTransform instantiatedRectTransform = instantiatedMenu.GetComponent<RectTransform>();
             if (instantiatedRectTransform == null)

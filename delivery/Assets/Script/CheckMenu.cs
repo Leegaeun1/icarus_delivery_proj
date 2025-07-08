@@ -18,6 +18,7 @@ public class CheckMenu : MonoBehaviour
     public void player_select()
     {
         string thisname = transform.GetChild(0).name;
+        print(thisname);
 
         if (isSelect)
         {

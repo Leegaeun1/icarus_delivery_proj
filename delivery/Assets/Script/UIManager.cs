@@ -18,31 +18,6 @@ public class UIManager : MonoBehaviour
     {
         names = CheckMenu.selectedNames;
     }
-    //public void OnMenuSelect(string label)
-    //{
-    //    Debug.Log($"선택된 메뉴: {label}");
-    //    //menuPanel.SetActive(false);
-    //    // 기타 처리
-
-    //}
-
-    //public void info()
-    //{
-    //    //names = CheckMenu.selectedNames;
-    //    if (names.Count == 0)
-    //    {
-    //        Debug.Log("선택된 항목이 없습니다.");
-    //    }
-    //    else
-    //    {
-    //        foreach (string name in names)
-    //        {
-    //            Debug.Log("선택된 이름: " + name);
-    //        }
-    //        print(string.Join(",", names));
-    //    }
-    //}
-
     public void nextScene()
     {
         SceneManager.LoadScene("Kitchen");

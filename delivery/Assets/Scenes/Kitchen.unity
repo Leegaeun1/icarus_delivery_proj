@@ -855,7 +855,7 @@ GameObject:
   - component: {fileID: 423715604}
   - component: {fileID: 423715603}
   m_Layer: 0
-  m_Name: pickle (1)
+  m_Name: pickle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1069,7 +1069,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &770142473
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1334,8 +1334,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20ed9dbd21787c947ab780a35b1e7f5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sandwich: {fileID: 355924682}
-  ChildCnt: 0
+  sandwichContainer: {fileID: 355924682}
+  dropStartYOffset: 500
+  dropDuration: 0.5
+  delayBetweenDrops: 0.2
+  bottomBreadName: bread2
+  topBreadName: bread
 --- !u!4 &1289990068
 Transform:
   m_ObjectHideFlags: 0
@@ -1871,7 +1875,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1808545143
 SpriteRenderer:
   m_ObjectHideFlags: 0
