@@ -11,8 +11,8 @@ public class CookManager : MonoBehaviour
 
     [Header("샌드위치 드롭 애니메이션 설정")]
     public float dropStartYOffset = 500f; // 화면 상단 밖으로 재료를 보낼 Y 오프셋 (픽셀 기준)
-    public float dropDuration = 0.5f;    // 각 재료가 떨어지는 데 걸리는 시간
-    public float delayBetweenDrops = 0.2f; // 각 재료가 떨어지기 시작하는 시간 간격
+    public float dropDuration = 0.25f;    // 각 재료가 떨어지는 데 걸리는 시간
+    public float delayBetweenDrops = 0.1f; // 각 재료가 떨어지기 시작하는 시간 간격
 
     [Header("빵 이름 설정")]
     public string bottomBreadName = "bread2"; // 가장 아래 놓일 빵 이름

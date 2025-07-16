@@ -1437,6 +1437,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2133103494}
   - {fileID: 798050060}
   - {fileID: 669117390}
   - {fileID: 1794697090}
@@ -1608,8 +1609,10 @@ MonoBehaviour:
   - {fileID: 5029548538338453806, guid: 968559815570dd54c811b7c0916e0ce6, type: 3}
   canvasRectTransform: {fileID: 1126289343}
   correctIngredient: {fileID: 798050057}
+  cardStackParent: {fileID: 0}
   cardsToDisplay: 3
   cardSpacing: 60
+  dealInterval: 0.5
 --- !u!4 &1252691148
 Transform:
   m_ObjectHideFlags: 0
@@ -1642,7 +1645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ae27266651067143bdd1b7233709311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectMenu: {fileID: 0}
+  selectMenu: {fileID: 1126289342}
 --- !u!1 &1794697089
 GameObject:
   m_ObjectHideFlags: 0
@@ -2410,7 +2413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ae27266651067143bdd1b7233709311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectMenu: {fileID: 0}
+  selectMenu: {fileID: 1126289342}
 --- !u!1001 &2123857765
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2604,7 +2607,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ae27266651067143bdd1b7233709311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectMenu: {fileID: 0}
+  selectMenu: {fileID: 1126289342}
+--- !u!1 &2133103493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2133103494}
+  m_Layer: 5
+  m_Name: CardStackParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2133103494
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133103493}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1126289343}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0.00000023469329, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!1001 &8971212946813522080
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2794,7 +2832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ae27266651067143bdd1b7233709311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectMenu: {fileID: 0}
+  selectMenu: {fileID: 1126289342}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

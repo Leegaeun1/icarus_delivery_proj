@@ -1336,8 +1336,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sandwichContainer: {fileID: 355924682}
   dropStartYOffset: 500
-  dropDuration: 0.5
-  delayBetweenDrops: 0.2
+  dropDuration: 0.25
+  delayBetweenDrops: 0.1
   bottomBreadName: bread2
   topBreadName: bread
 --- !u!4 &1289990068
