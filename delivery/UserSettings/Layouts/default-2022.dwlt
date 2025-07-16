@@ -1109,9 +1109,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 879.99, y: 495, z: 0}
+    m_Target: {x: 879.99, y: 490, z: 0}
     speed: 2
-    m_Value: {x: 879.99, y: 495, z: 0}
+    m_Value: {x: 879.99, y: 490, z: 0}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1157,13 +1157,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.18229227, y: 0.0014768706, z: -0.00025843046, w: 0.9832907}
+    m_Target: {x: 0.2810884, y: 0.14469944, z: -0.042908885, w: 0.9477895}
     speed: 2
-    m_Value: {x: 0.18228377, y: 0.0014768018, z: -0.0002584184, w: 0.98324484}
+    m_Value: {x: 0.28107512, y: 0.14469258, z: -0.042906854, w: 0.9477446}
   m_Size:
-    m_Target: 424.02118
+    m_Target: 250
     speed: 2
-    m_Value: 424.02118
+    m_Value: 250
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1225,9 +1225,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 9ef9ffff
+      m_SelectedIDs: baae0000
       m_LastClickedID: 0
-      m_ExpandedIDs: fea5ffff50b6ffff90b6ffffccb6ffff3cf4ffff46f6ffff04fbffff806700009a6700009c6700009e670000b2670000bc670000c6670000de670000e2670000ec670000
+      m_ExpandedIDs: 803effff7c68ffffe293ffff16fbffffc461000008620000126200001c62000070620000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1274,7 +1274,7 @@ MonoBehaviour:
     x: 300
     y: 73
     width: 1687
-    height: 840
+    height: 843
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1366,7 +1366,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/prefab/special_ingredient_prefab
+    - Assets/Script
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -1374,30 +1374,30 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/prefab/special_ingredient_prefab
+  - Assets/Script
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\user\Documents\GitHub\icarus_delivery_proj\delivery
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 66690000
-    m_LastClickedID: 26982
-    m_ExpandedIDs: 000000003c6400005264000000ca9a3b
+    m_SelectedIDs: 4e640000
+    m_LastClickedID: 25678
+    m_ExpandedIDs: 00000000326400004864000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: StreamingAssets
-      m_OriginalName: StreamingAssets
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 25690
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 17}
     m_SearchString: 
@@ -1411,7 +1411,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000003c640000
+    m_ExpandedIDs: 0000000032640000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1503,7 +1503,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: -24438
+  m_LastSelectedObjectID: 25134
 --- !u!114 &26
 MonoBehaviour:
   m_ObjectHideFlags: 52
