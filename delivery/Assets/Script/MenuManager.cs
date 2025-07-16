@@ -137,7 +137,7 @@ public class MenuManager : MonoBehaviour
         {
             // 1. 카드 인스턴스화
             GameObject instantiatedMenu = Instantiate(cardStack[i], cardStackParent);
-
+            instantiatedMenu.transform.SetSiblingIndex(i);
             // 2. CardGo 컴포넌트가 존재한다면 Flip 메서드를 호출합니다.
             CardGo cardGoComponent = instantiatedMenu.GetComponent<CardGo>();
             if (cardGoComponent != null)
