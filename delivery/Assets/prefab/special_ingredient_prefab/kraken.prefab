@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 7760521069870077745}
   - component: {fileID: -7199833764320482742}
   m_Layer: 5
-  m_Name: "\uD06C\uB77C\uCF04"
+  m_Name: kraken
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -447,7 +447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ae27266651067143bdd1b7233709311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectMenu: {fileID: 6049799516021121695}
+  selectMenu: {fileID: 8084662623312533552}
 --- !u!114 &-7199833764320482742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,7 +473,7 @@ GameObject:
   - component: {fileID: 7570784694570523701}
   - component: {fileID: 5682092280184964984}
   m_Layer: 5
-  m_Name: craken
+  m_Name: kraken
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -592,7 +592,7 @@ GameObject:
   - component: {fileID: 4421973085321028820}
   - component: {fileID: 2114879388572985805}
   m_Layer: 5
-  m_Name: craken
+  m_Name: kraken
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

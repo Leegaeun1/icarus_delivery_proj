@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public TextMeshProUGUI time;
+    public GameManager gameManager;
+    public int nowtime;
 
-    // Update is called once per frame
     void Update()
     {
-        
+        nowtime = Mathf.FloorToInt(gameManager.ElapsedTime);
+
+        int minutes = nowtime / 60;
+        int seconds = nowtime % 60;
+
+        time.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }
