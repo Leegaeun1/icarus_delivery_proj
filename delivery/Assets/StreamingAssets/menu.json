@@ -1,0 +1,34 @@
+{
+  "sandwiches": [
+    {
+      "name": "xxSandwich",
+      "ingredients": [
+        { "key": "pickle", "value": "O" },
+        { "key": "mustard", "value": "O" },
+        { "key": "cabbage", "value": "O" },
+        { "key": "chili", "value": "O" },
+        { "key": "tuna", "value": "O" }
+      ]
+    },
+    {
+      "name": "yySandwich",
+      "ingredients": [
+        { "key": "pickle", "value": "O" },
+        { "key": "mustard", "value": "X" },
+        { "key": "cabbage", "value": "O" },
+        { "key": "chili", "value": "O" },
+        { "key": "tuna", "value": "O" }
+      ]
+    },
+    {
+      "name": "zzSandwich",
+      "ingredients": [
+        { "key": "pickle", "value": "O" },
+        { "key": "mustard", "value": "X" },
+        { "key": "cabbage", "value": "O" },
+        { "key": "chili", "value": "O" },
+        { "key": "anchovy", "value": "X" }
+      ]
+    }
+  ]
+}
