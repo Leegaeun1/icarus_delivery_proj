@@ -36,7 +36,7 @@ public class MenuManager : MonoBehaviour
         {
             correctCardIndex = Random.Range(0, special_menus.Length);
             correctmenu = special_menus[correctCardIndex].name;
-            correctName.text = correctmenu;
+            correctName.text = special_menus[correctCardIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text;
         }
         else
         {

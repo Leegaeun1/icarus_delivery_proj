@@ -10,16 +10,18 @@ public class UIManager : MonoBehaviour
 {
     public GameObject menuPanel;
     List<string> names;
+    public GameObject addPanel;
 
     // 제한시간동안 고르고, 확인 누르면 넘어가도록 만들어봅시다
 
-    // 확인 누르기 전에 선택한 카드에 해당하는 이름을 저장합시다
     private void Start()
     {
         names = CheckMenu.selectedNames;
     }
     public void nextScene()
     {
+        menuPanel.SetActive(false); // 넘어가면 메뉴 선택창 안보이도록 하기 
+        addPanel.SetActive(false); // 넘어가면 추가 재료 글자 안보이도록 하기
         SceneManager.LoadScene("Kitchen");
     }
 
