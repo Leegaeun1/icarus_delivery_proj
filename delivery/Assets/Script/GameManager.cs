@@ -25,6 +25,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        print(ElapsedTime);
+        //print(ElapsedTime);
     }
 }

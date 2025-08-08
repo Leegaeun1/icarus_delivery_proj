@@ -567,7 +567,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &152832771
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,7 +865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &230676221
 GameObject:
   m_ObjectHideFlags: 0
@@ -1101,7 +1101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!114 &265510604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1242,7 +1242,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8898906100004947518, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Name
-      value: starfish
+      value: starfish_cookie
       objectReference: {fileID: 0}
     - target: {fileID: 9145412861822838374, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Pivot.x
@@ -1355,7 +1355,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &428839868
 GameObject:
   m_ObjectHideFlags: 0
@@ -2449,7 +2449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8898906100004947518, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Name
-      value: jelly_shake
+      value: jelly_drink
       objectReference: {fileID: 0}
     - target: {fileID: 9145412861822838374, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Pivot.x
@@ -2562,7 +2562,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &752207570
 GameObject:
   m_ObjectHideFlags: 0
@@ -3835,7 +3835,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8898906100004947518, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Name
-      value: star_shake
+      value: star_drink
       objectReference: {fileID: 0}
     - target: {fileID: 9145412861822838374, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Pivot.x
@@ -3948,7 +3948,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &1065250328
 GameObject:
   m_ObjectHideFlags: 0
@@ -4426,7 +4426,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &1188045907
 GameObject:
   m_ObjectHideFlags: 0
@@ -5191,7 +5191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &1317357275
 GameObject:
   m_ObjectHideFlags: 0
@@ -5792,7 +5792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1001 &1597912814
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6004,7 +6004,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &1683108524
 GameObject:
   m_ObjectHideFlags: 0
@@ -6287,7 +6287,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8898906100004947518, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Name
-      value: mer_shake
+      value: mer_drink
       objectReference: {fileID: 0}
     - target: {fileID: 9145412861822838374, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_Pivot.x
@@ -6400,7 +6400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
-  completebtn: {fileID: 0}
+  completebtn: {fileID: 854441710}
 --- !u!1 &1805659794
 GameObject:
   m_ObjectHideFlags: 0
