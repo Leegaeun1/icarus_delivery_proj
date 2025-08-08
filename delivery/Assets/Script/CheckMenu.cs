@@ -9,6 +9,7 @@ public class CheckMenu : MonoBehaviour
     private Image image;
     private bool isSelect = false;
     public GameObject selectMenu;
+    public GameObject completebtn;
 
     private void Awake()
     {
@@ -39,6 +40,7 @@ public class CheckMenu : MonoBehaviour
     public void completeBtn()
     {
         this.gameObject.SetActive(false);
+        completebtn.gameObject.SetActive(false );
         selectMenu.gameObject.SetActive(true);
     }
 }

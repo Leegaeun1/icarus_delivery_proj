@@ -678,7 +678,7 @@ GameObject:
   - component: {fileID: 439096147}
   - component: {fileID: 439096146}
   m_Layer: 0
-  m_Name: fire_cookie_0
+  m_Name: fire_cookie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1651,7 +1651,7 @@ GameObject:
   - component: {fileID: 1622441324}
   - component: {fileID: 1622441323}
   m_Layer: 0
-  m_Name: mer_drink_0
+  m_Name: mer_drink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1903,7 +1903,7 @@ GameObject:
   - component: {fileID: 1818983949}
   - component: {fileID: 1818983950}
   m_Layer: 0
-  m_Name: sand_bag_0
+  m_Name: sand_bag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
