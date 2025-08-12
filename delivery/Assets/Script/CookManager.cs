@@ -18,8 +18,20 @@ public class CookManager : MonoBehaviour
     public string bottomBreadName = "bread2"; // 가장 아래 놓일 빵 이름
     public string topBreadName = "bread";   // 가장 위에 놓일 빵 이름
 
+    [Header("봉투 애니메이션 설정")]
+    public float moveDistance = 20f;   // 이동 거리
+    public float moveSpeed = 2f;      // 이동 속도
+    public float waitTime = 2f;       // 대기 시간
+    public GameObject sandbag;
+    public GameObject NewSandwich;
+    private Vector3 startPos;
+    private Vector3 endPos;
+
     void Start()
     {
+        startPos = sandbag.transform.position;
+        endPos = startPos - new Vector3(0, moveDistance, 0);
+
         selectedIngredientsNames = CheckMenu.selectedNames;
         print("선택된 재료들: " + string.Join(',', selectedIngredientsNames));
 
@@ -29,18 +41,36 @@ public class CookManager : MonoBehaviour
             return;
         }
 
-        // 모든 재료를 일단 비활성화합니다. (씬 시작 시 모든 재료가 비활성 상태라고 가정)
+        // 시작 시 재료 전부 비활성화
         for (int i = 0; i < sandwichContainer.transform.childCount; i++)
         {
             sandwichContainer.transform.GetChild(i).gameObject.SetActive(false);
         }
 
-        StartCoroutine(AnimateSandwichDrops());
+        StartCoroutine(MainRoutine());
     }
 
-    IEnumerator AnimateSandwichDrops()
+    IEnumerator MainRoutine()
     {
-        // 1. 모든 재료 오브젝트를 이름으로 찾기 위한 딕셔너리 생성 (성능 최적화)
+        // 1. 샌드위치 재료 떨어뜨리기
+        yield return StartCoroutine(DropSandwichIngredients());
+
+        // 2. 2초 대기
+        yield return new WaitForSeconds(waitTime);
+
+        // 3. 봉투 내려오기
+        yield return StartCoroutine(MoveObject(sandbag, startPos, endPos));
+
+        // 4. 2초 대기
+        yield return new WaitForSeconds(waitTime);
+
+        // 5. 봉투와 샌드위치 같이 올라가기
+        yield return StartCoroutine(MoveBothUp());
+    }
+
+    IEnumerator DropSandwichIngredients()
+    {
+        // 모든 재료를 이름으로 찾기
         Dictionary<string, GameObject> allIngredientsDict = new Dictionary<string, GameObject>();
         for (int i = 0; i < sandwichContainer.transform.childCount; i++)
         {
@@ -48,78 +78,72 @@ public class CookManager : MonoBehaviour
             allIngredientsDict[child.name] = child;
         }
 
-        // 2. 드롭 애니메이션에 사용할 최종 정렬된 재료 리스트
         List<GameObject> dropOrderIngredients = new List<GameObject>();
 
         GameObject bottomBread = null;
         GameObject topBread = null;
 
-        // 3. 빵을 먼저 처리하여 드롭 순서 리스트에 추가
         if (allIngredientsDict.TryGetValue(bottomBreadName, out bottomBread))
-        {
             dropOrderIngredients.Add(bottomBread);
-        }
-        else
-        {
-            Debug.LogWarning($"'{bottomBreadName}' (바닥 빵)을 샌드위치 컨테이너에서 찾을 수 없습니다.");
-        }
 
-        // 4. 선택된 재료들 중 빵을 제외하고 중간 재료들만 필터링하여 Y축으로 정렬
         List<GameObject> middleIngredients = new List<GameObject>();
         foreach (string selectedName in selectedIngredientsNames)
         {
-            // 선택된 재료 이름이 빵 이름과 일치하지 않는 경우만 추가
             if (selectedName != bottomBreadName && selectedName != topBreadName)
             {
-                // 실제 GameObject를 딕셔너리에서 찾아 추가 (이름.Contains() 방식은 정확한 이름으로 변경)
                 GameObject ingredient = allIngredientsDict.FirstOrDefault(pair => pair.Key.Contains(selectedName)).Value;
-                // 또는 정확한 이름 일치: GameObject ingredient = allIngredientsDict.GetValueOrDefault(selectedName);
                 if (ingredient != null)
-                {
                     middleIngredients.Add(ingredient);
-                }
             }
         }
 
-        // 중간 재료들을 Y축 위치에 따라 정렬 (가장 아래 놓일 재료부터)
-        // 이 부분은 재료 프리팹들이 최종적으로 놓일 Y 위치에 따라 정렬됩니다.
         middleIngredients = middleIngredients.OrderBy(go => go.transform.position.y).ToList();
-        dropOrderIngredients.AddRange(middleIngredients); // 중간 재료들을 드롭 순서 리스트에 추가
+        dropOrderIngredients.AddRange(middleIngredients);
 
-        // 5. 마지막 빵 처리
         if (allIngredientsDict.TryGetValue(topBreadName, out topBread))
-        {
             dropOrderIngredients.Add(topBread);
-        }
-        else
-        {
-            Debug.LogWarning($"'{topBreadName}' (윗 빵)을 샌드위치 컨테이너에서 찾을 수 없습니다.");
-        }
 
-        //// 최종 드롭 순서 확인 (디버깅 용)
-        //Debug.Log("최종 드롭 순서:");
-        //foreach (var ing in dropOrderIngredients)
-        //{
-        //    Debug.Log($"- {ing.name} (Y: {ing.transform.position.y})");
-        //}
-
-
-        // 각 재료에 대한 애니메이션 실행
         foreach (GameObject ingredient in dropOrderIngredients)
         {
-            // 애니메이션 시작 전 초기 위치 설정 (최종 위치 + dropStartYOffset)
-            Vector3 originalPos = ingredient.transform.position; // 최종적으로 멈출 위치
+            Vector3 originalPos = ingredient.transform.position;
             Vector3 startPos = originalPos;
-            startPos.y += dropStartYOffset; // 시작 Y 위치 (화면 상단 밖)
+            startPos.y += dropStartYOffset;
 
-            ingredient.transform.position = startPos; // 초기 위치 설정
-            ingredient.SetActive(true); // 재료 활성화
+            ingredient.transform.position = startPos;
+            ingredient.SetActive(true);
 
-            // 애니메이션 실행: 위에서 아래로 떨어지도록
             ingredient.transform.DOMove(originalPos, dropDuration).SetEase(Ease.OutBounce);
 
-            // 다음 재료가 떨어지기까지 잠시 대기
             yield return new WaitForSeconds(delayBetweenDrops);
+        }
+    }
+
+    IEnumerator MoveObject(GameObject target, Vector3 from, Vector3 to)
+    {
+        float elapsed = 0f;
+        while (elapsed < 1f)
+        {
+            elapsed += Time.deltaTime * moveSpeed;
+            target.transform.position = Vector3.Lerp(from, to, elapsed);
+            yield return null;
+        }
+    }
+
+    IEnumerator MoveBothUp()
+    {
+        Vector3 bagCurrent = sandbag.transform.position;
+        Vector3 sandwichCurrent = NewSandwich.transform.position;
+
+        Vector3 bagTarget = startPos;
+        Vector3 sandwichTarget = sandwichCurrent + (bagTarget - bagCurrent);
+
+        float elapsed = 0f;
+        while (elapsed < 1f)
+        {
+            elapsed += Time.deltaTime * moveSpeed;
+            sandbag.transform.position = Vector3.Lerp(bagCurrent, bagTarget, elapsed);
+            NewSandwich.transform.position = Vector3.Lerp(sandwichCurrent, sandwichTarget, elapsed);
+            yield return null;
         }
     }
 }
