@@ -4,10 +4,12 @@ using UnityEngine;
 public class TimeManager : MonoBehaviour
 {
     public TextMeshProUGUI time;
+    public TextMeshProUGUI day;
     public GameManager gameManager;
 
+    private int date = 1;
     private static float gameTime = 0f; // static으로 유지
-    private const float timeScale = 120f;
+    private const float timeScale = 1000f;
 
     void Start()
     {
@@ -29,6 +31,17 @@ public class TimeManager : MonoBehaviour
         int hours = totalSeconds / 3600;
         int minutes = (totalSeconds % 3600) / 60;
 
-        time.text = string.Format("{0:00}:{1:00}", hours, minutes);
+        
+        if (hours == 3)
+        {
+            gameTime = 0f;
+            time.text = string.Format("{0:00}:{1:00}", 0, 0);
+            day.text = (date+1).ToString()+" 일차";
+        }
+        else
+        {
+            time.text = string.Format("{0:00}:{1:00}", hours, minutes);
+        }
+            
     }
 }
