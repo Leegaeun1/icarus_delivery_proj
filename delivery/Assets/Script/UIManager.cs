@@ -44,42 +44,42 @@ public class UIManager : MonoBehaviour
     {
         public List<Sandwich> sandwiches;
     }
-    public void LoadSandwiches() // Json 파일 읽어와서 알맞은 샌드위치를 불러와야함.
-    {
-        string path = Path.Combine(Application.streamingAssetsPath, "menu.json");
-        int cnt = names.Count;
+    //public void LoadSandwiches() // Json 파일 읽어와서 알맞은 샌드위치를 불러와야함.
+    //{
+    //    string path = Path.Combine(Application.streamingAssetsPath, "menu.json");
+    //    int cnt = names.Count;
 
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            SandwichListWrapper wrapper = JsonUtility.FromJson<SandwichListWrapper>(json);
+    //    if (File.Exists(path))
+    //    {
+    //        string json = File.ReadAllText(path);
+    //        SandwichListWrapper wrapper = JsonUtility.FromJson<SandwichListWrapper>(json);
 
-            foreach (var sandwich in wrapper.sandwiches)
-            {
-                int tmp_len = 0;
-                //Debug.Log($" 샌드위치: {sandwich.name}");
-                foreach (var ingredient in sandwich.ingredients)
-                {
-                    //Debug.Log($" 재료: {ingredient.key} = {ingredient.value}");
-                    for(int i = 0; i < cnt; i++)
-                    {
-                        if (ingredient.key == names[i] && ingredient.value !="X") // X인거 제외해줘야함.
-                        {
-                            tmp_len++;
-                        }
-                    }
+    //        foreach (var sandwich in wrapper.sandwiches)
+    //        {
+    //            int tmp_len = 0;
+    //            //Debug.Log($" 샌드위치: {sandwich.name}");
+    //            foreach (var ingredient in sandwich.ingredients)
+    //            {
+    //                //Debug.Log($" 재료: {ingredient.key} = {ingredient.value}");
+    //                for(int i = 0; i < cnt; i++)
+    //                {
+    //                    if (ingredient.key == names[i] && ingredient.value !="X") // X인거 제외해줘야함.
+    //                    {
+    //                        tmp_len++;
+    //                    }
+    //                }
                     
-                }
-                if (tmp_len == cnt)
-                {
-                    Debug.Log($" 샌드위치: {sandwich.name}");
-                }
-            }
-        }
-        else
-        {
-            Debug.LogWarning("menu.json 파일이 없습니다.");
-        }
-    }
+    //            }
+    //            if (tmp_len == cnt)
+    //            {
+    //                Debug.Log($" 샌드위치: {sandwich.name}");
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning("menu.json 파일이 없습니다.");
+    //    }
+    //}
 
 }

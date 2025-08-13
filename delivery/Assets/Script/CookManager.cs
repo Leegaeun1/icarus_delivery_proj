@@ -16,32 +16,49 @@ public class CookManager : MonoBehaviour
 
     [Header("빵 이름 설정")]
     public string bottomBreadName = "bread2"; // 가장 아래 놓일 빵 이름
-    public string topBreadName = "bread";   // 가장 위에 놓일 빵 이름
+    public string topBreadName = "bread";     // 가장 위에 놓일 빵 이름
 
     [Header("봉투 애니메이션 설정")]
-    public float moveDistance = 20f;   // 이동 거리
-    public float moveSpeed = 2f;      // 이동 속도
-    public float waitTime = 2f;       // 대기 시간
+    public float moveDistance = 20f; // 이동 거리
+    public float moveSpeed = 2f;     // 이동 속도
+    public float waitTime = 2f;      // 대기 시간
     public GameObject sandbag;
     public GameObject NewSandwich;
+
     private Vector3 startPos;
     private Vector3 endPos;
 
     void Start()
     {
-        startPos = sandbag.transform.position;
-        endPos = startPos - new Vector3(0, moveDistance, 0);
-
-        selectedIngredientsNames = CheckMenu.selectedNames;
-        print("선택된 재료들: " + string.Join(',', selectedIngredientsNames));
-
+        // --- 필수 참조 검사 ---
+        if (sandbag == null || NewSandwich == null)
+        {
+            Debug.LogError("[CookManager] sandbag 또는 NewSandwich가 할당되지 않았습니다.");
+            enabled = false;
+            return;
+        }
         if (sandwichContainer == null)
         {
-            Debug.LogError("CookManager: 'Sandwich Container' GameObject가 할당되지 않았습니다!");
+            Debug.LogError("[CookManager] sandwichContainer가 할당되지 않았습니다.");
+            enabled = false;
             return;
         }
 
-        // 시작 시 재료 전부 비활성화
+        // 선택된 재료 확인
+        selectedIngredientsNames = CheckMenu.selectedNames;
+        if (selectedIngredientsNames == null || selectedIngredientsNames.Count == 0)
+        {
+            Debug.LogWarning("[CookManager] 선택된 재료가 없습니다.");
+            selectedIngredientsNames = new List<string>();
+        }
+
+        print("선택된 재료들: " + string.Join(", ", selectedIngredientsNames));
+
+        // 초기 위치 저장
+        startPos = sandbag.transform.position;
+        endPos = startPos - new Vector3(0, moveDistance, 0);
+
+        // 시작 시 모든 재료 비활성화
         for (int i = 0; i < sandwichContainer.transform.childCount; i++)
         {
             sandwichContainer.transform.GetChild(i).gameObject.SetActive(false);
@@ -52,62 +69,76 @@ public class CookManager : MonoBehaviour
 
     IEnumerator MainRoutine()
     {
-        // 1. 샌드위치 재료 떨어뜨리기
+        // 1. 재료 떨어뜨리기
         yield return StartCoroutine(DropSandwichIngredients());
 
-        // 2. 2초 대기
+        // 2. 대기
         yield return new WaitForSeconds(waitTime);
 
         // 3. 봉투 내려오기
         yield return StartCoroutine(MoveObject(sandbag, startPos, endPos));
 
-        // 4. 2초 대기
+        // 4. 대기
         yield return new WaitForSeconds(waitTime);
 
-        // 5. 봉투와 샌드위치 같이 올라가기
+        // 5. 봉투 + 샌드위치 같이 올라가기
         yield return StartCoroutine(MoveBothUp());
     }
 
     IEnumerator DropSandwichIngredients()
     {
-        // 모든 재료를 이름으로 찾기
+        if (sandwichContainer == null)
+        {
+            Debug.LogError("[CookManager] sandwichContainer가 null입니다.");
+            yield break;
+        }
+
+        // --- 모든 재료 딕셔너리화 ---
         Dictionary<string, GameObject> allIngredientsDict = new Dictionary<string, GameObject>();
         for (int i = 0; i < sandwichContainer.transform.childCount; i++)
         {
             GameObject child = sandwichContainer.transform.GetChild(i).gameObject;
-            allIngredientsDict[child.name] = child;
+            if (!allIngredientsDict.ContainsKey(child.name))
+                allIngredientsDict[child.name] = child;
         }
 
         List<GameObject> dropOrderIngredients = new List<GameObject>();
 
-        GameObject bottomBread = null;
-        GameObject topBread = null;
-
-        if (allIngredientsDict.TryGetValue(bottomBreadName, out bottomBread))
+        // --- 빵 & 중간 재료 순서 구성 ---
+        if (allIngredientsDict.TryGetValue(bottomBreadName, out GameObject bottomBread))
             dropOrderIngredients.Add(bottomBread);
+        else
+            Debug.LogWarning($"[CookManager] '{bottomBreadName}' 빵을 찾을 수 없습니다.");
 
         List<GameObject> middleIngredients = new List<GameObject>();
         foreach (string selectedName in selectedIngredientsNames)
         {
             if (selectedName != bottomBreadName && selectedName != topBreadName)
             {
-                GameObject ingredient = allIngredientsDict.FirstOrDefault(pair => pair.Key.Contains(selectedName)).Value;
-                if (ingredient != null)
-                    middleIngredients.Add(ingredient);
+                var found = allIngredientsDict.FirstOrDefault(pair => pair.Key.Contains(selectedName)).Value;
+                if (found != null)
+                    middleIngredients.Add(found);
+                else
+                    Debug.LogWarning($"[CookManager] 선택된 재료 '{selectedName}'를 찾을 수 없습니다.");
             }
         }
 
+        // 중간 재료 순서 (현재 y좌표 기준 정렬)
         middleIngredients = middleIngredients.OrderBy(go => go.transform.position.y).ToList();
         dropOrderIngredients.AddRange(middleIngredients);
 
-        if (allIngredientsDict.TryGetValue(topBreadName, out topBread))
+        if (allIngredientsDict.TryGetValue(topBreadName, out GameObject topBread))
             dropOrderIngredients.Add(topBread);
+        else
+            Debug.LogWarning($"[CookManager] '{topBreadName}' 빵을 찾을 수 없습니다.");
 
+        // --- 드롭 애니메이션 실행 ---
         foreach (GameObject ingredient in dropOrderIngredients)
         {
+            if (ingredient == null) continue;
+
             Vector3 originalPos = ingredient.transform.position;
-            Vector3 startPos = originalPos;
-            startPos.y += dropStartYOffset;
+            Vector3 startPos = originalPos + new Vector3(0, dropStartYOffset, 0);
 
             ingredient.transform.position = startPos;
             ingredient.SetActive(true);
@@ -120,6 +151,12 @@ public class CookManager : MonoBehaviour
 
     IEnumerator MoveObject(GameObject target, Vector3 from, Vector3 to)
     {
+        if (target == null)
+        {
+            Debug.LogError("[CookManager] MoveObject 호출 시 target이 null입니다.");
+            yield break;
+        }
+
         float elapsed = 0f;
         while (elapsed < 1f)
         {
@@ -131,6 +168,12 @@ public class CookManager : MonoBehaviour
 
     IEnumerator MoveBothUp()
     {
+        if (sandbag == null || NewSandwich == null)
+        {
+            Debug.LogError("[CookManager] MoveBothUp 실행 불가: sandbag 또는 NewSandwich가 null입니다.");
+            yield break;
+        }
+
         Vector3 bagCurrent = sandbag.transform.position;
         Vector3 sandwichCurrent = NewSandwich.transform.position;
 

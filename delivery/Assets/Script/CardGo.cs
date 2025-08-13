@@ -18,8 +18,18 @@ public class CardGo : MonoBehaviour
 
     public void Flip()
     {
-        print(gameObject.name + "뒤집음");
-        flipped = !flipped;
-        transform.DOLocalRotate(new Vector3(0, flipped ? 180f : 0f, 0), 0.25f);
+        if (!Application.isPlaying) return; // 에디터 중 잘못 호출 방지
+        if (transform == null)
+        {
+            Debug.LogWarning($"[{name}] Transform이 유효하지 않아 Flip을 실행할 수 없습니다.");
+            return;
+        }
+        if (!DOTween.IsTweening(transform))
+        {
+            flipped = !flipped;
+            transform.DOLocalRotate(new Vector3(0, flipped ? 180f : 0f, 0), 0.25f)
+                     .SetEase(Ease.Linear);
+        }
     }
+
 }
