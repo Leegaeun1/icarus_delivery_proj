@@ -83,6 +83,9 @@ public class CookManager : MonoBehaviour
 
         // 5. 봉투 + 샌드위치 같이 올라가기
         yield return StartCoroutine(MoveBothUp());
+
+        // 6. 그 후에 다시 메인 화면으로 돌아가도록 !!!!!!!!!!!!!!!
+        //yield return StartCoroutine(nextStage());
     }
 
     IEnumerator DropSandwichIngredients()

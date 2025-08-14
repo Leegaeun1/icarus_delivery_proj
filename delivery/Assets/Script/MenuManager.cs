@@ -59,8 +59,16 @@ public class MenuManager : MonoBehaviour
         select_menu.SetActive(false);
 
         // --- 정답 카드 선택 ---
-        correctCardIndex = Random.Range(0, special_menus.Length);
-        correctmenu = special_menus[correctCardIndex].name;
+        while (true)
+        {
+            correctCardIndex = Random.Range(0, special_menus.Length);
+            correctmenu = special_menus[correctCardIndex].name;
+            if (correctmenu != null) {
+                if (correctmenu == "kraken" || correctmenu == "jellyfish" || correctmenu == "hydra") // 히든재료아니면 계속 다시 돌아야함
+                    break;
+            }
+
+        }
 
         // --- 정답 카드 이름 UI 표시 ---
         TextMeshProUGUI menuNameText = special_menus[correctCardIndex].transform
