@@ -17,6 +17,7 @@ public class CheckMenu : MonoBehaviour
     }
     private void Start()
     {
+
         if (image == null)
         {
             Debug.LogError("[CheckMenu] image가 할당되지 않았습니다.");

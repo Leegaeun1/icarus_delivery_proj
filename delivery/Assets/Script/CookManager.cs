@@ -81,9 +81,6 @@ public class CookManager : MonoBehaviour
         // 4. 대기
         yield return new WaitForSeconds(waitTime);
 
-        // 5. 봉투 + 샌드위치 같이 올라가기
-        yield return StartCoroutine(MoveBothUp());
-
         // 6. 그 후에 다시 메인 화면으로 돌아가도록 !!!!!!!!!!!!!!!
         //yield return StartCoroutine(nextStage());
     }
@@ -169,27 +166,27 @@ public class CookManager : MonoBehaviour
         }
     }
 
-    IEnumerator MoveBothUp()
-    {
-        if (sandbag == null || NewSandwich == null)
-        {
-            Debug.LogError("[CookManager] MoveBothUp 실행 불가: sandbag 또는 NewSandwich가 null입니다.");
-            yield break;
-        }
+    //IEnumerator MoveBothUp()
+    //{
+    //    if (sandbag == null || NewSandwich == null)
+    //    {
+    //        Debug.LogError("[CookManager] MoveBothUp 실행 불가: sandbag 또는 NewSandwich가 null입니다.");
+    //        yield break;
+    //    }
 
-        Vector3 bagCurrent = sandbag.transform.position;
-        Vector3 sandwichCurrent = NewSandwich.transform.position;
+    //    Vector3 bagCurrent = sandbag.transform.position;
+    //    Vector3 sandwichCurrent = NewSandwich.transform.position;
 
-        Vector3 bagTarget = startPos;
-        Vector3 sandwichTarget = sandwichCurrent + (bagTarget - bagCurrent);
+    //    Vector3 bagTarget = startPos;
+    //    Vector3 sandwichTarget = sandwichCurrent + (bagTarget - bagCurrent);
 
-        float elapsed = 0f;
-        while (elapsed < 1f)
-        {
-            elapsed += Time.deltaTime * moveSpeed;
-            sandbag.transform.position = Vector3.Lerp(bagCurrent, bagTarget, elapsed);
-            NewSandwich.transform.position = Vector3.Lerp(sandwichCurrent, sandwichTarget, elapsed);
-            yield return null;
-        }
-    }
+    //    float elapsed = 0f;
+    //    while (elapsed < 1f)
+    //    {
+    //        elapsed += Time.deltaTime * moveSpeed;
+    //        sandbag.transform.position = Vector3.Lerp(bagCurrent, bagTarget, elapsed);
+    //        NewSandwich.transform.position = Vector3.Lerp(sandwichCurrent, sandwichTarget, elapsed);
+    //        yield return null;
+    //    }
+    //}
 }
