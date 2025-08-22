@@ -10,11 +10,17 @@ public class CheckMenu : MonoBehaviour
     private bool isSelect = false;
     public GameObject selectMenu;
     public GameObject completebtn;
+    [SerializeField] private ReadSpreadSheet sheet;
 
     private void Awake()
     {
-        image = GetComponent<Image>();
+        if (image == null) 
+            image = GetComponent<Image>();
+
+        if (sheet == null) 
+            sheet = FindObjectOfType<ReadSpreadSheet>(); // 인스펙터 미연결 시 보조
     }
+
     private void Start()
     {
 
@@ -36,6 +42,7 @@ public class CheckMenu : MonoBehaviour
             enabled = false;
             return;
         }
+        
     }
 
     public void player_select()
@@ -51,23 +58,24 @@ public class CheckMenu : MonoBehaviour
             Debug.LogWarning("[CheckMenu] 자식 오브젝트가 없어 이름을 가져올 수 없습니다.");
             return;
         }
-
-        string thisname = transform.GetChild(0).name;
-        print(thisname);
-
-        if (isSelect)
+        
+        if (sheet == null)
         {
-            isSelect = false;
-            selectedNames.Remove(thisname);
-            image.color = new Color32(255, 255, 255, 255);
+            Debug.LogError("[CheckMenu] ReadSpreadSheet 참조가 없습니다. 인스펙터에 할당하거나 씬에 존재하는지 확인하세요.");
+            return;
         }
-        else
-        {
-            isSelect = true;
-            if (!selectedNames.Contains(thisname))
-                selectedNames.Add(thisname);
-            image.color = new Color32(220, 200, 200, 255);
-        }
+
+        string ingredientName = transform.GetChild(0).name;
+
+        // 토글
+        isSelect = !isSelect;
+
+        // 색상 변경 (UI 표시)
+        image.color = isSelect ? new Color32(220, 200, 200, 255)
+                               : new Color32(255, 255, 255, 255);
+
+        //미네랄 차감/환급 + 선택목록 관리는 ReadSpreadSheet가 처리
+        sheet.OnIngredientToggled(ingredientName, isSelect);
 
         Debug.Log("선택된 목록: " + string.Join(", ", selectedNames));
     }
@@ -80,8 +88,8 @@ public class CheckMenu : MonoBehaviour
             return;
         }
 
-        gameObject.SetActive(false);
-        completebtn.SetActive(false);
-        selectMenu.SetActive(true);
+        gameObject.SetActive(false); // 버튼 클릭하면 사라질 현재 UI
+        completebtn.SetActive(false); // 버튼 클릭하면 사라질 현재 UI
+        selectMenu.SetActive(true); // 버튼 클릭하면 다음으로 보이게 할 UI
     }
 }
