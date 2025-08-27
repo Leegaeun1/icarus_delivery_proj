@@ -1353,6 +1353,7 @@ MonoBehaviour:
   - sushi
   - smoothe
   - sandwich
+  maxOrderCount: 5
   orderContainer: {fileID: 1383274224}
   orderPrefab: {fileID: 8279701297183506901, guid: 883a26838a0fc8547be1efd1b1fc27f1, type: 3}
   nextPageButton: {fileID: 39484199}

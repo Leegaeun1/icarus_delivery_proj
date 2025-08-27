@@ -9,6 +9,7 @@ public class OrderManager : MonoBehaviour
     public float minOrderInterval = 5f;
     public float maxOrderInterval = 15f;
     public string[] orderNames = { "ramen", "pizza", "burger", "sushi" };
+    public int maxOrderCount = 5; 
 
     [Header("UI 설정")]
     public Transform orderContainer;
@@ -47,6 +48,12 @@ public class OrderManager : MonoBehaviour
 
     void CreateNewOrder()
     {
+        if (allOrders.Count >= maxOrderCount)
+        {
+            Debug.Log("주문 수가 최대치에 도달하여 더 이상 생성되지 않습니다.");
+            return;
+        }
+
         string randomOrderName = orderNames[Random.Range(0, orderNames.Length)];
         Order newOrder = new Order(randomOrderName, Time.time);
         allOrders.Add(newOrder);
@@ -69,7 +76,7 @@ public class OrderManager : MonoBehaviour
         foreach (GameObject orderUI in orderUIObjects)
         {
             if (orderUI != null)
-                DestroyImmediate(orderUI);
+                Destroy(orderUI);
         }
         orderUIObjects.Clear();
 

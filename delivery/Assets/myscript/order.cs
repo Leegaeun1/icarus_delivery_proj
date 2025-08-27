@@ -1,14 +1,11 @@
-[System.Serializable]
-public class Order
+﻿public class Order
 {
     public string orderName;
-    public float orderTime;
-    public bool isCompleted;
+    public float time;
 
-    public Order(string name, float time)
+    public Order(string orderName, float time)
     {
-        orderName = name;
-        orderTime = time;
-        isCompleted = false;
+        this.orderName = orderName;
+        this.time = time;
     }
 }
