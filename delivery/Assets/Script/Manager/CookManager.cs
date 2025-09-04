@@ -7,6 +7,8 @@ using DG.Tweening;
 public class CookManager : MonoBehaviour
 {
     private List<string> selectedIngredientsNames;
+
+    [Header("컨테이너(=NewSandwich 루트 추천)")]
     public GameObject sandwichContainer; // 샌드위치 재료들의 부모 오브젝트
 
     [Header("샌드위치 드롭 애니메이션 설정")]
@@ -18,15 +20,36 @@ public class CookManager : MonoBehaviour
     public string bottomBreadName = "bread2"; // 가장 아래 놓일 빵 이름
     public string topBreadName = "bread";     // 가장 위에 놓일 빵 이름
 
-    [Header("봉투 애니메이션 설정")]
-    public float moveDistance = 20f; // 이동 거리
-    public float moveSpeed = 2f;     // 이동 속도
-    public float waitTime = 2f;      // 대기 시간
+    [Header("구분자 이름")]
+    public string drinksSeparatorName = "====Drinks====";
+
+    // 샌드위치(드링크 이전)만 담는 임시 부모
+    private GameObject sandwichCore;
+    private readonly List<SpriteRenderer> sandwichCoreRenderers = new();
+    private readonly List<GameObject> sandwichCoreObjects = new();
+
+    // 구분자 이후(드링크,쿠키 등) - 선택되면 켜지도록
+    private readonly List<GameObject> staticObjects = new();
+    private readonly List<SpriteRenderer> staticRenderers = new();
+
+    //[Header("봉투 애니메이션 설정")]
+    //public float moveDistance = 20f; // 이동 거리
+    //public float moveSpeed = 2f;     // 이동 속도
+    //public float waitTime = 5f;      // 대기 시간
+
+    [Header("봉투/샌드위치 오브젝트")]
     public GameObject sandbag;
     public GameObject NewSandwich;
 
-    private Vector3 startPos;
-    private Vector3 endPos;
+
+    [Header("연출 타이밍")]
+    public float waitTime = 5f;
+
+    //private Vector3 startPos;
+    //private Vector3 endPos;
+
+    private SpriteRenderer bagRenderer;
+    private SpriteRenderer sandwichRenderer;
 
     void Start()
     {
@@ -44,6 +67,9 @@ public class CookManager : MonoBehaviour
             return;
         }
 
+        bagRenderer = sandbag.GetComponent<SpriteRenderer>();
+        sandwichRenderer = NewSandwich.GetComponent<SpriteRenderer>();
+
         // 선택된 재료 확인
         selectedIngredientsNames = CheckMenu.selectedNames;
         if (selectedIngredientsNames == null || selectedIngredientsNames.Count == 0)
@@ -54,9 +80,9 @@ public class CookManager : MonoBehaviour
 
         print("선택된 재료들: " + string.Join(", ", selectedIngredientsNames));
 
-        // 초기 위치 저장
-        startPos = sandbag.transform.position;
-        endPos = startPos - new Vector3(0, moveDistance, 0);
+        //// 초기 위치 저장
+        //startPos = sandbag.transform.position;
+        //endPos = startPos - new Vector3(0, moveDistance, 0);
 
         // 시작 시 모든 재료 비활성화
         for (int i = 0; i < sandwichContainer.transform.childCount; i++)
@@ -64,8 +90,71 @@ public class CookManager : MonoBehaviour
             sandwichContainer.transform.GetChild(i).gameObject.SetActive(false);
         }
 
+        // 1) 구분자 기준으로 SandwichCore/Static 분리
+        BuildSandwichCore();
+
+        // 2) 선택된 드링크/쿠키는 즉시 켜기 (샌드위치는 드롭에서 켜짐)
+        TurnOnSelectedStatic();
+
+        // 3) 샌드위치 파트는 전부 OFF로 시작
+        foreach (var go in sandwichCoreObjects) go.SetActive(false);
+
         StartCoroutine(MainRoutine());
     }
+    private void TurnOnSelectedStatic()
+    {
+        var set = new HashSet<string>(selectedIngredientsNames);
+        foreach (var go in staticObjects)
+        {
+            if (go != null && set.Contains(go.name))
+                go.SetActive(true);
+        }
+    }
+
+    private void BuildSandwichCore()
+    {
+        sandwichCore = new GameObject("SandwichCore");
+        sandwichCore.transform.SetParent(NewSandwich.transform, worldPositionStays: true);
+        sandwichCore.transform.localPosition = Vector3.zero;
+        sandwichCore.transform.localRotation = Quaternion.identity;
+        sandwichCore.transform.localScale    = Vector3.one;
+
+        bool reachedSeparator = false;
+
+        // 스냅샷
+        var children = new List<Transform>();
+        for (int i = 0; i < NewSandwich.transform.childCount; i++)
+            children.Add(NewSandwich.transform.GetChild(i));
+
+        foreach (var child in children)
+        {
+            if (child.name == drinksSeparatorName)
+            {
+                reachedSeparator = true;
+                // 구분자 자체도 static 그룹에 포함 (켜질 일은 거의 없지만 레퍼런스 용)
+                staticObjects.Add(child.gameObject);
+                staticRenderers.AddRange(child.GetComponentsInChildren<SpriteRenderer>(true));
+                continue;
+            }
+
+            if (!reachedSeparator)
+            {
+                // 샌드위치 파트 → SandwichCore로 이동
+                child.SetParent(sandwichCore.transform, worldPositionStays: true);
+                sandwichCoreObjects.Add(child.gameObject);
+                sandwichCoreRenderers.AddRange(child.GetComponentsInChildren<SpriteRenderer>(true));
+            }
+            else
+            {
+                // 이후(드링크/쿠키 등)
+                staticObjects.Add(child.gameObject);
+                staticRenderers.AddRange(child.GetComponentsInChildren<SpriteRenderer>(true));
+            }
+        }
+    }
+
+
+
 
     IEnumerator MainRoutine()
     {
@@ -76,7 +165,10 @@ public class CookManager : MonoBehaviour
         yield return new WaitForSeconds(waitTime);
 
         // 3. 봉투 내려오기
-        yield return StartCoroutine(MoveObject(sandbag, startPos, endPos));
+        //yield return StartCoroutine(MoveObject(sandbag, startPos, endPos));
+
+        // 3. 샌드위치 봉투에 넣기
+        yield return StartCoroutine(SandwichIntoBag());
 
         // 4. 대기
         yield return new WaitForSeconds(waitTime);
@@ -87,83 +179,105 @@ public class CookManager : MonoBehaviour
 
     IEnumerator DropSandwichIngredients()
     {
-        if (sandwichContainer == null)
+        if (sandwichCore == null) yield break;
+
+        // SandwichCore 자식들만으로 딕셔너리
+        var dict = new Dictionary<string, GameObject>();
+        for (int i = 0; i < sandwichCore.transform.childCount; i++)
         {
-            Debug.LogError("[CookManager] sandwichContainer가 null입니다.");
-            yield break;
+            var g = sandwichCore.transform.GetChild(i).gameObject;
+            if (!dict.ContainsKey(g.name)) dict[g.name] = g;
         }
 
-        // --- 모든 재료 딕셔너리화 ---
-        Dictionary<string, GameObject> allIngredientsDict = new Dictionary<string, GameObject>();
-        for (int i = 0; i < sandwichContainer.transform.childCount; i++)
-        {
-            GameObject child = sandwichContainer.transform.GetChild(i).gameObject;
-            if (!allIngredientsDict.ContainsKey(child.name))
-                allIngredientsDict[child.name] = child;
-        }
+        var dropOrder = new List<GameObject>();
 
-        List<GameObject> dropOrderIngredients = new List<GameObject>();
-
-        // --- 빵 & 중간 재료 순서 구성 ---
-        if (allIngredientsDict.TryGetValue(bottomBreadName, out GameObject bottomBread))
-            dropOrderIngredients.Add(bottomBread);
+        // 아래빵
+        if (dict.TryGetValue(bottomBreadName, out var bottomBread))
+            dropOrder.Add(bottomBread);
         else
-            Debug.LogWarning($"[CookManager] '{bottomBreadName}' 빵을 찾을 수 없습니다.");
+            Debug.LogWarning($"[CookManager] '{bottomBreadName}' 못 찾음");
 
-        List<GameObject> middleIngredients = new List<GameObject>();
-        foreach (string selectedName in selectedIngredientsNames)
+        // 중간 재료: 선택 목록 기반
+        var middle = new List<GameObject>();
+        foreach (var name in selectedIngredientsNames)
         {
-            if (selectedName != bottomBreadName && selectedName != topBreadName)
-            {
-                var found = allIngredientsDict.FirstOrDefault(pair => pair.Key.Contains(selectedName)).Value;
-                if (found != null)
-                    middleIngredients.Add(found);
-                else
-                    Debug.LogWarning($"[CookManager] 선택된 재료 '{selectedName}'를 찾을 수 없습니다.");
-            }
+            if (name == bottomBreadName || name == topBreadName) continue;
+
+            // 정확 일치 우선 → 없으면 contains 보조
+            GameObject found = null;
+            dict.TryGetValue(name, out found);
+            if (found == null)
+                found = dict.FirstOrDefault(p => p.Key.Contains(name)).Value;
+
+            if (found != null) middle.Add(found);
+            else Debug.LogWarning($"[CookManager] 선택 재료 '{name}' 없음");
         }
+        // 현재 y 기준 낮은 것부터
+        middle = middle.OrderBy(go => go.transform.position.y).ToList();
+        dropOrder.AddRange(middle);
 
-        // 중간 재료 순서 (현재 y좌표 기준 정렬)
-        middleIngredients = middleIngredients.OrderBy(go => go.transform.position.y).ToList();
-        dropOrderIngredients.AddRange(middleIngredients);
-
-        if (allIngredientsDict.TryGetValue(topBreadName, out GameObject topBread))
-            dropOrderIngredients.Add(topBread);
+        // 윗빵
+        if (dict.TryGetValue(topBreadName, out var topBread))
+            dropOrder.Add(topBread);
         else
-            Debug.LogWarning($"[CookManager] '{topBreadName}' 빵을 찾을 수 없습니다.");
+            Debug.LogWarning($"[CookManager] '{topBreadName}' 못 찾음");
 
-        // --- 드롭 애니메이션 실행 ---
-        foreach (GameObject ingredient in dropOrderIngredients)
+        // 드롭 실행 (이때 켠다)
+        foreach (var ing in dropOrder)
         {
-            if (ingredient == null) continue;
+            if (ing == null) continue;
 
-            Vector3 originalPos = ingredient.transform.position;
-            Vector3 startPos = originalPos + new Vector3(0, dropStartYOffset, 0);
+            Vector3 dst = ing.transform.position;
+            Vector3 src = dst + new Vector3(0, dropStartYOffset, 0);
 
-            ingredient.transform.position = startPos;
-            ingredient.SetActive(true);
+            ing.transform.position = src;
+            ing.SetActive(true);
 
-            ingredient.transform.DOMove(originalPos, dropDuration).SetEase(Ease.OutBounce);
-
+            ing.transform.DOMove(dst, dropDuration).SetEase(Ease.OutBounce);
             yield return new WaitForSeconds(delayBetweenDrops);
         }
     }
 
-    IEnumerator MoveObject(GameObject target, Vector3 from, Vector3 to)
-    {
-        if (target == null)
-        {
-            Debug.LogError("[CookManager] MoveObject 호출 시 target이 null입니다.");
-            yield break;
-        }
+    //IEnumerator MoveObject(GameObject target, Vector3 from, Vector3 to)
+    //{
+    //    if (target == null)
+    //    {
+    //        Debug.LogError("[CookManager] MoveObject 호출 시 target이 null입니다.");
+    //        yield break;
+    //    }
 
-        float elapsed = 0f;
-        while (elapsed < 1f)
-        {
-            elapsed += Time.deltaTime * moveSpeed;
-            target.transform.position = Vector3.Lerp(from, to, elapsed);
-            yield return null;
-        }
+    //    float elapsed = 0f;
+    //    while (elapsed < 1f)
+    //    {
+    //        elapsed += Time.deltaTime * moveSpeed;
+    //        target.transform.position = Vector3.Lerp(from, to, elapsed);
+    //        yield return null;
+    //    }
+    //}
+
+
+    IEnumerator SandwichIntoBag()
+    {
+        if (sandwichCore == null || bagRenderer == null) yield break;
+
+        Vector3 originalPos = sandwichCore.transform.position;
+        Vector3 upPos = originalPos + new Vector3(0, 7f, 0);
+        Vector3 downPos = originalPos +new Vector3(0, 3f, 0);
+
+        // ▲ 위로(그냥 연출) : 정렬 변경 안 함
+        yield return sandwichCore.transform.DOMove(upPos, 0.5f)
+            .SetEase(Ease.OutQuad).WaitForCompletion();
+
+        bagRenderer.sortingOrder = 7;
+
+        yield return sandwichCore.transform.DOMove(downPos, 0.5f)
+            .SetEase(Ease.InQuad).WaitForCompletion();
+
+        // 샌드위치만 숨김 (드링크/쿠키는 그대로 노출)
+        foreach (var go in sandwichCoreObjects) go.SetActive(false);
+
+        // 봉투 정렬 복구
+        //bagRenderer.sortingOrder = bagOrderOrig;
     }
 
     //IEnumerator MoveBothUp()

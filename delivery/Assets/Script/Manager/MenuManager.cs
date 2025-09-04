@@ -12,9 +12,14 @@ public class MenuManager : MonoBehaviour
     public RectTransform canvasRectTransform; // Canvas의 RectTransform
     public Transform cardStackParent; // 카드가 배치될 부모 오브젝트
     public TextMeshProUGUI correctName;
+    [SerializeField] 
+    private StageManage instance;
+    private int cookie_cnt;
+    private StageManage drink_cnt;
+
 
     [Header("카드 배치 설정")]
-    public int cardsToDisplay = 3; // 현재 스테이지에서 표시할 카드 수
+    public int cardsToDisplay; // 현재 스테이지에서 표시할 카드 수
     public float cardSpacing = 20f; // 카드와 카드 사이의 간격 (픽셀)
     public float dealInterval = 0.5f; // 카드가 펼쳐지는 시간 간격
 
@@ -53,6 +58,8 @@ public class MenuManager : MonoBehaviour
             enabled = false;
             return;
         }
+        print(instance.main_sand_cnt); // 오ㅓㅐ 안돼ㅐㅐ
+        cardsToDisplay = 3;
 
         // --- 초기 UI 상태 설정 ---
         check_menu.SetActive(true);
@@ -64,7 +71,9 @@ public class MenuManager : MonoBehaviour
             correctCardIndex = Random.Range(0, special_menus.Length);
             correctmenu = special_menus[correctCardIndex].name;
             if (correctmenu != null) {
-                if (correctmenu == "kraken" || correctmenu == "jellyfish" || correctmenu == "hydra") // 히든재료아니면 계속 다시 돌아야함
+                if (correctmenu == "tuna" || correctmenu == "anchovy") // 히든재료아니면 계속 다시 돌아야함
+                    continue;
+                else
                     break;
             }
 
@@ -227,4 +236,18 @@ public class MenuManager : MonoBehaviour
 
         card.anchoredPosition = targetPosition;
     }
+
+    public void OnStageDataLoaded(int mainCount, int cookieCount, int drinkCount)
+    {
+        // StageManage 데이터가 로드된 후 호출됨
+        cardsToDisplay = mainCount; // main_sand_cnt 적용
+        cookie_cnt = cookieCount;
+        //drink_cnt = drinkCount;
+
+        Debug.Log($"Stage data loaded. cardsToDisplay={cardsToDisplay}, cookie={cookie_cnt}, drink={drink_cnt}");
+
+        // 카드 스택 생성
+        CreateCardStack();
+    }
+
 }
