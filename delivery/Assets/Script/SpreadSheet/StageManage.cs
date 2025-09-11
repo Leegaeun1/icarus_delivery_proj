@@ -15,7 +15,7 @@ public class StageManage : MonoBehaviour
     public int main_sand_cnt;
     public int cookie_cnt;
     public int drink_cnt;
-    public StageManage instance;
+    public MenuManager menu;
 
     Dictionary<string, int[]> stageDict = new Dictionary<string, int[]>();
 
@@ -27,10 +27,9 @@ public class StageManage : MonoBehaviour
 
     }
 
-    void Awake()
+    void Start()
     {
-        if (instance == null)   
-            instance = this;
+        
         StartCoroutine(LoadData());
     }
     public static string GetTSVAddress(string address, string range, long sheetId)
@@ -52,6 +51,11 @@ public class StageManage : MonoBehaviour
         main_sand_cnt = stageDict["main"][now_stage-1];
         cookie_cnt = stageDict["cookie"][now_stage - 1];
         drink_cnt = stageDict["drink"][now_stage - 1];
+
+        menu.OnStageDataLoaded(main_sand_cnt, cookie_cnt, drink_cnt);
+        print(main_sand_cnt);
+        print(cookie_cnt);
+        print(drink_cnt);
     }
 
     T GetData<T>(string[] datas)

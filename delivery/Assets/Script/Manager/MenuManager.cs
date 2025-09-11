@@ -13,7 +13,6 @@ public class MenuManager : MonoBehaviour
     public Transform cardStackParent; // 카드가 배치될 부모 오브젝트
     public TextMeshProUGUI correctName;
     [SerializeField] 
-    private StageManage instance;
     private int cookie_cnt;
     private StageManage drink_cnt;
 
@@ -58,8 +57,8 @@ public class MenuManager : MonoBehaviour
             enabled = false;
             return;
         }
-        print(instance.main_sand_cnt); // 오ㅓㅐ 안돼ㅐㅐ
-        cardsToDisplay = 3;
+        // print(instance.main_sand_cnt); // 오ㅓㅐ 안돼ㅐㅐ
+        //cardsToDisplay = 3;
 
         // --- 초기 UI 상태 설정 ---
         check_menu.SetActive(true);
@@ -241,13 +240,12 @@ public class MenuManager : MonoBehaviour
     {
         // StageManage 데이터가 로드된 후 호출됨
         cardsToDisplay = mainCount; // main_sand_cnt 적용
+        print(cardsToDisplay);
         cookie_cnt = cookieCount;
         //drink_cnt = drinkCount;
 
         Debug.Log($"Stage data loaded. cardsToDisplay={cardsToDisplay}, cookie={cookie_cnt}, drink={drink_cnt}");
 
-        // 카드 스택 생성
-        CreateCardStack();
     }
 
 }

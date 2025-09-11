@@ -1653,11 +1653,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45fa69c5d43c6e343b1c206460d7e5da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  now_stage: 2
+  now_stage: 3
   main_sand_cnt: 0
   cookie_cnt: 0
   drink_cnt: 0
-  instance: {fileID: 0}
+  menu: {fileID: 1252691147}
 --- !u!1 &428839868
 GameObject:
   m_ObjectHideFlags: 0
@@ -5174,10 +5174,11 @@ MonoBehaviour:
   - {fileID: 5029548538338453806, guid: df8aead7f7f716d49b2835c75565ba69, type: 3}
   - {fileID: 5029548538338453806, guid: e29feb521a5fd6d4589ff25664578b46, type: 3}
   - {fileID: 5029548538338453806, guid: 968559815570dd54c811b7c0916e0ce6, type: 3}
+  - {fileID: 5029548538338453806, guid: 2df1c2e01fd38f84fb27e4d649a30dfa, type: 3}
   canvasRectTransform: {fileID: 639078251}
   cardStackParent: {fileID: 2145051802}
   correctName: {fileID: 546039454}
-  instance: {fileID: 301222680}
+  cookie_cnt: 0
   cardsToDisplay: 3
   cardSpacing: 60
   dealInterval: 0.25

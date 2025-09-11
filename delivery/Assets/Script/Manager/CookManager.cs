@@ -261,8 +261,8 @@ public class CookManager : MonoBehaviour
         if (sandwichCore == null || bagRenderer == null) yield break;
 
         Vector3 originalPos = sandwichCore.transform.position;
-        Vector3 upPos = originalPos + new Vector3(0, 7f, 0);
-        Vector3 downPos = originalPos +new Vector3(0, 3f, 0);
+        Vector3 upPos = originalPos + new Vector3(0, 5f, 0);
+        Vector3 downPos = originalPos +new Vector3(0, 2f, 0);
 
         // ▲ 위로(그냥 연출) : 정렬 변경 안 함
         yield return sandwichCore.transform.DOMove(upPos, 0.5f)
