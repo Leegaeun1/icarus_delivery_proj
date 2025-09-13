@@ -13,6 +13,7 @@ public class ReadSpreadSheet : MonoBehaviour
     public readonly long SHEET_ID = 0;
     public List<Food_material> materials;
     public TextMeshProUGUI mineral;
+    
 
     private bool dataReady = false; //  로딩 완료 플래그
 
@@ -31,6 +32,9 @@ public class ReadSpreadSheet : MonoBehaviour
         {
             Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
         }
+        // 저장된 돈 불러오기 (없으면 기본값 1000으로 시작한다고 가정)
+        int savedGold = PlayerPrefs.GetInt("Gold", 1000);
+        mineral.text = savedGold.ToString();
 
         StartCoroutine(LoadData());    
     }
@@ -152,7 +156,10 @@ public class ReadSpreadSheet : MonoBehaviour
         }
 
         mineral.text = haveMoney.ToString();
+        PlayerPrefs.SetInt("Gold", haveMoney);
+        PlayerPrefs.Save();
         Debug.Log("선택된 목록: " + string.Join(", ", CheckMenu.selectedNames));
+        
     }
 
 }
