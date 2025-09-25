@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class AlienAppearStepped : MonoBehaviour
@@ -15,15 +15,14 @@ public class AlienAppearStepped : MonoBehaviour
     private Color originalColor;
     private Vector3 startPos;
     private Vector3 targetPos;
+
     public SpeechBubble speech;
-    public FoodManager foodManager;
+    public OrderManager orderManager; // 새로 연결할 OrderManager 참조
 
     void Start()
     {
-        // SpriteRenderer만 초기화해두고, 소환은 버튼에서 실행
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = alienSprite;
-
         spriteRenderer.enabled = false;
 
         transform.localScale = desiredScale;
@@ -33,7 +32,7 @@ public class AlienAppearStepped : MonoBehaviour
         originalColor = Color.white;
     }
 
-    // 이 함수를 버튼에 연결하면 등장 시작
+    // 버튼에서 실행
     public void SummonAlien()
     {
         spriteRenderer.enabled = true;
@@ -52,7 +51,6 @@ public class AlienAppearStepped : MonoBehaviour
         for (int i = 0; i <= steps; i++)
         {
             float t = (float)i / steps;
-
             transform.position = Vector3.Lerp(startPos, targetPos, t);
             spriteRenderer.color = Color.Lerp(Color.black, originalColor, t);
 
@@ -63,7 +61,8 @@ public class AlienAppearStepped : MonoBehaviour
         transform.position = targetPos;
         spriteRenderer.color = originalColor;
 
-        string order = foodManager.GetRandomOrder();
-        speech.ShowMessage(order, 3f);
+        
+        string orderText = orderManager.GetRandomOrderText();
+        speech.ShowMessage(orderText, 3f);
     }
 }
