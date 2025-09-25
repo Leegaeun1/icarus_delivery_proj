@@ -10,7 +10,7 @@ public class OrderManager : MonoBehaviour
     public float minOrderInterval = 5f;
     public float maxOrderInterval = 15f;
     public string[] orderNames = { "ramen", "pizza", "burger", "sushi" };
-    public int maxOrderCount = 5; 
+    public int maxOrderCount = 5;
 
     [Header("UI ¼³Á¤")]
     public Transform orderContainer;
