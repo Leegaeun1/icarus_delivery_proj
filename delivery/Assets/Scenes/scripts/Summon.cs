@@ -16,6 +16,7 @@ public class AlienAppearStepped : MonoBehaviour
     private Vector3 startPos;
     private Vector3 targetPos;
     public SpeechBubble speech;
+    public FoodManager foodManager;
 
     void Start()
     {
@@ -62,6 +63,7 @@ public class AlienAppearStepped : MonoBehaviour
         transform.position = targetPos;
         spriteRenderer.color = originalColor;
 
-        speech.ShowMessage("hello World!", 3f);
+        string order = foodManager.GetRandomOrder();
+        speech.ShowMessage(order, 3f);
     }
 }
