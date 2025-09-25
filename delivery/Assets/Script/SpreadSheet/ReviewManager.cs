@@ -2,9 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Networking;
+using static ReviewManager;
+using System.Linq; // GroupBy, Select, ToDictionary 등
+
 
 public class ReviewManager : MonoBehaviour
 {
@@ -16,6 +20,43 @@ public class ReviewManager : MonoBehaviour
     public List<string> SampledNames { get; private set; }
     public List<string> SampledNegatives { get; private set; }
     public List<string> SampledPositives { get; private set; }
+
+    [Header("Review Inputs")]
+    public List<string> FinalIngredients = new(); // 실제 넣은 재료
+    public List<string> ExcludeRequest = new();   // 손님이 빼달라 한 재료
+    public List<string> IncludeRequest = new();   // 손님이 꼭 넣어달라 한 재료
+    public int MaxReviews = 4;
+    public int seed = -1; // -1이면 랜덤, 0 이상이면 결정론적
+    Dictionary<string, List<string>> posPool, negPool;
+
+    void BuildPhrasePools()
+    {
+        posPool = Rows
+            .Where(r => !string.IsNullOrWhiteSpace(r.name) && !string.IsNullOrWhiteSpace(r.positive_review))
+            .GroupBy(r => r.name.Trim())
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.positive_review.Trim()).Where(s => s.Length > 0).Distinct().ToList()
+            );
+
+        negPool = Rows
+            .Where(r => !string.IsNullOrWhiteSpace(r.name) && !string.IsNullOrWhiteSpace(r.negative_review))
+            .GroupBy(r => r.name.Trim())
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.negative_review.Trim()).Where(s => s.Length > 0).Distinct().ToList()
+            );
+    }
+
+
+    [System.Serializable]
+    public class ReviewUI
+    {
+        public GameObject name;
+        public GameObject dialog;
+    }
+
+    public List<ReviewUI> reviews;
 
     [Serializable]
     public class ReviewRow
@@ -60,11 +101,30 @@ public class ReviewManager : MonoBehaviour
         Debug.Log($"Loaded {Rows.Count} rows");
 
         // 여기에서 원하는 개수만큼 랜덤 샘플링하고 저장
-        AfterLoad_SampleAndPrint(4);
+        //AfterLoad_SampleAndPrint(4);
+        // 2) 시트로부터 재료별 문구 풀 생성
+        BuildPhrasePools();
+        // 3) 현재 플레이 결과를 바탕으로 리뷰 생성(최대 4개)
+        var lines = ReviewGenerator.Generate(
+            FinalIngredients,
+            ExcludeRequest,
+            IncludeRequest,
+            posPool,
+            negPool,
+            maxReviews: MaxReviews,
+            seed: seed
+        );
 
-        print($"[names  ({SampledNames.Count})] => [{string.Join(", ", SampledNames)}]");
-        print($"[negatives ({SampledNegatives.Count})] => [{string.Join(", ", SampledNegatives)}]");
-        print($"[positives ({SampledPositives.Count})] => [{string.Join(", ", SampledPositives)}]");
+        // 4) 리뷰어 이름과 매칭해서 UI에 바인딩
+        var names = (SampledNames != null && SampledNames.Count > 0)
+            ? SampledNames
+            : new List<string> { "리뷰어 1", "리뷰어 2", "리뷰어 3", "리뷰어 4" };
+
+        AssignData(names, lines);
+
+        // (디버그 출력은 원하면 유지)
+        print($"[names  ({names.Count})] => [{string.Join(", ", names)}]");
+        print($"[reviews ({lines.Count})] => [{string.Join(" | ", lines)}]");
     }
 
     private static List<ReviewRow> ParseTSV(string tsv)
@@ -98,11 +158,16 @@ public class ReviewManager : MonoBehaviour
                 for (int i = 3; i < cols.Length; i++)
                 {
                     var s = cols[i];
-                    if (string.IsNullOrWhiteSpace(s)) { stages.Add(0); continue; }
-                    if (int.TryParse(s, out int v)) stages.Add(v);
+                    if (string.IsNullOrWhiteSpace(s)) { 
+                        stages.Add(0); 
+                        continue; 
+                    }
+                    if (int.TryParse(s, out int v)) 
+                        stages.Add(v);
                     else stages.Add(0);
                 }
-                if (stages.Count > 0) row.stage = stages.ToArray();
+                if (stages.Count > 0) 
+                    row.stage = stages.ToArray();
             }
 
             // 완전 빈 행이면 스킵하려면 아래 주석 해제
@@ -151,6 +216,10 @@ public class ReviewManager : MonoBehaviour
         SampledNames = sampledNames;
         SampledNegatives = sampledNegs;
         SampledPositives = sampledPos;
+
+        // 7) 매핑
+        AssignData(sampledNames, sampledNegs);
+
     }
 
 
@@ -193,6 +262,14 @@ public class ReviewManager : MonoBehaviour
             result.Add(arr[i]);
         }
         return result;
+    }
+    void AssignData(List<string> nameData, List<string> dialogData)
+    {
+        for (int i = 0; i < reviews.Count && i < nameData.Count; i++)
+        {
+            reviews[i].name.GetComponent<TextMeshProUGUI>().text = nameData[i];
+            reviews[i].dialog.gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogData[i];
+        }
     }
 
     void SaveSamplesToJson(SampledColumns data, string path)
