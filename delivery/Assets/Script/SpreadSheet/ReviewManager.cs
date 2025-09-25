@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq; // GroupBy, Select, ToDictionary 등
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Networking;
 using static ReviewManager;
-using System.Linq; // GroupBy, Select, ToDictionary 등
 
 
 public class ReviewManager : MonoBehaviour
@@ -17,54 +17,26 @@ public class ReviewManager : MonoBehaviour
     private const string RANGE = "A2:Z";
     System.Random rand = new System.Random();
 
+    // 디버그/확인용 샘플링 결과
     public List<string> SampledNames { get; private set; }
     public List<string> SampledNegatives { get; private set; }
     public List<string> SampledPositives { get; private set; }
 
-    [Header("Review Inputs")]
-    public List<string> FinalIngredients = new(); // 실제 넣은 재료
-    public List<string> ExcludeRequest = new();   // 손님이 빼달라 한 재료
-    public List<string> IncludeRequest = new();   // 손님이 꼭 넣어달라 한 재료
-    public int MaxReviews = 4;
-    public int seed = -1; // -1이면 랜덤, 0 이상이면 결정론적
-    Dictionary<string, List<string>> posPool, negPool;
-
-    void BuildPhrasePools()
-    {
-        posPool = Rows
-            .Where(r => !string.IsNullOrWhiteSpace(r.name) && !string.IsNullOrWhiteSpace(r.positive_review))
-            .GroupBy(r => r.name.Trim())
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(r => r.positive_review.Trim()).Where(s => s.Length > 0).Distinct().ToList()
-            );
-
-        negPool = Rows
-            .Where(r => !string.IsNullOrWhiteSpace(r.name) && !string.IsNullOrWhiteSpace(r.negative_review))
-            .GroupBy(r => r.name.Trim())
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(r => r.negative_review.Trim()).Where(s => s.Length > 0).Distinct().ToList()
-            );
-    }
-
-
     [System.Serializable]
     public class ReviewUI
     {
-        public GameObject name;
-        public GameObject dialog;
+        public GameObject name;   // TextMeshProUGUI 포함 오브젝트
+        public GameObject dialog; // 말풍선(첫 번째 자식에 TextMeshProUGUI 있는 구조)
     }
-
     public List<ReviewUI> reviews;
 
     [Serializable]
     public class ReviewRow
     {
-        public string name;
-        public string negative_review;
-        public string positive_review;
-        public int[] stage; // optional
+        public string name;             // 재료명
+        public string negative_review;  // 재료별 부정 문구
+        public string positive_review;  // 재료별 긍정 문구
+        public int[] stage;             // optional
     }
 
     [Serializable]
@@ -77,6 +49,17 @@ public class ReviewManager : MonoBehaviour
     }
 
     public List<ReviewRow> Rows { get; private set; } = new List<ReviewRow>();
+
+    // ===== 리뷰 입력(인스펙터/컨텍스트에서 채움) =====
+    [Header("Review Inputs")]
+    public List<string> FinalIngredients = new(); // 실제 넣은 재료
+    public List<string> ExcludeRequest = new();   // 빼달라 한 재료
+    public List<string> IncludeRequest = new();   // 꼭 넣어달라 한 재료
+    public int MaxReviews = 4;
+    public int seed = -1; // -1: 비결정 랜덤, 0 이상: 고정 시드
+
+    // 시트에서 구성한 재료별 문구 풀
+    Dictionary<string, List<string>> posPool, negPool;
 
     void Start()
     {
@@ -97,14 +80,25 @@ public class ReviewManager : MonoBehaviour
             yield break;
         }
 
+        // 1) 파싱
         Rows = ParseTSV(www.downloadHandler.text);
         Debug.Log($"Loaded {Rows.Count} rows");
 
-        // 여기에서 원하는 개수만큼 랜덤 샘플링하고 저장
-        //AfterLoad_SampleAndPrint(4);
-        // 2) 시트로부터 재료별 문구 풀 생성
+        // 2) 이름/문구 열 샘플링(리뷰어 이름 용도로만 사용)
+        AfterLoad_SampleAndPrint(4);
+
+        // 3) 시트 → 재료별 긍/부정 문구 풀 구성
         BuildPhrasePools();
-        // 3) 현재 플레이 결과를 바탕으로 리뷰 생성(최대 4개)
+
+        // 4) 다른 씬의 선택 재료 가져오기 (컨텍스트 비어 있으면 인스펙터 값 그대로 사용)
+        if (FinalIngredients == null || FinalIngredients.Count == 0)
+            FinalIngredients = new List<string>(GameRevieContext.SelectedIngredients);
+        if (ExcludeRequest == null || ExcludeRequest.Count == 0)
+            ExcludeRequest = new List<string>(GameRevieContext.ExcludeRequest);
+        if (IncludeRequest == null || IncludeRequest.Count == 0)
+            IncludeRequest = new List<string>(GameRevieContext.IncludeRequest);
+
+        // 5) 리뷰 생성
         var lines = ReviewGenerator.Generate(
             FinalIngredients,
             ExcludeRequest,
@@ -115,15 +109,15 @@ public class ReviewManager : MonoBehaviour
             seed: seed
         );
 
-        // 4) 리뷰어 이름과 매칭해서 UI에 바인딩
+        // 6) 리뷰어 이름과 매칭하여 UI 바인딩
         var names = (SampledNames != null && SampledNames.Count > 0)
             ? SampledNames
             : new List<string> { "리뷰어 1", "리뷰어 2", "리뷰어 3", "리뷰어 4" };
 
         AssignData(names, lines);
 
-        // (디버그 출력은 원하면 유지)
-        print($"[names  ({names.Count})] => [{string.Join(", ", names)}]");
+        // (선택) 디버그 출력
+        print($"[names   ({names.Count})] => [{string.Join(", ", names)}]");
         print($"[reviews ({lines.Count})] => [{string.Join(" | ", lines)}]");
     }
 
@@ -158,19 +152,19 @@ public class ReviewManager : MonoBehaviour
                 for (int i = 3; i < cols.Length; i++)
                 {
                     var s = cols[i];
-                    if (string.IsNullOrWhiteSpace(s)) { 
-                        stages.Add(0); 
-                        continue; 
+                    if (string.IsNullOrWhiteSpace(s))
+                    {
+                        stages.Add(0);
+                        continue;
                     }
-                    if (int.TryParse(s, out int v)) 
-                        stages.Add(v);
+                    if (int.TryParse(s, out int v)) stages.Add(v);
                     else stages.Add(0);
                 }
-                if (stages.Count > 0) 
+                if (stages.Count > 0)
                     row.stage = stages.ToArray();
             }
 
-            // 완전 빈 행이면 스킵하려면 아래 주석 해제
+            // 완전 빈 행 스킵하려면 아래 주석 해제
             // if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(neg) && string.IsNullOrEmpty(pos)) continue;
 
             list.Add(row);
@@ -182,7 +176,7 @@ public class ReviewManager : MonoBehaviour
     // 랜덤 샘플링 + 저장 유틸리티
     // ---------------------------
 
-    // 열별 랜덤 샘플링 후 리스트 출력 (저장 X)
+    // 열별 랜덤 샘플링 후 리스트 저장 (UI 할당은 하지 않음)
     void AfterLoad_SampleAndPrint(int k, int? seed = null, bool dedup = true)
     {
         // 1) 열별 원본 값 수집(빈 값 제거)
@@ -211,17 +205,13 @@ public class ReviewManager : MonoBehaviour
         var sampledNegs = SampleWithoutReplacement(negatives, kNegs, rng);
         var sampledPos = SampleWithoutReplacement(positives, kPos, rng);
 
-        // 6) 저장
-
+        // 6) 저장(디버깅/확인용)
         SampledNames = sampledNames;
         SampledNegatives = sampledNegs;
         SampledPositives = sampledPos;
 
-        // 7) 매핑
-        AssignData(sampledNames, sampledNegs);
-
+        // UI에는 여기서 바로 꽂지 않고, 최종 리뷰 생성 후 AssignData에서 처리
     }
-
 
     List<string> CollectNonEmpty(Func<ReviewRow, string> selector)
     {
@@ -253,7 +243,7 @@ public class ReviewManager : MonoBehaviour
         var result = new List<string>(k);
         if (k <= 0 || n == 0) return result;
 
-        // Fisher–Yates로 앞 k개만 섞기 (부분 셔플)
+        // Fisher–Yates 부분 셔플
         var arr = src.ToArray();
         for (int i = 0; i < k; i++)
         {
@@ -263,12 +253,41 @@ public class ReviewManager : MonoBehaviour
         }
         return result;
     }
+
+    // 안전한 UI 바인딩 (세 리스트 중 최소 길이만큼만 표시)
     void AssignData(List<string> nameData, List<string> dialogData)
     {
-        for (int i = 0; i < reviews.Count && i < nameData.Count; i++)
+        int n = Math.Min(reviews.Count, Math.Min(nameData?.Count ?? 0, dialogData?.Count ?? 0));
+        for (int i = 0; i < n; i++)
         {
-            reviews[i].name.GetComponent<TextMeshProUGUI>().text = nameData[i];
-            reviews[i].dialog.gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogData[i];
+            var ui = reviews[i];
+            if (ui?.name != null)
+            {
+                var nameTmp = ui.name.GetComponent<TextMeshProUGUI>();
+                if (nameTmp != null) nameTmp.text = nameData[i];
+            }
+
+            if (ui?.dialog != null && ui.dialog.transform.childCount > 0)
+            {
+                var dialogTmp = ui.dialog.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+                if (dialogTmp != null) dialogTmp.text = dialogData[i];
+            }
+        }
+
+        // 남는 슬롯은 비우기(선택)
+        for (int i = n; i < reviews.Count; i++)
+        {
+            var ui = reviews[i];
+            if (ui?.name != null)
+            {
+                var nameTmp = ui.name.GetComponent<TextMeshProUGUI>();
+                if (nameTmp != null) nameTmp.text = "";
+            }
+            if (ui?.dialog != null && ui.dialog.transform.childCount > 0)
+            {
+                var dialogTmp = ui.dialog.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+                if (dialogTmp != null) dialogTmp.text = "";
+            }
         }
     }
 
@@ -283,5 +302,25 @@ public class ReviewManager : MonoBehaviour
         {
             Debug.LogError($"SaveSamplesToJson failed: {e.Message}");
         }
+    }
+
+    // ===== 시트 → 풀 구성 =====
+    void BuildPhrasePools()
+    {
+        posPool = Rows
+            .Where(r => !string.IsNullOrWhiteSpace(r.name) && !string.IsNullOrWhiteSpace(r.positive_review))
+            .GroupBy(r => r.name.Trim())
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.positive_review.Trim()).Where(s => s.Length > 0).Distinct().ToList()
+            );
+
+        negPool = Rows
+            .Where(r => !string.IsNullOrWhiteSpace(r.name) && !string.IsNullOrWhiteSpace(r.negative_review))
+            .GroupBy(r => r.name.Trim())
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.negative_review.Trim()).Where(s => s.Length > 0).Distinct().ToList()
+            );
     }
 }

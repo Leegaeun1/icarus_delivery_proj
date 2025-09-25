@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class GameRevieContext
 {
-    public static readonly List<string> SelectedIngredients = new(); // 플레이어가 넣은 최종 재료
-    public static readonly List<string> ExcludeRequest = new();      // "빼주세요" 요청 (없으면 비워둠)
-    public static readonly List<string> IncludeRequest = new();      // "꼭 넣어주세요" (없으면 비워둠)
+    public static readonly List<string> SelectedIngredients = new();
+
+    // 손님 요청: 빼주세요 / 꼭 넣어주세요 (없으면 비워둠)
+    public static readonly List<string> ExcludeRequest = new();
+    public static readonly List<string> IncludeRequest = new();
 
     public static void Set(
         IEnumerable<string> selected,
