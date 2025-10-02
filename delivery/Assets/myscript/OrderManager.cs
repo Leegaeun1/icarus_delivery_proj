@@ -103,6 +103,12 @@ public class OrderManager : MonoBehaviour
             orderText.text = order.orderName;
         }
 
+        TextMeshProUGUI tmpText = orderUI.GetComponentInChildren<TextMeshProUGUI>();
+        if (tmpText != null)
+        {
+            tmpText.text = order.orderName;
+        }
+
         Button orderButton = orderUI.GetComponent<Button>();
         if (orderButton != null)
         {

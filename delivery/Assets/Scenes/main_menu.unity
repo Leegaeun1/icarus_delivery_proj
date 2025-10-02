@@ -1165,6 +1165,7 @@ GameObject:
   - component: {fileID: 571315020}
   - component: {fileID: 571315022}
   - component: {fileID: 571315024}
+  - component: {fileID: 571315025}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -1254,6 +1255,27 @@ MonoBehaviour:
   checkButton: {fileID: 833005946}
   shimPanel: {fileID: 1784288767}
   checkPanel: {fileID: 1772309682}
+--- !u!114 &571315025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571315017}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bff170f0ec0382e40af12323184c5f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orderNames:
+  - ramen
+  - pizza
+  - burger
+  - sushi
+  - smoothe
+  - sandwich
+  itemContainer: {fileID: 0}
+  textPrefab: {fileID: 0}
 --- !u!1 &663653767
 GameObject:
   m_ObjectHideFlags: 0
@@ -3976,6 +3998,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1662837661}
+  - component: {fileID: 1662837662}
   m_Layer: 5
   m_Name: OnscreenLog
   m_TagString: Untagged
@@ -4002,6 +4025,18 @@ RectTransform:
   m_AnchoredPosition: {x: 61.093994, y: 111.428925}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1662837662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1662837660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28a5294891ce853479152ed2f13cb503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1696505905
 GameObject:
   m_ObjectHideFlags: 0
