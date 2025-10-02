@@ -2217,14 +2217,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reviews:
-  - name: {fileID: 22951706}
-    dialog: {fileID: 303693859}
-  - name: {fileID: 1784267841}
-    dialog: {fileID: 1067629814}
-  - name: {fileID: 948996355}
-    dialog: {fileID: 1312076565}
-  - name: {fileID: 975981282}
-    dialog: {fileID: 474178860}
+  - nameTMP: {fileID: 0}
+    dialogTMP: {fileID: 0}
+  - nameTMP: {fileID: 0}
+    dialogTMP: {fileID: 0}
+  - nameTMP: {fileID: 0}
+    dialogTMP: {fileID: 0}
+  - nameTMP: {fileID: 0}
+    dialogTMP: {fileID: 0}
   FinalIngredients: []
   ExcludeRequest: []
   IncludeRequest: []
@@ -2267,15 +2267,46 @@ MonoBehaviour:
   - name: {fileID: 975981284}
     dialog: {fileID: 98630966}
   FinalIngredients:
-  - "\uC591\uC0C1\uCD94"
-  - "\uCE60\uB9AC"
-  - "\uBA38\uC2A4\uD0C0\uB4DC"
-  - "\uD53C\uD074"
+  - ingredients:
+    - "\uD53C\uD074"
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uCE60\uB9AC"
+  - ingredients:
+    - "\uD53C\uD074"
+  - ingredients:
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uC591\uC0C1\uCD94"
+    - "\uCE60\uB9AC"
+  - ingredients:
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uC591\uC0C1\uCD94"
+    - "\uD53C\uD074"
   ExcludeRequest:
-  - "\uCE60\uB9AC"
-  - "\uD53C\uD074"
+  - ingredients:
+    - "\uC591\uC0C1\uCD94"
+  - ingredients:
+    - "\uCE60\uB9AC"
+    - "\uC591\uC0C1\uCD94"
+  - ingredients: []
+  - ingredients:
+    - "\uCE60\uB9AC"
   IncludeRequest:
-  - "\uC591\uC0C1\uCD94"
+  - ingredients:
+    - "\uD53C\uD074"
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uCE60\uB9AC"
+  - ingredients:
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uD53C\uD074"
+  - ingredients:
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uD53C\uD074"
+    - "\uCE60\uB9AC"
+    - "\uC591\uC0C1\uCD94"
+  - ingredients:
+    - "\uBA38\uC2A4\uD0C0\uB4DC"
+    - "\uC591\uC0C1\uCD94"
+    - "\uD53C\uD074"
   MaxReviews: 4
   seed: -1
   ReviewerNamePool:

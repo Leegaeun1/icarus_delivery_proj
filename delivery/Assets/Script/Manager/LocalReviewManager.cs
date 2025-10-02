@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -7,36 +6,60 @@ using UnityEngine;
 
 public class LocalReviewManager : MonoBehaviour
 {
-    [Serializable]
+    // --- 데이터 구조 정의 ---
+
+    [System.Serializable]
+    public class StringList
+    {
+        public List<string> ingredients = new();
+    }
+
+    [System.Serializable]
     public class ReviewUI
     {
-        public TextMeshProUGUI name;   // 리뷰어 이름 텍스트
-        public TextMeshProUGUI dialog; // 리뷰 내용 텍스트
+        public TextMeshProUGUI name;
+        public TextMeshProUGUI dialog;
     }
-    [Header("UI (이름/대사 슬롯)")]
-    public List<ReviewUI> reviews = new(); // 인스펙터에서 4개 연결 권장
 
-    [Header("입력 데이터 (컨텍스트 비면 사용)")]
-    public List<string> FinalIngredients = new(); // 예: ["양상추","칠리","피클"]
-    public List<string> ExcludeRequest = new(); // 예: ["머스타드"]
-    public List<string> IncludeRequest = new(); // 예: ["피클"]
+    // ADDED: 단일 주문 정보를 묶어서 관리하기 위한 클래스
+    public class Order
+    {
+        public List<string> SelectedIngredients { get; set; } = new();
+        public List<string> ExcludeRequest { get; set; } = new();
+        public List<string> IncludeRequest { get; set; } = new();
+    }
+
+    // --- 인스펙터 변수 ---
+
+    [Header("UI (이름/대사 슬롯)")]
+    public List<ReviewUI> reviews = new();
+
+    [Header("입력 데이터 (주문 단위로 매칭됨)")]
+    public List<StringList> FinalIngredients = new();
+    public List<StringList> ExcludeRequest = new();
+    public List<StringList> IncludeRequest = new();
 
     [Header("리뷰 정책")]
     [Range(1, 8)] public int MaxReviews = 4;
-    public int seed = -1; // -1: 비결정, 0 이상: 고정 랜덤
+    public int seed = -1;
 
-    [Header("로컬 이름 풀(중복 없이 샘플링)")]
+    [Header("이름")]
     public List<string> ReviewerNamePool = new()
     {
-        "알렉스", "보라", "치코", "디노", "에마", "피오", "지니", "해리"
+        "김솰라", "모구리", "치코", "디노", "쿠모", "피오", "비콜로", "지르론"
     };
-    // === 로컬 문구 풀(딕셔너리). 필요하면 수정/확장하세요 ===
-    Dictionary<string, List<string>> positivePool;
-    Dictionary<string, List<string>> negativeFlavorPool;
+
+    // --- 내부 데이터 풀 ---
+    private Dictionary<string, List<string>> positivePool;
+    private Dictionary<string, List<string>> negativeFlavorPool;
+    private System.Random rng;
+
+    // --- MonoBehaviour 라이프사이클 ---
 
     void Awake()
     {
         BuildLocalPools();
+        rng = seed >= 0 ? new System.Random(seed) : new System.Random();
     }
 
     void Start()
@@ -44,91 +67,130 @@ public class LocalReviewManager : MonoBehaviour
         GenerateAndDisplay();
     }
 
+    // --- 핵심 로직 ---
+
+    // REFACTORED: 주문 단위 처리를 위해 로직 전체 변경
+    void GenerateAndDisplay()
+    {
+        // 1. 입력 데이터를 '주문' 단위로 묶기
+        List<Order> orders = new List<Order>();
+        // GameReviewContext 처리 (선택적) - 지금은 인스펙터 값만 사용하도록 단순화
+        // 실제로는 이 부분도 GameReviewContext에서 List<Order>를 구성하도록 수정.
+        for (int i = 0; i < FinalIngredients.Count; i++)
+        {
+            var order = new Order
+            {
+                SelectedIngredients = FinalIngredients[i].ingredients
+            };
+            if (i < ExcludeRequest.Count)
+                order.ExcludeRequest = ExcludeRequest[i].ingredients;
+            if (i < IncludeRequest.Count)
+                order.IncludeRequest = IncludeRequest[i].ingredients;
+
+            orders.Add(order);
+        }
+
+        // 2. 각 주문을 개별적으로 평가하여 모든 리뷰 문장 수집
+        List<string> allGeneratedLines = new List<string>();
+        foreach (var order in orders)
+        {
+            // 각 주문에 대해 리뷰를 1개 생성하여 추가
+            string reviewLine = GenerateReviewForOrder(order);
+            allGeneratedLines.Add(reviewLine);
+        }
+
+        // 3. 최종 리뷰 목록을 정책에 맞게 조정 (랜덤 셔플, 개수 제한 등)
+        // Take는 처음 n개의 원소만 꺼내서 만든다.
+        var finalLines = allGeneratedLines.OrderBy(x => rng.Next()).Take(MaxReviews).ToList();
+
+        // 4. 이름 샘플링 및 UI 바인딩
+        var names = SampleNames(ReviewerNamePool, finalLines.Count, rng);
+        ApplyToUI(names, finalLines);
+    }
+
+    // 단일 주문을 평가하고 리뷰 문장 1개를 생성하는 메서드
+    private string GenerateReviewForOrder(Order order)
+    {
+        // --- 부정 리뷰 생성 ---
+
+        // 1. "빼달라는 재료"가 들어갔는지 검사
+        foreach (var excluded in order.ExcludeRequest)
+        {
+            if (order.SelectedIngredients.Contains(excluded))
+            { 
+                return $"{excluded} 빼달라고 했는데 들어있네요..";
+            }
+        }
+
+        // 2. "넣어달라는 재료"가 빠졌는지 검사
+        foreach (var included in order.IncludeRequest)
+        {
+            if (!order.SelectedIngredients.Contains(included))
+            {
+                return $"{included} 꼭 넣어달라고 했는데 빠졌어요.";
+            }
+        }
+
+        // --- 긍정 리뷰 생성 ---
+
+        // 성공했다면, 만들어진 재료 중 하나에 대해 긍정 리뷰 생성
+        if (order.SelectedIngredients.Count > 0)
+        {
+            // 포함된 재료 중 랜덤으로 하나 선택
+            string targetIngredient = order.SelectedIngredients[rng.Next(order.SelectedIngredients.Count)];
+
+            // 해당 재료에 대한 긍정 리뷰 문구가 있다면 사용, 없다면 기본 문구 사용. 키 있으면 out으로 내보냄 
+            if (positivePool.TryGetValue(targetIngredient, out List<string> lines) && lines.Count > 0)
+            {
+                return lines[rng.Next(lines.Count)];
+            }
+        }
+
+        // 모든 조건을 통과했지만 마땅한 리뷰가 없을 경우 기본 문구
+        return "음... 그냥 평범한 맛이네요.";
+    }
+
+    // --- 기존 유틸리티 메서드 ---
     void BuildLocalPools()
     {
-        // 키는 '재료명'과 정확히 일치해야 매칭됨
         positivePool = new Dictionary<string, List<string>>
         {
             { "양상추", new(){ "양상추가 아삭아삭해서 식감이 좋아요.", "신선한 양상추 덕분에 씹는 맛이 살아나요." } },
             { "칠리",   new(){ "칠리의 매콤함이 전체 맛을 끌어올려요.", "칠리가 적당히 매콤해서 중독적이에요." } },
             { "피클",   new(){ "피클이 상큼해서 느끼함을 잡아줘요.", "피클의 톡 쏘는 맛이 균형을 잡아요." } },
             { "머스타드", new(){ "머스타드 향이 은은해 잘 어울려요." } },
-            // 필요하면 더 추가
         };
         negativeFlavorPool = new Dictionary<string, List<string>>
         {
-            { "치즈", new(){ "치즈가 빠져서 너무 아쉬웠어요.", "치즈 없으니 풍미가 약해졌어요." } },
-            { "피클", new(){ "피클이 빠져서 밸런스가 무너졌어요." } },
-            { "머스타드", new(){ "머스타드가 과하게 들어가 다른 맛을 눌렀어요." } },
-            // 필요하면 더 추가
+            { "피클", new(){ "피클이 들어가서 맛이 이상해요." } }, 
+            { "머스타드", new(){ "머스타드가 빠져서 아쉬워요." } },
+            { "칠리", new(){ "칠리가 빠져서 아쉬워요." } },
+            { "양상추", new(){ "양상추가 빠져서 아쉬워요." } },
         };
     }
 
-    void GenerateAndDisplay()
+    List<string> SampleNames(List<string> pool, int k, System.Random random)
     {
-        // 1) 다른 씬에서 넘어온 값 우선 (GameReviewContext 사용)
-        var finalIngs = (GameRevieContext.SelectedIngredients.Count > 0)
-            ? new List<string>(GameRevieContext.SelectedIngredients)
-            : new List<string>(FinalIngredients);
-
-        var excl = (GameRevieContext.ExcludeRequest.Count > 0)
-            ? new List<string>(GameRevieContext.ExcludeRequest)
-            : new List<string>(ExcludeRequest);
-
-        var incl = (GameRevieContext.IncludeRequest.Count > 0)
-            ? new List<string>(GameRevieContext.IncludeRequest)
-            : new List<string>(IncludeRequest);
-
-        // 2) 리뷰 생성
-        var lines = ReviewGenerator.Generate(
-            finalIngs, excl, incl,
-            positivePool, negativeFlavorPool,
-            maxReviews: MaxReviews,
-            seed: seed
-        );
-
-        // 3) 이름 샘플링 (중복 없이)
-        var names = SampleNames(ReviewerNamePool, Mathf.Min(MaxReviews, reviews.Count), seed);
-
-        // 4) UI 바인딩
-        ApplyToUI(names, lines);
-    }
-
-    List<string> SampleNames(List<string> pool, int k, int seed)
-    {
-        var result = new List<string>();
-        if (pool == null || pool.Count == 0 || k <= 0) return result;
-        var rng = seed >= 0 ? new System.Random(seed) : new System.Random();
-        var arr = pool.ToList();
-
-        // Fisher–Yates 부분 셔플
-        int n = Mathf.Min(k, arr.Count);
-        for (int i = 0; i < n; i++)
-        {
-            int j = rng.Next(i, arr.Count);
-            (arr[i], arr[j]) = (arr[j], arr[i]);
-            result.Add(arr[i]);
-        }
-        return result;
+        if (pool == null || pool.Count == 0 || k <= 0) 
+            return new List<string>();
+        // Fisher–Yates 셔플 사용
+        return pool.OrderBy(x => random.Next()).Take(k).ToList();
     }
 
     void ApplyToUI(List<string> names, List<string> lines)
     {
-        int n = Mathf.Min(reviews.Count, Mathf.Min(names.Count, lines.Count));
+        int n = Mathf.Min(reviews.Count, Mathf.Min(names.Count, lines.Count)); // 작은 것 기준으로
         for (int i = 0; i < n; i++)
         {
             var ui = reviews[i];
-            if (ui?.name) ui.name.text = names[i];
-            if (ui?.dialog) ui.dialog.text = lines[i];
+            if (ui?.name) ui.name.text = names[i]; // null이 아니면 저장.
+            if (ui?.dialog) ui.dialog.text = lines[i]; // null이 아니면 저장.
         }
-        // 남는 슬롯 비우기
-        for (int i = n; i < reviews.Count; i++)
+        for (int i = n; i < reviews.Count; i++) // 나머지 칸이 필요없을 때 비워줌
         {
             var ui = reviews[i];
             if (ui?.name) ui.name.text = "";
             if (ui?.dialog) ui.dialog.text = "";
         }
     }
-
-
 }
