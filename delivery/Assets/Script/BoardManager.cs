@@ -1,0 +1,56 @@
+using TMPro;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class BoardManager : MonoBehaviour
+{
+    [Header("원본(작은) 포스트잇 프리팹")]
+    public GameObject postitPrefab;   // btn 대신 명확히
+
+    private GameObject spawned;       // 만든 복제본을 보관
+    public bool isOpen = false;
+
+    public void OnClick()
+    {
+        if (!isOpen)
+        {
+            // 부모를 바로 지정해서 생성 (RectTransform 유지)
+            spawned = Instantiate(postitPrefab, postitPrefab.transform.parent);
+            // 2) 복제본의 BoardManager(있다면) 제거해서 토글 중복 방지
+            var mgrOnClone = spawned.GetComponent<BoardManager>();
+            if (mgrOnClone) Destroy(mgrOnClone);
+            // 3) 복제본을 누르면 Close 되도록 버튼 이벤트 연결 (원본의 Close 호출)
+            var btnOnClone = spawned.GetComponent<Button>();
+            if (btnOnClone)
+            {
+                btnOnClone.onClick.RemoveListener(Close); // 중복 방지
+                btnOnClone.onClick.AddListener(Close);
+            }
+
+            var rect = spawned.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(1000, 1000);
+            rect.anchoredPosition = Vector2.zero;
+            // 5) "Explain" 텍스트가 있으면 폰트 크기 조정
+            var explainTf = spawned.transform.Find("Explain");
+            if (explainTf)
+            {
+                var tmp = explainTf.GetComponent<TextMeshProUGUI>();
+                if (tmp) tmp.fontSize = 100;
+            }
+            isOpen = true;
+        }
+        else
+        {
+            Close();
+        }
+    }
+    private void Close()
+    {
+        if (spawned) Destroy(spawned);
+        spawned = null;
+        isOpen = false;
+
+    }
+}
