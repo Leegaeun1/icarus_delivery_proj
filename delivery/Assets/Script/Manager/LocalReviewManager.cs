@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LocalReviewManager : MonoBehaviour
 {
@@ -30,6 +31,11 @@ public class LocalReviewManager : MonoBehaviour
     }
 
     // --- 인스펙터 변수 ---
+    [Header("별 개수")]
+    public int star_cnt = 3;
+    public int max_star = 5;
+    public GameObject star_prefab;
+    public Transform parentTransform;
 
     [Header("UI (이름/대사 슬롯)")]
     public List<ReviewUI> reviews = new();
@@ -65,6 +71,7 @@ public class LocalReviewManager : MonoBehaviour
     void Start()
     {
         GenerateAndDisplay();
+        review_star();
     }
 
     // --- 핵심 로직 ---
@@ -191,6 +198,80 @@ public class LocalReviewManager : MonoBehaviour
             var ui = reviews[i];
             if (ui?.name) ui.name.text = "";
             if (ui?.dialog) ui.dialog.text = "";
+        }
+    }
+    void review_star()
+    {
+        // 최대 별 개수만큼 별 생성하면서 별 개수만큼 color로 색 입히기
+
+        // y축 0~360까지 회전!
+
+        if (max_star <= 0) return;
+
+        // 1. 별 개수에 따른 중앙점으로부터의 시작 X 좌표(오프셋)와 간격 설정
+        float startX = 0f;
+        float spacing = 0f;
+
+        if (max_star == 1)
+        {
+            startX = 0f;
+            spacing = 0f;
+        }
+        else if (max_star == 2)
+        {
+            startX = -100f; // -100, 100
+            spacing = 200f;
+        }
+        else if (max_star == 3)
+        {
+            startX = -110f; // -110, 0, 110
+            spacing = 110f;
+        }
+        // 💡 요청하신 4개일 때의 불규칙 간격(-200, -65, 65, 200)을 위한 특별 처리
+        else if (max_star == 4)
+        {
+            // 이 경우, for 루프 대신 X 좌표를 배열로 정의
+            float[] xPositions = { -200f, -65f, 65f, 200f };
+
+            for (int i = 0; i < max_star; i++)
+            {
+                bool isfull = false;
+                if (i < star_cnt)
+                    isfull = true;
+                InstantiateAndPosition(xPositions[i], 0f,isfull);
+            }
+            return; // 4개일 때는 아래 일반 루프를 실행하지 않고 종료
+        }
+        else if (max_star == 5)
+        {
+            startX = -240f; // -240, -120, 0, 120, 240
+            spacing = 120f;
+        }
+
+        // 2. 설정된 startX와 spacing을 이용하여 반복적으로 별 생성 및 배치
+        for (int i = 0; i < max_star; i++)
+        {
+            bool isfull = false;
+            float currentX = startX + (i * spacing);
+            if (i <star_cnt) // 채워질 별의 수
+                isfull = true;
+            InstantiateAndPosition(currentX, 0f,isfull);
+        }
+        parentTransform.rotation = Quaternion.Euler(0f, 180f, 0f);
+    }
+    // 별을 생성하고 위치를 설정하는 헬퍼 함수
+    private void InstantiateAndPosition(float xPos, float yPos,bool isfull)
+    {
+        GameObject star = Instantiate(star_prefab, parentTransform);
+        if (isfull) { // 채워진 별의 수만큼 노랗게
+            star.GetComponent<Image>().color = Color.yellow;    
+        }
+        // RectTransform을 사용하여 UI 위치 설정
+        RectTransform rect = star.GetComponent<RectTransform>();
+        if (rect != null)
+        {
+            // (0, 0)은 부모 RectTransform의 중앙을 의미합니다.
+            rect.anchoredPosition = new Vector2(xPos, yPos);
         }
     }
 }
