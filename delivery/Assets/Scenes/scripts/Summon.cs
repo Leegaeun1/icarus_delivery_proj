@@ -19,6 +19,8 @@ public class AlienAppearStepped : MonoBehaviour
     public SpeechBubble speech;
     public OrderManager orderManager; // 새로 연결할 OrderManager 참조
 
+    public DialogueManager dialogueManager;
+
     void Start()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
@@ -61,8 +63,9 @@ public class AlienAppearStepped : MonoBehaviour
         transform.position = targetPos;
         spriteRenderer.color = originalColor;
 
-        
-        string orderText = orderManager.GetRandomOrderText();
-        speech.ShowMessage(orderText, 3f);
+
+        //string orderText = orderManager.GetRandomOrderText();
+        //speech.ShowMessage(orderText, 3f);
+        dialogueManager.StartInitialDialogue();
     }
 }
