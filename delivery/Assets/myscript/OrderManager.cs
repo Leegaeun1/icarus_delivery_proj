@@ -23,7 +23,6 @@ public class OrderManager : MonoBehaviour
     private List<GameObject> orderUIObjects = new List<GameObject>();
     private int currentPage = 0;
     private int totalPages = 1;
-    private bool autoPageNavigation = true;
 
     void Start()
     {
@@ -41,53 +40,42 @@ public class OrderManager : MonoBehaviour
     {
         while (true)
         {
-            float waitTime = Random.Range(minOrderInterval, maxOrderInterval);
-            yield return new WaitForSeconds(waitTime);
+            yield return new WaitForSeconds(Random.Range(minOrderInterval, maxOrderInterval));
             CreateNewOrder();
         }
     }
 
     void CreateNewOrder()
     {
-        if (allOrders.Count >= maxOrderCount)
-        {
-            Debug.Log("주문 수가 최대치에 도달하여 더 이상 생성되지 않습니다.");
-            return;
-        }
+        if (allOrders.Count >= maxOrderCount) return;
 
         string randomOrderName = orderNames[Random.Range(0, orderNames.Length)];
         Order newOrder = new Order(randomOrderName, Time.time);
         allOrders.Add(newOrder);
 
         totalPages = Mathf.CeilToInt((float)allOrders.Count / maxOrdersPerPage);
-
-        if (autoPageNavigation && allOrders.Count > maxOrdersPerPage)
-        {
-            currentPage = totalPages - 1;
-        }
-
-        UpdateOrderUI();
         UpdatePageButtons();
 
+        if (orderUIObjects.Count < maxOrdersPerPage)
+        {
+            CreateOrderUI(newOrder);
+        }
+
+        UpdatePageButtons();
         Debug.Log("새 주문 생성: " + randomOrderName);
     }
 
     void UpdateOrderUI()
     {
-        foreach (GameObject orderUI in orderUIObjects)
-        {
-            if (orderUI != null)
-                Destroy(orderUI);
-        }
+        foreach (GameObject ui in orderUIObjects)
+            if (ui != null) Destroy(ui);
         orderUIObjects.Clear();
 
-        int startIndex = currentPage * maxOrdersPerPage;
-        int endIndex = Mathf.Min(startIndex + maxOrdersPerPage, allOrders.Count);
+        int start = currentPage * maxOrdersPerPage;
+        int end = Mathf.Min(start + maxOrdersPerPage, allOrders.Count);
 
-        for (int i = startIndex; i < endIndex; i++)
-        {
+        for (int i = start; i < end; i++)
             CreateOrderUI(allOrders[i]);
-        }
     }
 
     void CreateOrderUI(Order order)
@@ -97,54 +85,19 @@ public class OrderManager : MonoBehaviour
         GameObject orderUI = Instantiate(orderPrefab, orderContainer);
         orderUIObjects.Add(orderUI);
 
-        Text orderText = orderUI.GetComponentInChildren<Text>();
-        if (orderText != null)
-        {
-            orderText.text = order.orderName;
-        }
-
         TextMeshProUGUI tmpText = orderUI.GetComponentInChildren<TextMeshProUGUI>();
-        if (tmpText != null)
-        {
-            tmpText.text = order.orderName;
-        }
+        if (tmpText != null) tmpText.text = order.orderName;
 
-        Button orderButton = orderUI.GetComponent<Button>();
-        if (orderButton != null)
-        {
-            orderButton.onClick.AddListener(() => CompleteOrder(order));
-        }
-    }
-
-    public void CompleteOrder(Order order)
-    {
-        allOrders.Remove(order);
-
-        totalPages = Mathf.Max(1, Mathf.CeilToInt((float)allOrders.Count / maxOrdersPerPage));
-
-        if (currentPage >= totalPages)
-        {
-            currentPage = Mathf.Max(0, totalPages - 1);
-            autoPageNavigation = true;
-        }
-
-        UpdateOrderUI();
-        UpdatePageButtons();
-
-        Debug.Log("주문 완료: " + order.orderName);
+        ButtonKeeper keeper = orderUI.GetComponent<ButtonKeeper>();
+        if (keeper != null) keeper.Initialize(order);
     }
 
     void UpdatePageButtons()
     {
         if (nextPageButton != null)
-        {
             nextPageButton.gameObject.SetActive(currentPage < totalPages - 1);
-        }
-
         if (prevPageButton != null)
-        {
             prevPageButton.gameObject.SetActive(currentPage > 0);
-        }
     }
 
     public void NextPage()
@@ -152,7 +105,6 @@ public class OrderManager : MonoBehaviour
         if (currentPage < totalPages - 1)
         {
             currentPage++;
-            autoPageNavigation = false;
             UpdateOrderUI();
             UpdatePageButtons();
         }
@@ -163,7 +115,6 @@ public class OrderManager : MonoBehaviour
         if (currentPage > 0)
         {
             currentPage--;
-            autoPageNavigation = false;
             UpdateOrderUI();
             UpdatePageButtons();
         }
@@ -172,8 +123,6 @@ public class OrderManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             CreateNewOrder();
-        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿public class Order
 {
     public string orderName;
-    public float time;
+    public float orderTime; 
+    public bool isCompleted;
 
     public Order(string orderName, float time)
     {
         this.orderName = orderName;
-        this.time = time;
+        this.orderTime = time; 
+        isCompleted = false;
     }
 }
