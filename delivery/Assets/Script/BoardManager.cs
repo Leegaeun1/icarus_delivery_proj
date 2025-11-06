@@ -30,7 +30,7 @@ public class BoardManager : MonoBehaviour
 
             var rect = spawned.GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(1000, 1000);
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x*10, rect.sizeDelta.y * 10);
             rect.anchoredPosition = Vector2.zero;
             // 5) "Explain" 텍스트가 있으면 폰트 크기 조정
             var explainTf = spawned.transform.Find("Explain");
@@ -39,7 +39,12 @@ public class BoardManager : MonoBehaviour
                 var tmp = explainTf.GetComponent<TextMeshProUGUI>();
                 if (tmp) tmp.fontSize = 100;
             }
-            isOpen = true;
+            else
+            {
+                var tmp = spawned.transform.GetChild(0).GetComponent<RectTransform>();
+                tmp.sizeDelta = new Vector2(tmp.sizeDelta.x * 10, tmp.sizeDelta.y * 10);
+            }
+                isOpen = true;
         }
         else
         {
