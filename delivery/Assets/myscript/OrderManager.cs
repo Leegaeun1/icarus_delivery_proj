@@ -100,7 +100,7 @@ public class OrderManager : MonoBehaviour
             prevPageButton.gameObject.SetActive(currentPage > 0);
     }
 
-    public void NextPage()
+        public void NextPage()
     {
         if (currentPage < totalPages - 1)
         {
