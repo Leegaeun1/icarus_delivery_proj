@@ -7,9 +7,15 @@ public class BoardManager : MonoBehaviour
 {
     [Header("원본(작은) 포스트잇 프리팹")]
     public GameObject postitPrefab;   // btn 대신 명확히
-
+    private GameObject board_panel; // 끄고 킬 보드 패널
+    private bool isBoardClikced = false;
     private GameObject spawned;       // 만든 복제본을 보관
     public bool isOpen = false;
+
+    private void Start()
+    {
+        board_panel = postitPrefab.transform.parent.gameObject;
+    }
 
     public void OnClick()
     {
@@ -29,8 +35,10 @@ public class BoardManager : MonoBehaviour
             }
 
             var rect = spawned.GetComponent<RectTransform>();
+            var pin = spawned.transform.Find("Image").GetComponent<RectTransform>();
             rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
             rect.sizeDelta = new Vector2(rect.sizeDelta.x*10, rect.sizeDelta.y * 10);
+            pin.sizeDelta = new Vector2(pin.sizeDelta.x * 10, pin.sizeDelta.y * 10);
             rect.anchoredPosition = Vector2.zero;
             // 5) "Explain" 텍스트가 있으면 폰트 크기 조정
             var explainTf = spawned.transform.Find("Explain");
@@ -57,5 +65,11 @@ public class BoardManager : MonoBehaviour
         spawned = null;
         isOpen = false;
 
+    }
+
+    public void cookBoardClick()
+    {
+        isBoardClikced = !isBoardClikced;
+        board_panel.gameObject.SetActive(isBoardClikced);
     }
 }
