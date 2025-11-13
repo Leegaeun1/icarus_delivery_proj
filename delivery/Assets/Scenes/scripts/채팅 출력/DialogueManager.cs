@@ -7,7 +7,7 @@ public class DialogueManager : MonoBehaviour
 {
     // 외부 컴포넌트 연결
     public ChatBubbleGenerator bubbleGenerator;
-    public Choice choiceUI; // 선택지 UI 관리 (Choice.cs)
+    public GameObject choiceUIPanel; // 선택지 UI 관리 (Choice.cs)
     public OrderManager orderManager; // 주문 정보 필요
 
     // 현재 대화 데이터 (구글 시트에서 로드하거나 인스펙터에서 직접 정의)
@@ -52,7 +52,7 @@ public class DialogueManager : MonoBehaviour
     // 대화 한 묶음을 순차적으로 진행하는 코루틴
     IEnumerator RunDialogue(List<DialogueData> dialogues)
     {
-        choiceUI.gameObject.SetActive(false); // 대화 시작 시 선택지 숨기기
+        choiceUIPanel.gameObject.SetActive(false); // 대화 시작 시 선택지 숨기기
 
         foreach (var data in dialogues)
         {
@@ -67,7 +67,7 @@ public class DialogueManager : MonoBehaviour
             if (data.activateChoice)
             {
                 isWaitingForChoice = true;
-                choiceUI.gameObject.SetActive(true); // 선택지 UI를 화면에 표시
+                choiceUIPanel.gameObject.SetActive(true); // 선택지 UI를 화면에 표시
 
                 // 선택이 이루어질 때까지 대기
                 yield return new WaitUntil(() => isWaitingForChoice == false);

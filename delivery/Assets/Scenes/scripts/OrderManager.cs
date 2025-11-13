@@ -33,9 +33,9 @@ public class OrderManager : MonoBehaviour
             yield return null;
 
         // 이름 규칙으로 카테고리 분류
-        sandwiches = sheetLoader.materials.FindAll(m => m.name.Contains("샌드위치"));
-        drinks = sheetLoader.materials.FindAll(m => m.name.Contains("드링크"));
-        cookies = sheetLoader.materials.FindAll(m => m.name.Contains("쿠키"));
+        sandwiches = sheetLoader.materials.FindAll(m => m.name.Contains("sand"));
+        drinks = sheetLoader.materials.FindAll(m => m.name.Contains("drink"));
+        cookies = sheetLoader.materials.FindAll(m => m.name.Contains("cookie"));
 
         if (sandwiches.Count == 0 || drinks.Count == 0 || cookies.Count == 0)
         {
