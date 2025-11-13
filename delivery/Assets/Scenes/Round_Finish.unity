@@ -2049,7 +2049,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2536442d51e08c4b8aff60db52405ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  star_cnt: 3
+  star_cnt: 2.5
   max_star: 4
   star_prefab: {fileID: 1346395452443876384, guid: 132c240f3e16c6a49b6444df614843ea, type: 3}
   parent: {fileID: 573290661}

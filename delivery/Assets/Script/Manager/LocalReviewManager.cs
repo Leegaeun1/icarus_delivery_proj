@@ -33,8 +33,8 @@ public class LocalReviewManager : MonoBehaviour
 
     // --- 인스펙터 변수 ---
     [Header("별 개수")]
-    public int star_cnt = 3;
-    public int max_star = 5;
+    public float star_cnt = 2;
+    public int max_star = 4;
     public GameObject star_prefab;
     public GameObject parent;
 
@@ -205,40 +205,65 @@ public class LocalReviewManager : MonoBehaviour
     {
         for (int i = 0; i < max_star; i++)
         {
-            bool isfull = i < star_cnt; // 채워질 별인지 여부
-
+            bool isfull = i < star_cnt; // 채워져야하는 별이면 true
             // 별 생성
             GameObject star = Instantiate(star_prefab, parent.transform);
-            if (isfull)
-                star.GetComponent<Image>().color = Color.yellow;
+            
+            if (isfull){ // 채워져야한다면 노란색으로 변경
+                var ishalf = 0f;
+                var speed = 0.5f;
+                if (i == star_cnt - 0.5) // 반개일 때
+                {
+                    ishalf = 0.5f;
+                    speed = 0.25f;
+                }
+                // 회전할때 필요함
+                //star.GetComponent<Image>().color = Color.yellow; 
+                Slider slider = star.transform.GetChild(0).GetComponent<Slider>();
+                StartCoroutine(FillSlider(slider, 0f, 1f- ishalf, speed)); // 0.5초 동안 부드럽게 채우기
+            }
 
-            RectTransform rect = star.GetComponent<RectTransform>();
+                RectTransform rect = star.GetComponent<RectTransform>();
             if (rect != null)
-                rect.anchoredPosition = new Vector2(0f, 0f);
+                rect.anchoredPosition = new Vector2(0f, 0f); // 가운데로 anchor 바꾸기 
 
             // 별 회전 애니메이션 시작
-            StartCoroutine(RotateStar(star.transform, Quaternion.Euler(0f, 180f, 0f), 0.5f));
+            //StartCoroutine(RotateStar(star.transform, Quaternion.Euler(0f, 180f, 0f), 0.5f));
 
             yield return new WaitForSeconds(0.5f); // 별 간 생성 간격
         }
     }
 
+    // 회전하는 코드
     IEnumerator RotateStar(Transform target, Quaternion targetRotation, float duration)
     {
+        // 시작점 기록
         Quaternion startRotation = target.rotation;
         float time = 0f;
 
         while (time < duration)
         {
             time += Time.deltaTime;
-            float t = time / duration * 1.1f;
+            float t = time / duration;
 
-            // 부드럽게 회전
+            // starRotation부터 targetRotation까지 t시간 동안 부드럽게 회전하도록! 
             target.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
             yield return null;
         }
 
     }
-
+    // 슬라이더로 채우는 코드
+    IEnumerator FillSlider(Slider slider, float startValue, float endValue, float duration)
+    {
+        float time = 0f;
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+            slider.value = Mathf.Lerp(startValue, endValue, t);
+            yield return null;
+        }
+        slider.value = endValue;
+    }
 
 }
