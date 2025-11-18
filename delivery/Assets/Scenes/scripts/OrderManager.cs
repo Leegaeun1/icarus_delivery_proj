@@ -43,14 +43,16 @@ public class OrderManager : MonoBehaviour
             yield break;
         }
 
-        // 랜덤 주문 생성
-        FoodOrder order = MakeRandomOrder();
+        isReady = true;
 
-        // SpeechBubble로 출력
-        if (speechBubble != null)
-        {
-            speechBubble.ShowMessage(order.GetOrderText(), 4f); // 4초간 표시
-        }
+        // 랜덤 주문 생성
+        /* FoodOrder order = MakeRandomOrder();
+
+         // SpeechBubble로 출력
+         if (speechBubble != null)
+         {
+             speechBubble.ShowMessage(order.GetOrderText(), 4f); // 4초간 표시
+         }*/
     }
 
     private FoodOrder MakeRandomOrder()
