@@ -37,6 +37,7 @@ public class LocalReviewManager : MonoBehaviour
     public int max_star = 4;
     public GameObject star_prefab;
     public GameObject parent;
+    List<GameObject> createdStars = new List<GameObject> ();
 
     [Header("UI (이름/대사 슬롯)")]
     public List<ReviewUI> reviews = new();
@@ -203,34 +204,45 @@ public class LocalReviewManager : MonoBehaviour
     }
     IEnumerator review_star()
     {
+        createdStars.Clear();
+        for (int i = 0; i < max_star; i++)
+        {
+            // 별 생성
+            GameObject star = Instantiate(star_prefab, parent.transform);
+            RectTransform rect = star.GetComponent<RectTransform>();
+
+            if (rect != null)
+                rect.anchoredPosition = new Vector2(0f, 0f); // 가운데로 anchor 바꾸기 
+
+            // 별을 리스트에 저장함
+            createdStars.Add(star);
+        }
+        
         for (int i = 0; i < max_star; i++)
         {
             bool isfull = i < star_cnt; // 채워져야하는 별이면 true
-            // 별 생성
-            GameObject star = Instantiate(star_prefab, parent.transform);
+            
             
             if (isfull){ // 채워져야한다면 노란색으로 변경
                 var ishalf = 0f;
-                var speed = 0.5f;
-                if (i == star_cnt - 0.5) // 반개일 때
+                var speed = 0.8f;
+                if (star_cnt % i != 0 && i == (int)star_cnt) // 반개일 때
                 {
                     ishalf = 0.5f;
-                    speed = 0.25f;
+                    speed = 0.4f;
                 }
-                // 회전할때 필요함
-                //star.GetComponent<Image>().color = Color.yellow; 
-                Slider slider = star.transform.GetChild(0).GetComponent<Slider>();
+                GameObject targetStar = createdStars[i];
+
+                Slider slider = targetStar.transform.GetChild(0).GetComponent<Slider>();
                 StartCoroutine(FillSlider(slider, 0f, 1f- ishalf, speed)); // 0.5초 동안 부드럽게 채우기
             }
 
-                RectTransform rect = star.GetComponent<RectTransform>();
-            if (rect != null)
-                rect.anchoredPosition = new Vector2(0f, 0f); // 가운데로 anchor 바꾸기 
+            
 
             // 별 회전 애니메이션 시작
             //StartCoroutine(RotateStar(star.transform, Quaternion.Euler(0f, 180f, 0f), 0.5f));
 
-            yield return new WaitForSeconds(0.5f); // 별 간 생성 간격
+            yield return new WaitForSeconds(0.8f); // 별 색칠 간격
         }
     }
 

@@ -14,7 +14,7 @@ public class BoardManager : MonoBehaviour
 
     private void Start()
     {
-        board_panel = postitPrefab.transform.parent.gameObject;
+        board_panel = postitPrefab.transform.parent.transform.parent.gameObject;
     }
 
     public void OnClick()
@@ -47,12 +47,12 @@ public class BoardManager : MonoBehaviour
                 var tmp = explainTf.GetComponent<TextMeshProUGUI>();
                 if (tmp) tmp.fontSize = 100;
             }
-            else
-            {
-                var tmp = spawned.transform.GetChild(0).GetComponent<RectTransform>();
-                tmp.sizeDelta = new Vector2(tmp.sizeDelta.x * 10, tmp.sizeDelta.y * 10);
-            }
-                isOpen = true;
+            //else
+            //{
+            //    var tmp = spawned.transform.GetChild(0).GetComponent<RectTransform>();
+            //    tmp.sizeDelta = new Vector2(tmp.sizeDelta.x * 10, tmp.sizeDelta.y * 10);
+            //}
+            isOpen = true;
         }
         else
         {

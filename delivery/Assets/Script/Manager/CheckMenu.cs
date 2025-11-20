@@ -69,10 +69,20 @@ public class CheckMenu : MonoBehaviour
 
         // 토글
         isSelect = !isSelect;
-
-        // 색상 변경 (UI 표시)
-        image.color = isSelect ? new Color32(220, 200, 200, 255)
-                               : new Color32(255, 255, 255, 255);
+        
+        if(transform.parent.name == "CardStackParent")
+        {
+            // 색상 변경 (UI 표시)
+            transform.GetChild(0).GetComponent<Image>().color = isSelect ? new Color32(220, 200, 200, 255)
+                                   : new Color32(255, 255, 255, 255);
+        }
+        else
+        {
+            // 색상 변경 (UI 표시)
+            image.color = isSelect ? new Color32(220, 200, 200, 255)
+                                   : new Color32(255, 255, 255, 255);
+        }
+            
 
         //미네랄 차감/환급 + 선택목록 관리는 ReadSpreadSheet가 처리
         sheet.OnIngredientToggled(ingredientName, isSelect);
