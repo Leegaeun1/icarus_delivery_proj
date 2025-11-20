@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7309398209096406294}
   - component: {fileID: 6839616641108091610}
-  - component: {fileID: 115513809872236530}
   - component: {fileID: 3738754716574761679}
   m_Layer: 0
-  m_Name: summon
+  m_Name: Alien_Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,27 +86,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &115513809872236530
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4560978769142555612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e1178d81db5ff9498be41b9c9f52a1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  alienSprite: {fileID: 21300000, guid: 53ea0536bf2afb046a0955830535e967, type: 3}
-  steps: 5
-  framesPerStep: 35
-  spawnPosition: {x: -3, y: 1, z: 3}
-  moveOffset: {x: -3, y: 0, z: 0}
-  desiredScale: {x: 3, y: 3, z: 1}
-  speech: {fileID: 0}
-  orderManager: {fileID: 0}
-  dialogueManager: {fileID: 0}
 --- !u!114 &3738754716574761679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,7 +93,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4560978769142555612}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1550b6e9de30c3b49913b10fc1fb9fbc, type: 3}
   m_Name: 
