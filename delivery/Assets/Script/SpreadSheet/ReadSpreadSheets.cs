@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class ReadSpreadSheet : MonoBehaviour
+public class ReadSpreadSheets : MonoBehaviour
 {
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
     public readonly string RANGE = "A2:B";

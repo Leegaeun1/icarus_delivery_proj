@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class OrderManager : MonoBehaviour
+public class OrderManagers : MonoBehaviour
 {
     [Header("주문 설정")]
     public float minOrderInterval = 5f;
