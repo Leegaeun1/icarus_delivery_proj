@@ -4,7 +4,6 @@ using UnityEngine;
 public class PersistentUI : MonoBehaviour
 {
     public static PersistentUI Instance;
-    //public GameObject g;
 
     private void Awake()
     {
@@ -12,7 +11,6 @@ public class PersistentUI : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            //DontDestroyOnLoad(g);
         }
         else
         {
