@@ -12,13 +12,13 @@ public class ItemCheck : MonoBehaviour
     private Image image;
 
     [SerializeField] 
-    public ReadSpreadSheet sheet;
+    public ReadSpreadSheets sheet;
 
     private void Start()
     {
         image = GetComponent<Image>();
         if (sheet == null)
-            sheet = FindObjectOfType<ReadSpreadSheet>();
+            sheet = FindObjectOfType<ReadSpreadSheets>();
     }
 
     public void select()

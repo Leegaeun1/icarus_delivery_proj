@@ -10,7 +10,7 @@ public class CheckMenu : MonoBehaviour
     private bool isSelect = false;
     public GameObject selectMenu;
     public GameObject completebtn;
-    [SerializeField] private ReadSpreadSheet sheet;
+    [SerializeField] private ReadSpreadSheets sheet;
 
     private void Awake()
     {
@@ -18,7 +18,7 @@ public class CheckMenu : MonoBehaviour
             image = GetComponent<Image>();
 
         if (sheet == null) 
-            sheet = FindObjectOfType<ReadSpreadSheet>(); // 인스펙터 미연결 시 보조
+            sheet = FindObjectOfType<ReadSpreadSheets>(); // 인스펙터 미연결 시 보조
     }
 
     private void Start()
