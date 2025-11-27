@@ -2294,7 +2294,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 214.4812, y: -208.73041, z: 6.934548}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0https://github.com/Leegaeun1/icarus_delivery_proj/pull/10/conflict?name=delivery%252FUserSettings%252FLayouts%252Fdefault-2022.dwlt&ancestor_oid=50280c778f0826d0d3e739ccb9180b8f66fad709&base_oid=f52690a74ebd0fef505351a33ec94f7e9121bb2a&head_oid=abdb122cec6ddb3a12a1762887e465f848872705
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1888496440}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2310,83 +2310,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bbe995d029727441b03ffee3de76e13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &536440388
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 536440389}
-  - component: {fileID: 536440391}
-  - component: {fileID: 536440390}
-  m_Layer: 5
-  m_Name: TimeAttack_Img
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &536440389
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 536440388}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 981411627}
-  - {fileID: 702076977}
-  m_Father: {fileID: 947766906}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -309.57593, y: -31.120697}
-  m_SizeDelta: {x: 270, y: 100}
-  m_Pivot: {x: 1, y: 1}
---- !u!114 &536440390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 536440388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &536440391
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 536440388}
-  m_CullTransparentMesh: 1
 --- !u!1 &546039452
 GameObject:
   m_ObjectHideFlags: 0
@@ -4670,7 +4593,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 536440389}
   - {fileID: 1210171085}
   - {fileID: 428839869}
   - {fileID: 1263899346}
