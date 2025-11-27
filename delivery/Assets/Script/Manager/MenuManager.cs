@@ -57,8 +57,6 @@ public class MenuManager : MonoBehaviour
             enabled = false;
             return;
         }
-        // print(instance.main_sand_cnt); // 오ㅓㅐ 안돼ㅐㅐ
-        //cardsToDisplay = 3;
 
         // --- 초기 UI 상태 설정 ---
         check_menu.SetActive(true);
