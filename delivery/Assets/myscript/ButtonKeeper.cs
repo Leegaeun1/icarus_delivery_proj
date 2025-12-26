@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // 추가
+using TMPro;
 using System.Collections;
 
 public class ButtonKeeper : MonoBehaviour
@@ -18,14 +18,12 @@ public class ButtonKeeper : MonoBehaviour
 
     public ButtonType buttonType;
 
-    // Text 대신 TextMeshProUGUI 사용
     [SerializeField] private TextMeshProUGUI missionCompleteText;
 
     private static ButtonKeeper pressedOrderButton = null;
     private static ButtonKeeper pressedFoodButton = null;
     private static ButtonKeeper pressedDeliveryManButton = null;
 
-    // TextMeshProUGUI로 변경
     private static TextMeshProUGUI sharedMissionText = null;
 
     void Start()
@@ -40,7 +38,6 @@ public class ButtonKeeper : MonoBehaviour
         {
             sharedMissionText = missionCompleteText;
             sharedMissionText.gameObject.SetActive(false);
-            Debug.Log("Mission Complete Text 설정 완료");
         }
     }
 
@@ -48,15 +45,15 @@ public class ButtonKeeper : MonoBehaviour
     {
         linkedOrder = order;
         button = GetComponent<Button>();
-        if (button != null)
+
+        // 이미 완료된 주문이면 버튼 비활성화
+        if (linkedOrder != null && linkedOrder.isCompleted)
         {
-            button.onClick.AddListener(OnButtonClick);
-            if (linkedOrder.isCompleted)
-            {
-                button.interactable = false;
-                isPressed = true;
-            }
+            if (button != null) button.interactable = false;
+            isPressed = true;
         }
+
+        // 리스너는 Start에서 등록하므로 중복 등록 방지
     }
 
     void OnButtonClick()
@@ -64,7 +61,7 @@ public class ButtonKeeper : MonoBehaviour
         if (!isPressed)
         {
             isPressed = true;
-            button.interactable = false;
+            if (button != null) button.interactable = false;
 
             switch (buttonType)
             {
@@ -86,7 +83,7 @@ public class ButtonKeeper : MonoBehaviour
         if (linkedOrder != null && !linkedOrder.isCompleted)
         {
             linkedOrder.isCompleted = true;
-            button.interactable = false;
+            if (button != null) button.interactable = false;
         }
 
         CheckMissionComplete();
@@ -107,19 +104,13 @@ public class ButtonKeeper : MonoBehaviour
     private void HideSelectedButtons()
     {
         if (pressedOrderButton != null && pressedOrderButton.gameObject != null)
-        {
             pressedOrderButton.gameObject.SetActive(false);
-        }
 
         if (pressedFoodButton != null && pressedFoodButton.gameObject != null)
-        {
             pressedFoodButton.gameObject.SetActive(false);
-        }
 
         if (pressedDeliveryManButton != null && pressedDeliveryManButton.gameObject != null)
-        {
             pressedDeliveryManButton.gameObject.SetActive(false);
-        }
 
         pressedOrderButton = null;
         pressedFoodButton = null;
@@ -143,12 +134,8 @@ public class ButtonKeeper : MonoBehaviour
         sharedMissionText.gameObject.SetActive(true);
         sharedMissionText.text = "Mission Complete!";
 
-        Debug.Log("Mission Complete 표시 - 3초 대기");
-
         yield return new WaitForSeconds(3f);
 
         sharedMissionText.gameObject.SetActive(false);
-
-        Debug.Log("Mission Complete 숨김");
     }
 }

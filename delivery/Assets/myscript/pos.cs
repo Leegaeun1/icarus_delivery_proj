@@ -3,107 +3,37 @@ using UnityEngine.UI;
 
 public class pos : MonoBehaviour
 {
+    // 기본 POS 버튼 및 패널 변수만 유지
     public Button posButton;
     public GameObject shimPanel;
     public GameObject popupPanel;
 
-    public Button alarmButton;
-    public GameObject alarmShimPanel;
-    public GameObject alarmPopupPanel;
-
-    public Button dsButton;
-    public GameObject dsShimPanel;
-    public GameObject dsPopupPanel;
-
-    public Button daButton;
-    public GameObject daShimPanel;
-    public GameObject daPopupPanel;
-
     void Awake()
     {
+        // 초기화 시 팝업과 배경 숨김
         shimPanel.SetActive(false);
         popupPanel.SetActive(false);
-        alarmShimPanel.SetActive(false);
-        alarmPopupPanel.SetActive(false);
-        dsShimPanel.SetActive(false);
-        dsPopupPanel.SetActive(false);
-        daShimPanel.SetActive(false);
-        daPopupPanel.SetActive(false);
-
-        alarmButton.gameObject.SetActive(false);
-        dsButton.gameObject.SetActive(false);
-        daButton.gameObject.SetActive(false);
     }
 
     void Start()
     {
+        // 버튼 클릭 시 팝업 열기 연결
         posButton.onClick.AddListener(OpenPopup);
+        // 배경(shim) 클릭 시 팝업 닫기 연결
         shimPanel.GetComponent<Button>().onClick.AddListener(ClosePopup);
-
-        alarmButton.onClick.AddListener(OpenAlarmPopup);
-        alarmShimPanel.GetComponent<Button>().onClick.AddListener(CloseAlarmPopup);
-
-        dsButton.onClick.AddListener(OpenDsPopup);
-        dsShimPanel.GetComponent<Button>().onClick.AddListener(CloseDsPopup);
-
-        daButton.onClick.AddListener(OpenDaPopup);
-        daShimPanel.GetComponent<Button>().onClick.AddListener(CloseDaPopup);
     }
 
     public void OpenPopup()
     {
         shimPanel.SetActive(true);
         popupPanel.SetActive(true);
-
-        alarmButton.gameObject.SetActive(true);
-        dsButton.gameObject.SetActive(true);
-        daButton.gameObject.SetActive(true);
+        // 기존에 있던 다른 버튼들을 켜는 로직 제거됨
     }
 
     public void ClosePopup()
     {
         shimPanel.SetActive(false);
         popupPanel.SetActive(false);
-
-        alarmButton.gameObject.SetActive(false);
-        dsButton.gameObject.SetActive(false);
-        daButton.gameObject.SetActive(false);
-    }
-
-    public void OpenAlarmPopup()
-    {
-        alarmShimPanel.SetActive(true);
-        alarmPopupPanel.SetActive(true);
-    }
-
-    public void CloseAlarmPopup()
-    {
-        alarmShimPanel.SetActive(false);
-        alarmPopupPanel.SetActive(false);
-    }
-
-    public void OpenDsPopup()
-    {
-        dsShimPanel.SetActive(true);
-        dsPopupPanel.SetActive(true);
-    }
-
-    public void CloseDsPopup()
-    {
-        dsShimPanel.SetActive(false);
-        dsPopupPanel.SetActive(false);
-    }
-
-    public void OpenDaPopup()
-    {
-        daShimPanel.SetActive(true);
-        daPopupPanel.SetActive(true);
-    }
-
-    public void CloseDaPopup()
-    {
-        daShimPanel.SetActive(false);
-        daPopupPanel.SetActive(false);
+        // 기존에 있던 다른 버튼들을 끄는 로직 제거됨
     }
 }
-
