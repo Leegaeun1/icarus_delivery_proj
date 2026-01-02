@@ -1,71 +1,79 @@
 using System.Collections;
-using System.Collections;
 using UnityEngine;
 
 public class AlienAppearStepped : MonoBehaviour
 {
-    public Sprite alienSprite;
+    // 원본 캐릭터 스프라이트 대신, 소환할 외계인 캐릭터 프리팹을 참조합니다.
+    public GameObject alienPrefab; // <--- 프리팹을 연결할 새 필드
+
     public int steps = 10;
     public int framesPerStep = 2;
     public Vector3 spawnPosition = new Vector3(3f, 1.5f, 0f);
     public Vector3 moveOffset = new Vector3(-1f, 0f, 0f);
     public Vector3 desiredScale = new Vector3(2f, 2f, 1f);
 
-    private SpriteRenderer spriteRenderer;
-    private Color originalColor;
-    private Vector3 startPos;
-    private Vector3 targetPos;
-
-    public SpeechBubble speech;
-    public OrderManager orderManager; // 새로 연결할 OrderManager 참조
-
     public DialogueManager dialogueManager;
 
+
+    private GameObject currentAlienInstance; // <--- 현재 씬에 소환된 인스턴스를 저장
+    
+    // Start() 함수는 이제 이 컴포넌트(summon)의 초기화만 담당하며, 캐릭터는 소환하지 않습니다.
     void Start()
     {
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = alienSprite;
-        spriteRenderer.enabled = false;
-
-        transform.localScale = desiredScale;
-        transform.position = spawnPosition;
-
-        spriteRenderer.color = Color.black;
-        originalColor = Color.white;
+        // 기존의 spriteRenderer 초기화 로직은 제거
+        // 원본 오브젝트를 이동시키지 않으므로 transform.position 설정도 제거
     }
 
     // 버튼에서 실행
     public void SummonAlien()
     {
-        spriteRenderer.enabled = true;
+        if (alienPrefab == null)
+        {
+            Debug.LogError("Alien Prefab이 연결되지 않았습니다.");
+            return;
+        }
 
-        startPos = spawnPosition;
-        targetPos = spawnPosition + moveOffset;
-        transform.position = startPos;
-        transform.localScale = desiredScale;
-        spriteRenderer.color = Color.black;
+        // 이미 외계인이 소환되어 있다면 제거하고 새로 시작 (선택 사항)
+        if (currentAlienInstance != null)
+        {
+            Destroy(currentAlienInstance);
+        }
 
-        StartCoroutine(SteppedFadeInMove());
+        // 1. 새로운 외계인 인스턴스 복제
+        currentAlienInstance = Instantiate(alienPrefab, spawnPosition, Quaternion.identity);
+        currentAlienInstance.transform.localScale = desiredScale;
+        
+        SpriteRenderer sr = currentAlienInstance.GetComponent<SpriteRenderer>();
+        if (sr == null) return; // SpriteRenderer가 없으면 중단
+
+        // 2. 초기 상태 설정
+        sr.enabled = true;
+        sr.color = Color.black; // 페이드 인을 위해 검은색으로 시작
+
+        // 3. 애니메이션 코루틴 시작
+        StartCoroutine(SteppedFadeInMove(currentAlienInstance, sr, sr.color, Color.white));
     }
 
-    IEnumerator SteppedFadeInMove()
+    // 애니메이션 코루틴은 이제 소환된 인스턴스와 해당 SpriteRenderer를 매개변수로 받습니다.
+    IEnumerator SteppedFadeInMove(GameObject alienInstance, SpriteRenderer sr, Color startColor, Color targetColor)
     {
+        Vector3 startPos = spawnPosition;
+        Vector3 targetPos = spawnPosition + moveOffset;
+
         for (int i = 0; i <= steps; i++)
         {
             float t = (float)i / steps;
-            transform.position = Vector3.Lerp(startPos, targetPos, t);
-            spriteRenderer.color = Color.Lerp(Color.black, originalColor, t);
+            alienInstance.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            sr.color = Color.Lerp(startColor, targetColor, t);
 
             for (int f = 0; f < framesPerStep; f++)
                 yield return new WaitForEndOfFrame();
         }
 
-        transform.position = targetPos;
-        spriteRenderer.color = originalColor;
+        alienInstance.transform.position = targetPos;
+        sr.color = targetColor;
 
-
-        //string orderText = orderManager.GetRandomOrderText();
-        //speech.ShowMessage(orderText, 3f);
+        // 4. 애니메이션 완료 후 대화 시작
         dialogueManager.StartInitialDialogue();
     }
 }
