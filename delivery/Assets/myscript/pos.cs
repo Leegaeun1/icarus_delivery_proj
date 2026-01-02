@@ -3,37 +3,50 @@ using UnityEngine.UI;
 
 public class pos : MonoBehaviour
 {
-    // 기본 POS 버튼 및 패널 변수만 유지
-    public Button posButton;
-    public GameObject shimPanel;
-    public GameObject popupPanel;
+    [Header("버튼 설정")]
+    public Button OpenButton;      // POS 열기 버튼
+    public Button closeButton;    // X (닫기) 버튼
+
+    [Header("패널 설정")]
+    public GameObject popupPanel; // 팝업 패널
 
     void Awake()
     {
-        // 초기화 시 팝업과 배경 숨김
-        shimPanel.SetActive(false);
-        popupPanel.SetActive(false);
+        // 시작 시 팝업 숨김
+        if (popupPanel != null)
+        {
+            popupPanel.SetActive(false);
+        }
     }
 
     void Start()
     {
-        // 버튼 클릭 시 팝업 열기 연결
-        posButton.onClick.AddListener(OpenPopup);
-        // 배경(shim) 클릭 시 팝업 닫기 연결
-        shimPanel.GetComponent<Button>().onClick.AddListener(ClosePopup);
+        // POS 버튼 클릭 시 열기 기능 연결
+        if (OpenButton != null)
+        {
+            OpenButton.onClick.AddListener(OpenPopup);
+        }
+
+        // X 버튼 클릭 시 닫기 기능 연결
+        if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(ClosePopup);
+        }
     }
 
     public void OpenPopup()
     {
-        shimPanel.SetActive(true);
-        popupPanel.SetActive(true);
-        // 기존에 있던 다른 버튼들을 켜는 로직 제거됨
+        if (popupPanel != null)
+        {
+            popupPanel.SetActive(true);
+        }
     }
 
     public void ClosePopup()
     {
-        shimPanel.SetActive(false);
-        popupPanel.SetActive(false);
-        // 기존에 있던 다른 버튼들을 끄는 로직 제거됨
+        if (popupPanel != null)
+        {
+            popupPanel.SetActive(false);
+        }
     }
 }
