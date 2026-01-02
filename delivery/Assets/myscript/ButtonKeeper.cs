@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // 추가
+using TMPro;
 using System.Collections;
 
 public class ButtonKeeper : MonoBehaviour
@@ -9,24 +9,20 @@ public class ButtonKeeper : MonoBehaviour
     private Order linkedOrder;
     private bool isPressed = false;
 
-    public enum ButtonType
-    {
-        Order,
-        Food,
-        DeliveryMan
-    }
-
+    public enum ButtonType { Order, Food, DeliveryMan }
     public ButtonType buttonType;
 
-    // Text 대신 TextMeshProUGUI 사용
-    [SerializeField] private TextMeshProUGUI missionCompleteText;
+    [Header("점수 및 UI 설정")]
+    [SerializeField] private TextMeshProUGUI scoreText;
 
+    // 모든 버튼이 공유하는 데이터 (static)
+    private static int totalScore = 0;
+    private static TextMeshProUGUI sharedScoreDisplay;
+
+    // 현재 선택된 버튼들을 저장
     private static ButtonKeeper pressedOrderButton = null;
     private static ButtonKeeper pressedFoodButton = null;
     private static ButtonKeeper pressedDeliveryManButton = null;
-
-    // TextMeshProUGUI로 변경
-    private static TextMeshProUGUI sharedMissionText = null;
 
     void Start()
     {
@@ -36,26 +32,22 @@ public class ButtonKeeper : MonoBehaviour
             button.onClick.AddListener(OnButtonClick);
         }
 
-        if (missionCompleteText != null && sharedMissionText == null)
+        // 공유 UI 텍스트 설정
+        if (scoreText != null)
         {
-            sharedMissionText = missionCompleteText;
-            sharedMissionText.gameObject.SetActive(false);
-            Debug.Log("Mission Complete Text 설정 완료");
+            sharedScoreDisplay = scoreText;
+            UpdateScoreUI();
         }
     }
 
     public void Initialize(Order order)
     {
         linkedOrder = order;
-        button = GetComponent<Button>();
-        if (button != null)
+        // 이미 완료된 주문일 경우의 초기 처리
+        if (linkedOrder != null && linkedOrder.isCompleted)
         {
-            button.onClick.AddListener(OnButtonClick);
-            if (linkedOrder.isCompleted)
-            {
-                button.interactable = false;
-                isPressed = true;
-            }
+            isPressed = true;
+            if (button != null) button.interactable = false;
         }
     }
 
@@ -64,91 +56,66 @@ public class ButtonKeeper : MonoBehaviour
         if (!isPressed)
         {
             isPressed = true;
-            button.interactable = false;
+            if (button != null) button.interactable = false; // 버튼 중복 클릭 방지
 
+            // 1. 타입에 맞게 정적 변수에 자기 자신 저장
             switch (buttonType)
             {
-                case ButtonType.Order:
-                    pressedOrderButton = this;
-                    Debug.Log("Order 버튼 눌림");
-                    break;
-                case ButtonType.Food:
-                    pressedFoodButton = this;
-                    Debug.Log("Food 버튼 눌림");
-                    break;
-                case ButtonType.DeliveryMan:
-                    pressedDeliveryManButton = this;
-                    Debug.Log("DeliveryMan 버튼 눌림");
-                    break;
+                case ButtonType.Order: pressedOrderButton = this; break;
+                case ButtonType.Food: pressedFoodButton = this; break;
+                case ButtonType.DeliveryMan: pressedDeliveryManButton = this; break;
             }
-        }
 
-        if (linkedOrder != null && !linkedOrder.isCompleted)
-        {
-            linkedOrder.isCompleted = true;
-            button.interactable = false;
-        }
+            // 2. 주문 데이터 상태 업데이트
+            if (linkedOrder != null) linkedOrder.isCompleted = true;
 
-        CheckMissionComplete();
+            // 3. 미션 완료 체크
+            CheckMissionComplete();
+        }
     }
 
     private void CheckMissionComplete()
     {
-        if (pressedOrderButton != null &&
-            pressedFoodButton != null &&
-            pressedDeliveryManButton != null)
+        // 세 종류의 버튼이 모두 선택되었는지 확인
+        if (pressedOrderButton != null && pressedFoodButton != null && pressedDeliveryManButton != null)
         {
-            Debug.Log("미션 완료! 3가지 버튼 모두 선택됨");
-            HideSelectedButtons();
-            ShowMissionComplete();
+            // 점수 5점 추가
+            totalScore += 5;
+            UpdateScoreUI();
+
+            Debug.Log("미션 완료! 5점 획득.");
+
+            // 버튼 숨기기 및 초기화 실행
+            HideAndResetButtons();
         }
     }
 
-    private void HideSelectedButtons()
+    private void HideAndResetButtons()
     {
-        if (pressedOrderButton != null && pressedOrderButton.gameObject != null)
-        {
-            pressedOrderButton.gameObject.SetActive(false);
-        }
+        // 1. 선택되었던 버튼 오브젝트들을 화면에서 숨김
+        if (pressedOrderButton != null) pressedOrderButton.gameObject.SetActive(false);
+        if (pressedFoodButton != null) pressedFoodButton.gameObject.SetActive(false);
+        if (pressedDeliveryManButton != null) pressedDeliveryManButton.gameObject.SetActive(false);
 
-        if (pressedFoodButton != null && pressedFoodButton.gameObject != null)
-        {
-            pressedFoodButton.gameObject.SetActive(false);
-        }
+        // 2. 다음 미션을 위해 관리 변수들 리셋
+        ResetSystem();
+    }
 
-        if (pressedDeliveryManButton != null && pressedDeliveryManButton.gameObject != null)
-        {
-            pressedDeliveryManButton.gameObject.SetActive(false);
-        }
-
+    private void ResetSystem()
+    {
+        // 참조 변수 초기화 (이걸 해줘야 다음 버튼들을 다시 클릭했을 때 인지함)
         pressedOrderButton = null;
         pressedFoodButton = null;
         pressedDeliveryManButton = null;
+
+        Debug.Log("시스템 리셋 완료. 다음 버튼들을 선택할 수 있습니다.");
     }
 
-    private void ShowMissionComplete()
+    private void UpdateScoreUI()
     {
-        if (sharedMissionText != null)
+        if (sharedScoreDisplay != null)
         {
-            StartCoroutine(ShowMissionCompleteCoroutine());
+            sharedScoreDisplay.text = "Score: " + totalScore;
         }
-        else
-        {
-            Debug.LogWarning("Mission Complete Text가 할당되지 않았습니다!");
-        }
-    }
-
-    private IEnumerator ShowMissionCompleteCoroutine()
-    {
-        sharedMissionText.gameObject.SetActive(true);
-        sharedMissionText.text = "Mission Complete!";
-
-        Debug.Log("Mission Complete 표시 - 3초 대기");
-
-        yield return new WaitForSeconds(3f);
-
-        sharedMissionText.gameObject.SetActive(false);
-
-        Debug.Log("Mission Complete 숨김");
     }
 }
