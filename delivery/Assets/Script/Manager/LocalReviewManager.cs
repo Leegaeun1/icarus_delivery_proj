@@ -16,19 +16,16 @@ public class LocalReviewManager : MonoBehaviour
         public List<string> ingredients = new();
     }
 
-    [System.Serializable]
-    public class ReviewUI
-    {
-        public TextMeshProUGUI name;
-        public TextMeshProUGUI dialog;
-    }
-
-    // ADDED: 단일 주문 정보를 묶어서 관리하기 위한 클래스
+    // 주문 정보 클래스
     public class Order
     {
         public List<string> SelectedIngredients { get; set; } = new();
         public List<string> ExcludeRequest { get; set; } = new();
         public List<string> IncludeRequest { get; set; } = new();
+
+        // 주문의 성공 여부와 실패 사유를 저장할 변수
+        public bool isSuccess;
+        public string failReason;
     }
 
     // --- 인스펙터 변수 ---
@@ -36,11 +33,21 @@ public class LocalReviewManager : MonoBehaviour
     public float star_cnt = 2;
     public int max_star = 4;
     public GameObject star_prefab;
-    public GameObject parent;
-    List<GameObject> createdStars = new List<GameObject> ();
+    public GameObject star_parent;
+    List<GameObject> createdStars = new List<GameObject>();
 
     [Header("UI (이름/대사 슬롯)")]
-    public List<ReviewUI> reviews = new();
+
+    [Tooltip("일반 리뷰 프리팹")]
+    public GameObject review_prefab;
+    [Tooltip("반전된 리뷰 프리팹")]
+    public GameObject review_flip_prefab;
+    [Tooltip("리뷰들이 생성될 부모 오브젝트 (보통 Layout Group이 있는 Content)")]
+    public GameObject review_parent;
+
+    // 생성된 리뷰 오브젝트들을 추적 관리하기 위한 리스트
+    private List<GameObject> spawnedReviewObjects = new List<GameObject>();
+
 
     [Header("입력 데이터 (주문 단위로 매칭됨)")]
     public List<StringList> FinalIngredients = new();
@@ -48,7 +55,7 @@ public class LocalReviewManager : MonoBehaviour
     public List<StringList> IncludeRequest = new();
 
     [Header("리뷰 정책")]
-    [Range(1, 8)] public int MaxReviews = 4;
+    public int MaxDisplayCount = 4; // 최대 표시 개수
     public int seed = -1;
 
     [Header("이름")]
@@ -57,12 +64,8 @@ public class LocalReviewManager : MonoBehaviour
         "김솰라", "모구리", "치코", "디노", "쿠모", "피오", "비콜로", "지르론"
     };
 
-    // --- 내부 데이터 풀 ---
     private Dictionary<string, List<string>> positivePool;
-    private Dictionary<string, List<string>> negativeFlavorPool;
     private System.Random rng;
-
-    // --- MonoBehaviour 라이프사이클 ---
 
     void Awake()
     {
@@ -72,94 +75,159 @@ public class LocalReviewManager : MonoBehaviour
 
     void Start()
     {
-        GenerateAndDisplay();
-        StartCoroutine(review_star());
+        // 리뷰 생성 및 별점 연출 시작
+        StartCoroutine(GenerateReviewsSequence());
     }
 
-    // --- 핵심 로직 ---
-
-    // REFACTORED: 주문 단위 처리를 위해 로직 전체 변경
-    void GenerateAndDisplay()
+    IEnumerator GenerateReviewsSequence()
     {
-        // 1. 입력 데이터를 '주문' 단위로 묶기
-        List<Order> orders = new List<Order>();
-        // GameReviewContext 처리 (선택적) - 지금은 인스펙터 값만 사용하도록 단순화
-        // 실제로는 이 부분도 GameReviewContext에서 List<Order>를 구성하도록 수정.
+        // 0. 기존에 생성된 리뷰 오브젝트가 있다면 모두 삭제
+        foreach (var obj in spawnedReviewObjects)
+        {
+            if (obj != null) Destroy(obj);
+        }
+        spawnedReviewObjects.Clear();
+
+        // 1. 입력 데이터를 '주문' 객체로 변환하고 성공/실패 여부 미리 판별
+        List<Order> allOrders = new List<Order>();
+        List<Order> successOrders = new List<Order>();
+        List<Order> failOrders = new List<Order>();
+
         for (int i = 0; i < FinalIngredients.Count; i++)
         {
             var order = new Order
             {
                 SelectedIngredients = FinalIngredients[i].ingredients
             };
-            if (i < ExcludeRequest.Count)
-                order.ExcludeRequest = ExcludeRequest[i].ingredients;
-            if (i < IncludeRequest.Count)
-                order.IncludeRequest = IncludeRequest[i].ingredients;
+            if (i < ExcludeRequest.Count) order.ExcludeRequest = ExcludeRequest[i].ingredients;
+            if (i < IncludeRequest.Count) order.IncludeRequest = IncludeRequest[i].ingredients;
 
-            orders.Add(order);
+            // 성공/실패 여부 판별
+            CheckOrderResult(order);
+
+            allOrders.Add(order);
+            if (order.isSuccess) successOrders.Add(order);
+            else failOrders.Add(order);
         }
 
-        // 2. 각 주문을 개별적으로 평가하여 모든 리뷰 문장 수집
-        List<string> allGeneratedLines = new List<string>();
-        foreach (var order in orders)
+        // 2. 개수 산정 로직
+        int totalReviewCount = Mathf.Min(MaxDisplayCount, allOrders.Count);
+        int negativeCount = Mathf.Min(totalReviewCount, failOrders.Count);
+        int positiveCount = totalReviewCount - negativeCount;
+
+        // 3. 실제 표시할 주문 목록 구성
+        List<Order> finalDisplayOrders = new List<Order>();
+        var selectedFails = failOrders.OrderBy(x => rng.Next()).Take(negativeCount).ToList();
+        var selectedSuccesses = successOrders.OrderBy(x => rng.Next()).Take(positiveCount).ToList();
+
+        finalDisplayOrders.AddRange(selectedFails);
+        finalDisplayOrders.AddRange(selectedSuccesses);
+
+        // 순서를 섞음
+        finalDisplayOrders = finalDisplayOrders.OrderBy(x => rng.Next()).ToList();
+
+        // 4. 이름 배정
+        var names = SampleNames(ReviewerNamePool, finalDisplayOrders.Count, rng);
+
+        // 5. 하나씩 리뷰 출력 
+        for (int i = 0; i < finalDisplayOrders.Count; i++)
         {
-            // 각 주문에 대해 리뷰를 1개 생성하여 추가
-            string reviewLine = GenerateReviewForOrder(order);
-            allGeneratedLines.Add(reviewLine);
+            // i가 짝수면 normal prefab, 홀수면 flip prefab
+            GameObject prefabToUse = (i % 2 == 0) ? review_prefab : review_flip_prefab;
+
+            if (prefabToUse == null || review_parent == null)
+            {
+                Debug.LogError("Review Prefab 또는 Review Parent가 인스펙터에 할당되지 않았습니다.");
+                yield break;
+            }
+
+            // 프리팹 생성 및 부모 설정
+            GameObject newReviewGO = Instantiate(prefabToUse, review_parent.transform);
+            spawnedReviewObjects.Add(newReviewGO); // 관리 리스트에 추가
+
+            TextMeshProUGUI[] texts = newReviewGO.GetComponentsInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI nameUI = null;
+            TextMeshProUGUI dialogUI = null;
+
+            if (texts.Length >= 2)
+            {
+                nameUI = texts[0];   // 첫 번째로 발견된 TMP
+                dialogUI = texts[1]; // 두 번째로 발견된 TMP
+            }
+            else
+            {
+                Debug.LogWarning($"리뷰 프리팹({newReviewGO.name}) 하위에 TextMeshProUGUI 컴포넌트가 2개 이상 필요합니다.");
+            }
+
+            // --- 텍스트 내용 결정 (기존 로직) ---
+            Order currentOrder = finalDisplayOrders[i];
+            string reviewText = "";
+
+            if (!currentOrder.isSuccess)
+            {
+                reviewText = currentOrder.failReason;
+            }
+            else
+            {
+                reviewText = GeneratePositiveReview(currentOrder);
+            }
+
+            // UI 적용
+            if (nameUI != null) nameUI.text = names[i];
+            if (dialogUI != null) dialogUI.text = reviewText;
+
+            // 리뷰가 하나 뜰 때마다 잠시 대기
+            yield return new WaitForSeconds(0.5f);
         }
 
-        // 3. 최종 리뷰 목록을 정책에 맞게 조정 (랜덤 셔플, 개수 제한 등)
-        // Take는 처음 n개의 원소만 꺼내서 만든다.
-        var finalLines = allGeneratedLines.OrderBy(x => rng.Next()).Take(MaxReviews).ToList();
-
-        // 4. 이름 샘플링 및 UI 바인딩
-        var names = SampleNames(ReviewerNamePool, finalLines.Count, rng);
-        ApplyToUI(names, finalLines);
+        // 6. 리뷰 작성이 끝난 후 별점 애니메이션 시작
+        StartCoroutine(review_star());
     }
 
-    // 단일 주문을 평가하고 리뷰 문장 1개를 생성하는 메서드
-    private string GenerateReviewForOrder(Order order)
+    void CheckOrderResult(Order order)
     {
-        // --- 부정 리뷰 생성 ---
-
-        // 1. "빼달라는 재료"가 들어갔는지 검사
+        // 1. "빼달라는 재료"가 들어갔는지 검사 (실패)
         foreach (var excluded in order.ExcludeRequest)
         {
             if (order.SelectedIngredients.Contains(excluded))
-            { 
-                return $"{excluded} 빼달라고 했는데 들어있네요..";
+            {
+                order.isSuccess = false;
+                order.failReason = $"{excluded} 빼달라고 했는데 들어있네요..";
+                return;
             }
         }
 
-        // 2. "넣어달라는 재료"가 빠졌는지 검사
+        // 2. "넣어달라는 재료"가 빠졌는지 검사 (실패)
         foreach (var included in order.IncludeRequest)
         {
             if (!order.SelectedIngredients.Contains(included))
             {
-                return $"{included} 꼭 넣어달라고 했는데 빠졌어요.";
+                order.isSuccess = false;
+                order.failReason = $"{included} 꼭 넣어달라고 했는데 빠졌어요.";
+                return;
             }
         }
 
-        // --- 긍정 리뷰 생성 ---
+        // 통과 (성공)
+        order.isSuccess = true;
+        order.failReason = "";
+    }
 
-        // 성공했다면, 만들어진 재료 중 하나에 대해 긍정 리뷰 생성
+    string GeneratePositiveReview(Order order)
+    {
         if (order.SelectedIngredients.Count > 0)
         {
-            // 포함된 재료 중 랜덤으로 하나 선택
             string targetIngredient = order.SelectedIngredients[rng.Next(order.SelectedIngredients.Count)];
 
-            // 해당 재료에 대한 긍정 리뷰 문구가 있다면 사용, 없다면 기본 문구 사용. 키 있으면 out으로 내보냄 
             if (positivePool.TryGetValue(targetIngredient, out List<string> lines) && lines.Count > 0)
             {
                 return lines[rng.Next(lines.Count)];
             }
         }
-
-        // 모든 조건을 통과했지만 마땅한 리뷰가 없을 경우 기본 문구
         return "음... 그냥 평범한 맛이네요.";
     }
 
-    // --- 기존 유틸리티 메서드 ---
+
     void BuildLocalPools()
     {
         positivePool = new Dictionary<string, List<string>>
@@ -169,102 +237,58 @@ public class LocalReviewManager : MonoBehaviour
             { "피클",   new(){ "피클이 상큼해서 느끼함을 잡아줘요.", "피클의 톡 쏘는 맛이 균형을 잡아요." } },
             { "머스타드", new(){ "머스타드 향이 은은해 잘 어울려요." } },
         };
-        negativeFlavorPool = new Dictionary<string, List<string>>
-        {
-            { "피클", new(){ "피클이 들어가서 맛이 이상해요." } }, 
-            { "머스타드", new(){ "머스타드가 빠져서 아쉬워요." } },
-            { "칠리", new(){ "칠리가 빠져서 아쉬워요." } },
-            { "양상추", new(){ "양상추가 빠져서 아쉬워요." } },
-        };
     }
 
     List<string> SampleNames(List<string> pool, int k, System.Random random)
     {
-        if (pool == null || pool.Count == 0 || k <= 0) 
+        if (pool == null || pool.Count == 0 || k <= 0)
             return new List<string>();
-        // Fisher–Yates 셔플 사용
         return pool.OrderBy(x => random.Next()).Take(k).ToList();
     }
 
-    void ApplyToUI(List<string> names, List<string> lines)
-    {
-        int n = Mathf.Min(reviews.Count, Mathf.Min(names.Count, lines.Count)); // 작은 것 기준으로
-        for (int i = 0; i < n; i++)
-        {
-            var ui = reviews[i];
-            if (ui?.name) ui.name.text = names[i]; // null이 아니면 저장.
-            if (ui?.dialog) ui.dialog.text = lines[i]; // null이 아니면 저장.
-        }
-        for (int i = n; i < reviews.Count; i++) // 나머지 칸이 필요없을 때 비워줌
-        {
-            var ui = reviews[i];
-            if (ui?.name) ui.name.text = "";
-            if (ui?.dialog) ui.dialog.text = "";
-        }
-    }
     IEnumerator review_star()
     {
+        // 기존 별 삭제 및 리스트 초기화
+        foreach (var star in createdStars)
+        {
+            if (star != null) Destroy(star);
+        }
         createdStars.Clear();
+
+        // star_parent가 할당되지 않았으면 에러 방지
+        if (star_parent == null) yield break;
+
         for (int i = 0; i < max_star; i++)
         {
-            // 별 생성
-            GameObject star = Instantiate(star_prefab, parent.transform);
+            GameObject star = Instantiate(star_prefab, star_parent.transform);
             RectTransform rect = star.GetComponent<RectTransform>();
 
-            if (rect != null)
-                rect.anchoredPosition = new Vector2(0f, 0f); // 가운데로 anchor 바꾸기 
-
-            // 별을 리스트에 저장함
             createdStars.Add(star);
         }
-        
+
         for (int i = 0; i < max_star; i++)
         {
-            bool isfull = i < star_cnt; // 채워져야하는 별이면 true
-            
-            
-            if (isfull){ // 채워져야한다면 노란색으로 변경
+            bool isfull = i < star_cnt;
+
+            if (isfull)
+            {
                 var ishalf = 0f;
                 var speed = 0.8f;
-                if (star_cnt % i != 0 && i == (int)star_cnt) // 반개일 때
+                if (star_cnt % i != 0 && i == (int)star_cnt)
                 {
                     ishalf = 0.5f;
-                    speed = 0.4f;
+                    speed = 0.5f;
                 }
                 GameObject targetStar = createdStars[i];
 
                 Slider slider = targetStar.transform.GetChild(0).GetComponent<Slider>();
-                StartCoroutine(FillSlider(slider, 0f, 1f- ishalf, speed)); // 0.5초 동안 부드럽게 채우기
+                StartCoroutine(FillSlider(slider, 0f, 1f - ishalf, speed));
             }
 
-            
-
-            // 별 회전 애니메이션 시작
-            //StartCoroutine(RotateStar(star.transform, Quaternion.Euler(0f, 180f, 0f), 0.5f));
-
-            yield return new WaitForSeconds(0.8f); // 별 색칠 간격
+            yield return new WaitForSeconds(0.8f);
         }
     }
 
-    // 회전하는 코드
-    IEnumerator RotateStar(Transform target, Quaternion targetRotation, float duration)
-    {
-        // 시작점 기록
-        Quaternion startRotation = target.rotation;
-        float time = 0f;
-
-        while (time < duration)
-        {
-            time += Time.deltaTime;
-            float t = time / duration;
-
-            // starRotation부터 targetRotation까지 t시간 동안 부드럽게 회전하도록! 
-            target.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
-            yield return null;
-        }
-
-    }
-    // 슬라이더로 채우는 코드
     IEnumerator FillSlider(Slider slider, float startValue, float endValue, float duration)
     {
         float time = 0f;
@@ -277,5 +301,4 @@ public class LocalReviewManager : MonoBehaviour
         }
         slider.value = endValue;
     }
-
 }

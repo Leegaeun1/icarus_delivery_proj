@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3d023249701ea7e44af70dee2d6c99f5
+guid: 9afaa59b4ffc7274a91bcbbdf4471522
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -123,13 +123,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: phoenix_0
+      name: notification_0
       rect:
         serializedVersion: 2
-        x: 4
-        y: 2
-        width: 328
-        height: 107
+        x: 11
+        y: 13
+        width: 1491
+        height: 157
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,8 +137,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dd46c4f47486d5f4baca18547cab7e6f
-      internalID: 491520174
+      spriteID: 4bfc2a9b1cce8474abf717872bc0db73
+      internalID: -300811539
       vertices: []
       indices: 
       edges: []
@@ -154,7 +154,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      phoenix_0: 491520174
+      notification_0: -300811539
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

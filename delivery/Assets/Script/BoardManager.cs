@@ -45,7 +45,7 @@ public class BoardManager : MonoBehaviour
             if (explainTf)
             {
                 var tmp = explainTf.GetComponent<TextMeshProUGUI>();
-                if (tmp) tmp.fontSize = 100;
+                if (tmp) tmp.fontSize = 90;
             }
             //else
             //{
