@@ -16,6 +16,8 @@ public class CheckMenu : MonoBehaviour
     [SerializeField] private ReadSpreadSheets sheet;
     public MenuManager menuManager;
     public TimeManager timeManager;
+    public Sprite errorbtn;
+    public Sprite combtn;
 
 
     private void Awake()
@@ -88,6 +90,8 @@ public class CheckMenu : MonoBehaviour
 
         if (isSuccess)
         {
+            completebtn.GetComponent<Image>().sprite = combtn;
+
             gameObject.SetActive(false);
             completebtn.SetActive(false);
             selectMenu.SetActive(true);
@@ -99,6 +103,7 @@ public class CheckMenu : MonoBehaviour
         }
         else
         {
+            completebtn.GetComponent<Image>().sprite = errorbtn;
             Debug.Log("돈이 부족합니다.");
         }
     }

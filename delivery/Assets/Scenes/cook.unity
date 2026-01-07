@@ -1250,6 +1250,8 @@ MonoBehaviour:
   sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
 --- !u!1 &230676221
 GameObject:
   m_ObjectHideFlags: 0
@@ -2532,6 +2534,7 @@ MonoBehaviour:
   time: {fileID: 827552517}
   day: {fileID: 2072030537}
   gameManager: {fileID: 529194883}
+  sheet: {fileID: 0}
   timeattack: {fileID: 1400220451}
   timeattack_UI: {fileID: 904733538}
   uiManager: {fileID: 0}
@@ -2725,6 +2728,8 @@ MonoBehaviour:
   sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
+  errorbtn: {fileID: 21300000, guid: 0b565136d7e22864c960b0388cbf073c, type: 3}
+  combtn: {fileID: 21300000, guid: d8167f572e5e9a54f85f34fdfc84638d, type: 3}
 --- !u!1001 &698436396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4896,6 +4901,8 @@ MonoBehaviour:
   sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
 --- !u!1001 &1095107941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7918,6 +7925,8 @@ MonoBehaviour:
   sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
 --- !u!1001 &1597912814
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8141,6 +8150,8 @@ MonoBehaviour:
   sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
 --- !u!1 &1661514282
 GameObject:
   m_ObjectHideFlags: 0
@@ -10747,6 +10758,8 @@ MonoBehaviour:
   sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
+  errorbtn: {fileID: 21300000, guid: 0b565136d7e22864c960b0388cbf073c, type: 3}
+  combtn: {fileID: 21300000, guid: d8167f572e5e9a54f85f34fdfc84638d, type: 3}
 --- !u!1 &2120323485
 GameObject:
   m_ObjectHideFlags: 0
