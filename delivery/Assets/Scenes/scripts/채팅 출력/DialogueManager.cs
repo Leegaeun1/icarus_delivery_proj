@@ -8,7 +8,7 @@ public class DialogueManager : MonoBehaviour
     // 외부 컴포넌트 연결
     public ChatBubbleGenerator bubbleGenerator;
     public GameObject choiceUIPanel; // 선택지 UI 관리 (Choice.cs)
-    public OrderManager orderManager; // 주문 정보 필요
+    public OrderManagers orderManager; // 주문 정보 필요
 
     // 현재 대화 데이터 (구글 시트에서 로드하거나 인스펙터에서 직접 정의)
     public List<DialogueBlock> dialogueBlocks;

@@ -15,7 +15,7 @@ public class FoodOrder
     }
 }
 
-public class OrderManager : MonoBehaviour
+public class OrderManagers : MonoBehaviour
 {
     public ReadSpreadSheet sheetLoader;  // ReadSpreadSheet 연결
     public SpeechBubble speechBubble;    // SpeechBubble 연결
