@@ -1470,12 +1470,12 @@ RectTransform:
   - {fileID: 1157787501}
   - {fileID: 1636974081}
   - {fileID: 412170578}
-  - {fileID: 1772309683}
   - {fileID: 1367641541}
   - {fileID: 222391375}
-  - {fileID: 20339977}
   - {fileID: 767073520}
   - {fileID: 640507612}
+  - {fileID: 1772309683}
+  - {fileID: 20339977}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3091,6 +3091,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2425583043510359367, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2425583043510359367, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2425583043510359367, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2425583043510359367, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 2425583043510359367, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4345198768653628529, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 74264637, guid: af214d217f6e77643a4d167c47402922, type: 3}
     - target: {fileID: 4536777931786184056, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.5
@@ -3127,6 +3151,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: b1a7031dff0082040bb4c17685149582, type: 3}
+    - target: {fileID: 6267576515443986263, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1153696632, guid: af214d217f6e77643a4d167c47402922, type: 3}
     - target: {fileID: 6710238114662793140, guid: 4d4be67ca0b1b124d8a8672ee33ca44c, type: 3}
       propertyPath: m_Name
       value: checkpanel
