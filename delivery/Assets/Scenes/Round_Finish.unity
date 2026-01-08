@@ -1090,7 +1090,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1468641637}
-  - component: {fileID: 1468641636}
   - component: {fileID: 1468641638}
   m_Layer: 0
   m_Name: GameObject
@@ -1099,32 +1098,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1468641636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1468641635}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ecaaa41d36d0714b81147cf2781b04d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  reviews:
-  - nameTMP: {fileID: 0}
-    dialogTMP: {fileID: 0}
-  - nameTMP: {fileID: 0}
-    dialogTMP: {fileID: 0}
-  - nameTMP: {fileID: 0}
-    dialogTMP: {fileID: 0}
-  - nameTMP: {fileID: 0}
-    dialogTMP: {fileID: 0}
-  FinalIngredients: []
-  ExcludeRequest: []
-  IncludeRequest: []
-  MaxReviews: 4
-  seed: -1
 --- !u!4 &1468641637
 Transform:
   m_ObjectHideFlags: 0
@@ -1159,13 +1132,13 @@ MonoBehaviour:
   - {fileID: 3278247071716474600, guid: 2aedee552e2fc904f901529127c979d3, type: 3}
   - {fileID: 3295299195766342505, guid: 42cfb0e76d8a25948a5228aab3cfb52f, type: 3}
   total_parent: {fileID: 505685852}
+  review_prefab: {fileID: 503701468804424237, guid: 5c35a96aca0a20e47a1e7e5db2256c3b, type: 3}
+  review_flip_prefab: {fileID: 5492139591429297078, guid: 5455e475b9d237a4a9eadf3be1954ab3, type: 3}
+  review_parent: {fileID: 733048523}
   star_cnt: 3.5
   max_star: 4
   star_prefab: {fileID: 1346395452443876384, guid: 132c240f3e16c6a49b6444df614843ea, type: 3}
   star_parent: {fileID: 573290661}
-  review_prefab: {fileID: 503701468804424237, guid: 5c35a96aca0a20e47a1e7e5db2256c3b, type: 3}
-  review_flip_prefab: {fileID: 5492139591429297078, guid: 5455e475b9d237a4a9eadf3be1954ab3, type: 3}
-  review_parent: {fileID: 733048523}
   FinalIngredients:
   - ingredients:
     - "\uD53C\uD074"
@@ -1207,6 +1180,39 @@ MonoBehaviour:
     - "\uBA38\uC2A4\uD0C0\uB4DC"
     - "\uC591\uC0C1\uCD94"
     - "\uD53C\uD074"
+  RequestedSpecials:
+  - "\uD06C\uB77C\uCF04 \uC0CC\uB4DC\uC704\uCE58"
+  - "\uD788\uB4DC\uB77C \uC0CC\uB4DC\uC704\uCE58"
+  - "\uD589\uC131 \uC0CC\uB4DC\uC704\uCE58"
+  - "\uD06C\uB77C\uCF04 \uC0CC\uB4DC\uC704\uCE58"
+  ProvidedSpecials:
+  - "\uD06C\uB77C\uCF04 \uC0CC\uB4DC\uC704\uCE58"
+  - "\uD06C\uB77C\uCF04 \uC0CC\uB4DC\uC704\uCE58"
+  - "\uD589\uC131 \uC0CC\uB4DC\uC704\uCE58"
+  - "\uBD88\uC0AC\uC870 \uC0CC\uB4DC\uC704\uCE58"
+  RequestedSides:
+  - ingredients:
+    - "\uBA38\uB7AD \uCFE0\uD0A4"
+    - "\uD1A1\uD1A1 \uC824\uB9AC \uC250\uC774\uD06C"
+  - ingredients:
+    - "\uD1A1\uD1A1 \uC824\uB9AC \uC250\uC774\uD06C"
+  - ingredients:
+    - "\uBCC4\uBB34\uB9AC \uC250\uC774\uD06C"
+  - ingredients:
+    - "\uC2E0\uC120 \uC9C4\uC8FC \uC250\uC774\uD06C"
+    - "\uAC74\uC870 \uBD88\uAC00\uC0AC\uB9AC"
+  ProvidedSides:
+  - ingredients:
+    - "\uAC74\uC870 \uBD88\uAC00\uC0AC\uB9AC"
+    - "\uD1A1\uD1A1 \uC824\uB9AC \uC250\uC774\uD06C"
+  - ingredients:
+    - "\uD1A1\uD1A1 \uC824\uB9AC \uC250\uC774\uD06C"
+  - ingredients:
+    - "\uBCC4\uBB34\uB9AC \uC250\uC774\uD06C"
+  - ingredients:
+    - "\uBCC4\uBB34\uB9AC \uC250\uC774\uD06C"
+    - "\uAC74\uC870 \uBD88\uAC00\uC0AC\uB9AC"
+  IsDeliverySuccessList: 01010101
   MaxDisplayCount: 4
   seed: -1
   ReviewerNamePool:
