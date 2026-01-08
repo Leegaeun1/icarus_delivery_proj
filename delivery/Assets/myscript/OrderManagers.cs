@@ -54,11 +54,12 @@ public class OrderManagers : MonoBehaviour
         allOrders.Add(newOrder);
 
         totalPages = Mathf.CeilToInt((float)allOrders.Count / maxOrdersPerPage);
-        UpdatePageButtons();
 
-        if (orderUIObjects.Count < maxOrdersPerPage)
+        // UI가 꽉 차지 않았거나, 현재 보고 있는 페이지가 마지막 페이지라면 갱신
+        if (orderUIObjects.Count < maxOrdersPerPage || currentPage == totalPages - 1)
         {
-            CreateOrderUI(newOrder);
+            // 현재 페이지 갱신
+            UpdateOrderUI();
         }
 
         UpdatePageButtons();
@@ -100,7 +101,7 @@ public class OrderManagers : MonoBehaviour
             prevPageButton.gameObject.SetActive(currentPage > 0);
     }
 
-        public void NextPage()
+    public void NextPage()
     {
         if (currentPage < totalPages - 1)
         {
