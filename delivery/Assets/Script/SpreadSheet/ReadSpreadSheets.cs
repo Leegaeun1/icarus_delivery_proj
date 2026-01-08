@@ -13,7 +13,9 @@ public class ReadSpreadSheets : MonoBehaviour
     public readonly long SHEET_ID = 0;
     public List<Food_material> materials;
     public TextMeshProUGUI mineral;
-    
+
+    public int money;      // 현재 보유한 돈
+    public int usedMoney = 0; // 선택한 재료들의 총 비용 (장바구니 금액)
 
     private bool dataReady = false; //  로딩 완료 플래그
 
@@ -28,13 +30,17 @@ public class ReadSpreadSheets : MonoBehaviour
     
     void Start()
     {
+
+        PlayerPrefs.DeleteKey("SavedDeck");
+
         if (mineral == null)
         {
             Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
         }
+        PlayerPrefs.DeleteKey("Gold");
         // 저장된 돈 불러오기 (없으면 기본값 1000으로 시작한다고 가정)
-        int savedGold = PlayerPrefs.GetInt("Gold", 1000);
-        mineral.text = savedGold.ToString();
+        money = PlayerPrefs.GetInt("Gold", 20);
+        mineral.text = money.ToString();
 
         StartCoroutine(LoadData());    
     }
@@ -52,8 +58,34 @@ public class ReadSpreadSheets : MonoBehaviour
         Debug.Log(www.downloadHandler.text);
         materials = GetDatas<Food_material>(www.downloadHandler.text);
         dataReady = true; // 데이터 준비 완료 
-    }
 
+        LoadSavedDeck();
+    }
+    // 마지막으로 저장된 덱을 불러오고 비용 계산
+    public void LoadSavedDeck()
+    {
+        // 1. 저장된 문자열 가져오기
+        string savedString = PlayerPrefs.GetString("SavedDeck", "");
+
+        if (!string.IsNullOrEmpty(savedString))
+        {
+            // 2. 리스트로 변환하여 static 리스트에 복원
+            string[] savedItems = savedString.Split(',');
+
+            CheckMenu.selectedNames.Clear(); // 불러오기 전에 현재 상태 초기화 (중복 방지)
+            CheckMenu.selectedNames.AddRange(savedItems);
+
+            // 3. 복원된 아이템들의 가격 합산 (usedMoney 복구)
+            usedMoney = 0;
+            foreach (string itemName in CheckMenu.selectedNames)
+            {
+                var mat = materials.Find(m => m.name == itemName);
+                if (mat != null) usedMoney += mat.cost;
+            }
+
+            Debug.Log($"[로드 완료] 불러온 목록: {savedString} / 총 비용: {usedMoney}");
+        }
+    }
     T GetData<T>(string[] datas) // TSV 한 행을 T타입 객체로 변환하는 함수 
     {
         object data = Activator.CreateInstance(typeof(T)); // T 타입의 기본 생성자로 객체를 하나 만듬
@@ -113,53 +145,56 @@ public class ReadSpreadSheets : MonoBehaviour
         return returnList;
     }
 
+    // 여기서는 비용 계산만 하고 실제 돈은 차감하지 않습니다.
     public void OnIngredientToggled(string ingredientName, bool isSelected)
     {
-        if (!dataReady)
-        {
-            Debug.LogWarning("[ReadSpreadSheet] 데이터가 아직 로드되지 않았습니다.");
-            return;
-        }
-        if (mineral == null)
-        {
-            Debug.LogError("[ReadSpreadSheet] mineral(TextMeshProUGUI)이 없습니다.");
-            return;
-        }
-        if (!int.TryParse(mineral.text, out int haveMoney))
-        {
-            Debug.LogError($"[ReadSpreadSheet] mineral 텍스트를 숫자로 변환할 수 없습니다: '{mineral.text}'");
-            return;
-        }
+        if (!dataReady) return;
 
-        // 재료 찾기 (정확히 이름이 같은 항목)
         var material = materials.Find(m => m.name == ingredientName);
-        if (material == null)
-        {
-            Debug.LogError($"[ReadSpreadSheet] '{ingredientName}' 재료를 materials에서 찾을 수 없습니다.");
-            return;
-        }
+        if (material == null) return;
 
         if (isSelected)
         {
             if (!CheckMenu.selectedNames.Contains(ingredientName))
             {
                 CheckMenu.selectedNames.Add(ingredientName);
-                haveMoney -= material.cost;
-
+                usedMoney += material.cost;
             }
-                
         }
         else
         {
-            CheckMenu.selectedNames.Remove(ingredientName);
-            haveMoney += material.cost;
+            if (CheckMenu.selectedNames.Contains(ingredientName))
+            {
+                CheckMenu.selectedNames.Remove(ingredientName);
+                usedMoney -= material.cost;
+            }
+        }
+        Debug.Log($"현재 선택 총액: {usedMoney}");
+    }
+
+    public bool ApplyPurchase()
+    {
+        if (money < usedMoney)
+        {
+            Debug.LogWarning(" 잔액 부족! 결제 취소");
+
+            LoadSavedDeck(); 
+            return false;
         }
 
-        mineral.text = haveMoney.ToString();
-        PlayerPrefs.SetInt("Gold", haveMoney);
+        money -= usedMoney;
+
+        mineral.text = money.ToString();
+        PlayerPrefs.SetInt("Gold", money);
+
+        // 구매 성공 시 현재 덱(목록)을 저장함
+        string dataToSave = string.Join(",", CheckMenu.selectedNames);
+        PlayerPrefs.SetString("SavedDeck", dataToSave);
+
         PlayerPrefs.Save();
-        Debug.Log("선택된 목록: " + string.Join(", ", CheckMenu.selectedNames));
-        
+
+        Debug.Log(" 결제 성공 및 덱 저장 완료!");
+        return true;
     }
 
 }

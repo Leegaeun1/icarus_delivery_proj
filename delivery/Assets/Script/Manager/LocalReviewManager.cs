@@ -29,6 +29,11 @@ public class LocalReviewManager : MonoBehaviour
     }
 
     // --- 인스펙터 변수 ---
+    [Header("종합 평가")]
+    public List<GameObject> resultPrefabs;
+    public Transform total_parent;
+
+
     [Header("별 개수")]
     public float star_cnt = 2;
     public int max_star = 4;
@@ -78,10 +83,26 @@ public class LocalReviewManager : MonoBehaviour
         // 리뷰 생성 및 별점 연출 시작
         StartCoroutine(GenerateReviewsSequence());
     }
+    IEnumerator Total() // 순서대로 추가
+    {
+        foreach (GameObject prefab in resultPrefabs)
+        {
+            if (prefab != null) Instantiate(prefab, total_parent);
 
+            yield return new WaitForSeconds(0.5f);
+        }
+        yield return null;
+    }
     IEnumerator GenerateReviewsSequence()
     {
-        // 0. 기존에 생성된 리뷰 오브젝트가 있다면 모두 삭제
+        // 0. 별점 애니메이션 시작
+        yield return StartCoroutine(review_star());
+
+        // 0.5. 수익과 개수 출력
+
+        yield return StartCoroutine(Total());
+
+        // 1. 기존에 생성된 리뷰 오브젝트가 있다면 모두 삭제
         foreach (var obj in spawnedReviewObjects)
         {
             if (obj != null) Destroy(obj);
@@ -180,8 +201,7 @@ public class LocalReviewManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
 
-        // 6. 리뷰 작성이 끝난 후 별점 애니메이션 시작
-        StartCoroutine(review_star());
+        
     }
 
     void CheckOrderResult(Order order)
