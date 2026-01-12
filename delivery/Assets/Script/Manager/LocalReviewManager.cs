@@ -12,7 +12,7 @@ public class LocalReviewManager : MonoBehaviour
 
     // --- 인스펙터 변수 ---
     [Header("종합 평가 & UI")]
-    public List<GameObject> resultPrefabs;
+    public List<GameObject> resultPrefabs; // 0:수익, 1:지출, 2:순이익
     public Transform total_parent;
     public GameObject review_prefab;
     public GameObject review_flip_prefab;
@@ -64,10 +64,42 @@ public class LocalReviewManager : MonoBehaviour
         // 0. 별점 애니메이션
         yield return StartCoroutine(review_star());
 
-        // 0.5 종합 평가 프리팹 생성
-        foreach (GameObject prefab in resultPrefabs)
+        // 저장된 재정 데이터 불러오기
+        int totalSpent = PlayerPrefs.GetInt("TotalSpent", 0);
+        int totalRevenue = PlayerPrefs.GetInt("TotalRevenue", 0);
+        int netProfit = totalRevenue - totalSpent;
+
+        // 0.5 종합 평가 프리팹 생성 및 텍스트 갱신
+        for (int i = 0; i < resultPrefabs.Count; i++)
         {
-            if (prefab != null) Instantiate(prefab, total_parent);
+            if (resultPrefabs[i] == null) continue;
+
+            GameObject obj = Instantiate(resultPrefabs[i], total_parent);
+
+            // 프리팹 순서에 따른 텍스트 설정
+            // 0번: 수익, 1번: 지출, 2번: 순이익
+            if (obj.transform.childCount > 1)
+            {
+                TextMeshProUGUI uiText = obj.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
+                if (uiText != null)
+                {
+                    if (i == 0) // 1번째 프리팹: 총 수익 (+TotalRevenue)
+                    {
+                        uiText.text = "+" + totalRevenue.ToString();
+                    }
+                    else if (i == 1) // 2번째 프리팹: 총 지출 (-TotalSpent)
+                    {
+                        uiText.text = "-" + totalSpent.ToString();
+                    }
+                    else if (i == 2) // 3번째 프리팹: 순이익 (Revenue - Spent)
+                    {
+                        string sign = netProfit >= 0 ? "+" : ""; // 양수면 + 붙이기
+                        uiText.text = sign + netProfit.ToString();
+                    }
+                }
+            }
+
             yield return new WaitForSeconds(0.5f);
         }
 
@@ -82,7 +114,6 @@ public class LocalReviewManager : MonoBehaviour
         yield return StartCoroutine(DisplayReviews(allOrders));
     }
 
-    // 데이터를 Order_check 객체로 변환하고 OrderChecker에게 판정을 맡김
     List<Order_check> CreateAndCheckOrders()
     {
         List<Order_check> orders = new List<Order_check>();
@@ -92,7 +123,6 @@ public class LocalReviewManager : MonoBehaviour
         {
             var order = new Order_check { SelectedIngredients = FinalIngredients[i].ingredients };
 
-            // 인덱스 안전하게 데이터 주입
             if (i < ExcludeRequest.Count) order.ExcludeRequest = ExcludeRequest[i].ingredients;
             if (i < IncludeRequest.Count) order.IncludeRequest = IncludeRequest[i].ingredients;
 
@@ -104,9 +134,7 @@ public class LocalReviewManager : MonoBehaviour
 
             if (i < IsDeliverySuccessList.Count) order.IsDeliverySuccess = IsDeliverySuccessList[i];
 
-            // OrderChecker가 성공/실패 판별
             OrderChecker.Check(order);
-
             orders.Add(order);
         }
         return orders;
@@ -114,7 +142,6 @@ public class LocalReviewManager : MonoBehaviour
 
     IEnumerator DisplayReviews(List<Order_check> orders)
     {
-        // 출력할 리뷰 선정 (성공/실패 비율 맞추기)
         var successOrders = orders.Where(o => o.isSuccess).ToList();
         var failOrders = orders.Where(o => !o.isSuccess).ToList();
 
@@ -124,7 +151,7 @@ public class LocalReviewManager : MonoBehaviour
 
         var displayList = failOrders.OrderBy(x => rng.Next()).Take(negCount)
                           .Concat(successOrders.OrderBy(x => rng.Next()).Take(posCount))
-                          .OrderBy(x => rng.Next()).ToList(); // 섞기
+                          .OrderBy(x => rng.Next()).ToList();
 
         var names = ReviewerNamePool.OrderBy(x => rng.Next()).Take(displayList.Count).ToList();
 
@@ -140,45 +167,35 @@ public class LocalReviewManager : MonoBehaviour
             if (texts.Length >= 2)
             {
                 texts[0].text = names[i];
-                // 성공이면 긍정 리뷰 생성, 실패면 실패 사유 출력
                 texts[1].text = displayList[i].isSuccess ? GeneratePositiveReview(displayList[i]) : displayList[i].failReason;
             }
             yield return new WaitForSeconds(0.5f);
         }
     }
 
-    // 긍정 리뷰 멘트 생성 (ReviewDataProvider 사용)
     string GeneratePositiveReview(Order_check order)
     {
         string review = null;
-
-        // 1. 스페셜 메뉴 (50%)
         if (!string.IsNullOrEmpty(order.ProvidedSpecial) && rng.Next(2) == 0)
         {
             review = ReviewDataProvider.GetRandomReview(order.ProvidedSpecial, rng);
             if (review != null) return review;
         }
-
-        // 2. 사이드 메뉴 (30%)
         if (order.ProvidedSides.Count > 0 && rng.Next(3) == 0)
         {
             string randomSide = order.ProvidedSides[rng.Next(order.ProvidedSides.Count)];
             review = ReviewDataProvider.GetRandomReview(randomSide, rng);
             if (review != null) return review;
         }
-
-        // 3. 기본 재료
         if (order.SelectedIngredients.Count > 0)
         {
             string target = order.SelectedIngredients[rng.Next(order.SelectedIngredients.Count)];
             review = ReviewDataProvider.GetRandomReview(target, rng);
             if (review != null) return review;
         }
-
         return "배달도 빠르고 맛도 무난하네요. 잘 먹었습니다.";
     }
 
-    // --- 별점 UI ---
     IEnumerator review_star()
     {
         foreach (var star in createdStars) if (star != null) Destroy(star);

@@ -8,21 +8,32 @@ using UnityEngine.Networking;
 
 public class ReadSpreadSheets : MonoBehaviour
 {
+    [Header("Google Sheet Settings")]
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
     public readonly string RANGE = "A2:B";
-    public readonly long SHEET_ID = 0;
-    public List<Food_material> materials;
+    public readonly long SHEET_ID_MATERIAL = 0;          // 재료 시트
+    public readonly long SHEET_ID_SALES = 899576211;     // [추가] 판매 가격 시트 (2열: food_name, price)
+
+    [Header("Data Lists")]
+    public List<Food_material> materials;  // 재료 리스트
+    public List<Food_product> productPrices; // [추가] 완성품 가격 리스트
+
+    [Header("Game State")]
     public TextMeshProUGUI mineral;
+    public int money;
+    public int usedMoney = 0;
 
-    public int money;      // 현재 보유한 돈
-    public int usedMoney = 0; // 선택한 재료들의 총 비용 (장바구니 금액)
+    // 통계용 변수 (메모리에만 저장, 일차 종료 시 SaveDailyData로 저장)
+    public int totalSpent = 0;   // 총 지출
+    public int totalRevenue = 0; // [추가] 총 수익
 
-    // 총 지출액과 총 수익을 저장할 변수
-    public int totalSpent = 0;
-    // public int totalRevenue = 0; // 필요시 총 수익도 추가 가능
+    // 오늘 하루 동안 번 돈 (정산 전)
+    public int dailyRevenue = 0;
 
-    private bool dataReady = false; //  로딩 완료 플래그
+    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
+    public string currentRequestName = "kraken_sand";
 
+    private bool dataReady = false;
     private string last_name = string.Empty;
 
     [System.Serializable]
@@ -30,6 +41,13 @@ public class ReadSpreadSheets : MonoBehaviour
     {
         public string name;
         public int cost;
+    }
+
+    [System.Serializable]
+    public class Food_product // 완성품 (수익)
+    {
+        public string food_name;
+        public int price;
     }
 
     void Start()
@@ -44,9 +62,13 @@ public class ReadSpreadSheets : MonoBehaviour
         //PlayerPrefs.DeleteKey("Gold");
         //PlayerPrefs.DeleteKey("TotalSpent");
 
+        // 하루 시작 시 일일 수익 초기화
+        dailyRevenue = 0;
+
         // 저장된 돈 불러오기 (없으면 기본값 1000으로 시작한다고 가정 - 값 조정 필요)
-        money = PlayerPrefs.GetInt("Gold", 20);
+        money = PlayerPrefs.GetInt("Gold", 40);
         totalSpent = PlayerPrefs.GetInt("TotalSpent", 0); // 누적 지출 불러오기
+        totalRevenue = PlayerPrefs.GetInt("TotalRevenue", 0); // 수익 불러오기
 
         mineral.text = money.ToString();
 
@@ -54,7 +76,7 @@ public class ReadSpreadSheets : MonoBehaviour
         CheckMenu.selectedNames.Clear();
         usedMoney = 0;
 
-        StartCoroutine(LoadData());
+        StartCoroutine(LoadAllData());
     }
 
     public static string GetTSVAddress(string address, string range, long sheetId)
@@ -62,15 +84,22 @@ public class ReadSpreadSheets : MonoBehaviour
         return $"{address}/export?format=tsv&range={range}&gid={sheetId}";
     }
 
-    private IEnumerator LoadData()
+    // 두 개의 시트를 순차적으로 로딩
+    private IEnumerator LoadAllData()
     {
-        UnityWebRequest www = UnityWebRequest.Get(GetTSVAddress(ADDRESS, RANGE, SHEET_ID));
-        yield return www.SendWebRequest();
+        // 1. 재료 데이터 로드 (기존)
+        UnityWebRequest wwwMaterial = UnityWebRequest.Get(GetTSVAddress(ADDRESS, RANGE, SHEET_ID_MATERIAL));
+        yield return wwwMaterial.SendWebRequest();
+        materials = GetDatas<Food_material>(wwwMaterial.downloadHandler.text);
+        Debug.Log("재료 데이터 로드 완료");
 
-        Debug.Log(www.downloadHandler.text);
-        materials = GetDatas<Food_material>(www.downloadHandler.text);
-        dataReady = true; // 데이터 준비 완료 
+        // 2. [추가] 판매 가격 데이터 로드 (GID: 899576211)
+        UnityWebRequest wwwSales = UnityWebRequest.Get(GetTSVAddress(ADDRESS, RANGE, SHEET_ID_SALES));
+        yield return wwwSales.SendWebRequest();
+        productPrices = GetDatas<Food_product>(wwwSales.downloadHandler.text);
+        Debug.Log("판매 가격 데이터 로드 완료");
 
+        dataReady = true;
     }
     T GetData<T>(string[] datas) // TSV 한 행을 T타입 객체로 변환하는 함수 
     {
@@ -117,6 +146,41 @@ public class ReadSpreadSheets : MonoBehaviour
             returnList.Add(GetData<T>(datas));
         }
         return returnList;
+    }
+    // 수익 계산 로직
+    // 요청한 메뉴 이름(requestName)에 맞는 재료가 포함되어 있는지 검사
+    private int CalculateSalesRevenue(string requestName)
+    {
+        // 1. 요청한 메뉴의 가격 정보 찾기
+        var product = productPrices.Find(p => p.food_name == requestName);
+        if (product == null)
+        {
+            Debug.LogError($"[오류] 요청한 메뉴 '{requestName}'가 가격표(Sheet)에 없습니다.");
+            return 0;
+        }
+
+        // 2. 검증 로직: "요청 메뉴 이름" 안에 "선택된 재료 이름"이 포함되어 있는지 확인
+        // 예: request="kraken_sand" 이고, 재료에 "kraken"이 있으면 성공
+        bool isMatch = false;
+        foreach (string ingredient in CheckMenu.selectedNames)
+        {
+            if (requestName.Contains(ingredient))
+            {
+                isMatch = true;
+                Debug.Log($"[매칭 성공] 요청: {requestName} / 핵심재료: {ingredient}");
+                break;
+            }
+        }
+
+        if (isMatch)
+        {
+            return product.price;
+        }
+        else
+        {
+            Debug.Log($"[매칭 실패] 요청은 '{requestName}'였으나, 핵심 재료가 포함되지 않았습니다.");
+            return 0; // 요청 불일치 시 수익 없음
+        }
     }
 
     public void OnIngredientToggled(string ingredientName, bool isSelected)
@@ -174,7 +238,22 @@ public class ReadSpreadSheets : MonoBehaviour
         money -= usedMoney;        // 현재 잔액 차감
         totalSpent += usedMoney;   // 총 지출액에 누적
 
-        // 3. UI 및 저장
+        // 3. 수익 처리 (요청한 메뉴와 일치하는지 확인 후 돈 지급)
+        // 현재는 Inspector에 있는 currentRequestName을 사용 (나중에 손님 시스템과 연동 필요)
+        int revenue = CalculateSalesRevenue(currentRequestName);
+
+        if (revenue > 0)
+        {
+            dailyRevenue += revenue;
+            totalRevenue += revenue; 
+            Debug.Log($"[수익] 메뉴 완성! {revenue} 골드 획득. (요청: {currentRequestName})");
+        }
+        else
+        {
+            Debug.Log("[수익] 요청한 메뉴가 아니므로 수익이 발생하지 않았습니다.");
+        }
+
+        // 4. UI 및 저장
         mineral.text = money.ToString();
 
         PlayerPrefs.SetInt("Gold", money);
@@ -191,9 +270,16 @@ public class ReadSpreadSheets : MonoBehaviour
     }
     public void SaveDailyData()
     {
-        //PlayerPrefs.SetInt("Gold", money);
+        // 1. 모아둔 일일 수익을 플레이어 돈에 합산
+        money += dailyRevenue;
+        // 2. UI 갱신 (정산된 금액 표시)
+        mineral.text = money.ToString();
+
+        // 3. 데이터 저장
+        PlayerPrefs.SetInt("Gold", money);
         PlayerPrefs.SetInt("TotalSpent", totalSpent);
+        PlayerPrefs.SetInt("TotalRevenue", totalRevenue); // 수익도 저장
         PlayerPrefs.Save();
-        Debug.Log("일차 종료. 데이터 저장 완료.");
+        Debug.Log($"[일차 마감] 총 {dailyRevenue} 골드 수익 정산 완료. 현재 자산: {money}");
     }
 }
