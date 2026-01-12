@@ -93,7 +93,7 @@ public class TimeManager : MonoBehaviour
     {
         isRunning = true;
         timeattack_UI.SetActive(true);
-        Debug.Log("타임어택 시작!");
+        //Debug.Log("타임어택 시작!");
     }
 
     // 타임 오버 시 처리
@@ -102,11 +102,26 @@ public class TimeManager : MonoBehaviour
         limitTime = 0;
         isRunning = false;
         timeattack_UI.SetActive(false);
+
+        // --- 여기서 결제 로직 수행 ---
         if (sheet != null)
         {
-            sheet.LoadSavedDeck();
-            Debug.Log("게임 종료: 저장된 덱을 다시 불러왔습니다.");
+            // 1. 결제를 시도합니다.
+            // 성공하면(돈 충분) -> 돈이 차감되고 true 반환
+            // 실패하면(돈 부족) -> ReadSpreadSheets 내부 로직에 의해 '마지막 재료'가 삭제되고 false 반환
+            bool purchaseSuccess = sheet.ApplyPurchase();
+
+            if (!purchaseSuccess)
+            {
+                Debug.Log("잔액 부족으로 특수 재료 제거됨. 남은 재료로 재결제 시도.");
+
+                // 2. 실패했다면, 특수재료가 빠진 상태(가격이 내려감)로 다시 결제를 시도합니다.
+                sheet.ApplyPurchase();
+            }
+            sheet.SaveDailyData();
         }
+        // ---------------------------
+
         // 다음 씬으로 이동
         if (uiManager != null)
         {

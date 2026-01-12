@@ -164,9 +164,6 @@ public class CookManager : MonoBehaviour
         // 2. 대기
         yield return new WaitForSeconds(waitTime);
 
-        // 3. 봉투 내려오기
-        //yield return StartCoroutine(MoveObject(sandbag, startPos, endPos));
-
         // 3. 샌드위치 봉투에 넣기
         yield return StartCoroutine(SandwichIntoBag());
 
@@ -238,23 +235,6 @@ public class CookManager : MonoBehaviour
         }
     }
 
-    //IEnumerator MoveObject(GameObject target, Vector3 from, Vector3 to)
-    //{
-    //    if (target == null)
-    //    {
-    //        Debug.LogError("[CookManager] MoveObject 호출 시 target이 null입니다.");
-    //        yield break;
-    //    }
-
-    //    float elapsed = 0f;
-    //    while (elapsed < 1f)
-    //    {
-    //        elapsed += Time.deltaTime * moveSpeed;
-    //        target.transform.position = Vector3.Lerp(from, to, elapsed);
-    //        yield return null;
-    //    }
-    //}
-
 
     IEnumerator SandwichIntoBag()
     {
@@ -264,7 +244,7 @@ public class CookManager : MonoBehaviour
         Vector3 upPos = originalPos + new Vector3(0, 5f, 0);
         Vector3 downPos = originalPos +new Vector3(0, 2f, 0);
 
-        // ▲ 위로(그냥 연출) : 정렬 변경 안 함
+        // 위로(그냥 연출) : 정렬 변경 안 함
         yield return sandwichCore.transform.DOMove(upPos, 0.5f)
             .SetEase(Ease.OutQuad).WaitForCompletion();
 
@@ -276,31 +256,6 @@ public class CookManager : MonoBehaviour
         // 샌드위치만 숨김 (드링크/쿠키는 그대로 노출)
         foreach (var go in sandwichCoreObjects) go.SetActive(false);
 
-        // 봉투 정렬 복구
-        //bagRenderer.sortingOrder = bagOrderOrig;
     }
 
-    //IEnumerator MoveBothUp()
-    //{
-    //    if (sandbag == null || NewSandwich == null)
-    //    {
-    //        Debug.LogError("[CookManager] MoveBothUp 실행 불가: sandbag 또는 NewSandwich가 null입니다.");
-    //        yield break;
-    //    }
-
-    //    Vector3 bagCurrent = sandbag.transform.position;
-    //    Vector3 sandwichCurrent = NewSandwich.transform.position;
-
-    //    Vector3 bagTarget = startPos;
-    //    Vector3 sandwichTarget = sandwichCurrent + (bagTarget - bagCurrent);
-
-    //    float elapsed = 0f;
-    //    while (elapsed < 1f)
-    //    {
-    //        elapsed += Time.deltaTime * moveSpeed;
-    //        sandbag.transform.position = Vector3.Lerp(bagCurrent, bagTarget, elapsed);
-    //        NewSandwich.transform.position = Vector3.Lerp(sandwichCurrent, sandwichTarget, elapsed);
-    //        yield return null;
-    //    }
-    //}
 }
