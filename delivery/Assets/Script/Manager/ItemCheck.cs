@@ -33,9 +33,7 @@ public class ItemCheck : MonoBehaviour
         {
             HandleSelection(ref selectedDrink, name);
         }
-        //else if (gameObject.transform.GetChild(0).CompareTag("special_menu")){
-        //    HandleSelection(ref selectedSpecial, name);
-        //}
+
     }
     private void HandleSelection(ref ItemCheck selectedItem, string name)
     {

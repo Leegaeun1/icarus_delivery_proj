@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
     {
         menuPanel.SetActive(false); // 넘어가면 메뉴 선택창 안보이도록 하기 
         addPanel.SetActive(false); // 넘어가면 추가 재료 글자 안보이도록 하기
+
         SceneManager.LoadScene("Kitchen");
     }
 
