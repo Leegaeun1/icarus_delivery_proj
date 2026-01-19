@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
@@ -12,27 +12,34 @@ public class ButtonKeeper : MonoBehaviour
     public enum ButtonType { Order, Food, DeliveryMan }
     public ButtonType buttonType;
 
-    [Header("Á¡¼ö ¹× UI ¼³Á¤")]
+    [Header("ì ìˆ˜ ë° UI ì„¤ì •")]
     [SerializeField] private TextMeshProUGUI scoreText;
 
-    // ¸ğµç ¹öÆ°ÀÌ °øÀ¯ÇÏ´Â µ¥ÀÌÅÍ (static)
+    // ëª¨ë“  ë²„íŠ¼ì´ ê³µìœ í•˜ëŠ” ë°ì´í„° (static)
     private static int totalScore = 0;
     private static TextMeshProUGUI sharedScoreDisplay;
 
-    // ÇöÀç ¼±ÅÃµÈ ¹öÆ°µéÀ» ÀúÀå
+    // [ì¶”ê°€] ì£¼ë¬¸ ë§¤ë‹ˆì € ì°¸ì¡° (ì •ì  ë³€ìˆ˜)
+    private static OrderQueueSystem orderManager;
+
+    // í˜„ì¬ ì„ íƒëœ ë²„íŠ¼ë“¤ì„ ì €ì¥
     private static ButtonKeeper pressedOrderButton = null;
     private static ButtonKeeper pressedFoodButton = null;
     private static ButtonKeeper pressedDeliveryManButton = null;
 
     void Start()
     {
+        // [ì¶”ê°€] ì”¬ì— ìˆëŠ” ë§¤ë‹ˆì €ë¥¼ ì°¾ì•„ì„œ í• ë‹¹ (í•œ ë²ˆë§Œ ì‹¤í–‰ë¨)
+        if (orderManager == null)
+            orderManager = FindObjectOfType<OrderQueueSystem>();
+
         button = GetComponent<Button>();
         if (button != null)
         {
             button.onClick.AddListener(OnButtonClick);
         }
 
-        // °øÀ¯ UI ÅØ½ºÆ® ¼³Á¤
+        // ê³µìœ  UI í…ìŠ¤íŠ¸ ì„¤ì •
         if (scoreText != null)
         {
             sharedScoreDisplay = scoreText;
@@ -43,7 +50,7 @@ public class ButtonKeeper : MonoBehaviour
     public void Initialize(Order order)
     {
         linkedOrder = order;
-        // ÀÌ¹Ì ¿Ï·áµÈ ÁÖ¹®ÀÏ °æ¿ìÀÇ ÃÊ±â Ã³¸®
+        // ì´ë¯¸ ì™„ë£Œëœ ì£¼ë¬¸ì¼ ê²½ìš°ì˜ ì´ˆê¸° ì²˜ë¦¬
         if (linkedOrder != null && linkedOrder.isCompleted)
         {
             isPressed = true;
@@ -56,9 +63,9 @@ public class ButtonKeeper : MonoBehaviour
         if (!isPressed)
         {
             isPressed = true;
-            if (button != null) button.interactable = false; // ¹öÆ° Áßº¹ Å¬¸¯ ¹æÁö
+            if (button != null) button.interactable = false; // ë²„íŠ¼ ì¤‘ë³µ í´ë¦­ ë°©ì§€
 
-            // 1. Å¸ÀÔ¿¡ ¸Â°Ô Á¤Àû º¯¼ö¿¡ ÀÚ±â ÀÚ½Å ÀúÀå
+            // 1. íƒ€ì…ì— ë§ê²Œ ì •ì  ë³€ìˆ˜ì— ìê¸° ìì‹  ì €ì¥
             switch (buttonType)
             {
                 case ButtonType.Order: pressedOrderButton = this; break;
@@ -66,49 +73,83 @@ public class ButtonKeeper : MonoBehaviour
                 case ButtonType.DeliveryMan: pressedDeliveryManButton = this; break;
             }
 
-            // 2. ÁÖ¹® µ¥ÀÌÅÍ »óÅÂ ¾÷µ¥ÀÌÆ®
+            // 2. ì£¼ë¬¸ ë°ì´í„° ìƒíƒœ ì—…ë°ì´íŠ¸
             if (linkedOrder != null) linkedOrder.isCompleted = true;
 
-            // 3. ¹Ì¼Ç ¿Ï·á Ã¼Å©
+            // 3. ë¯¸ì…˜ ì™„ë£Œ ì²´í¬
             CheckMissionComplete();
         }
     }
 
     private void CheckMissionComplete()
     {
-        // ¼¼ Á¾·ùÀÇ ¹öÆ°ÀÌ ¸ğµÎ ¼±ÅÃµÇ¾ú´ÂÁö È®ÀÎ
+        // ì„¸ ì¢…ë¥˜ì˜ ë²„íŠ¼ì´ ëª¨ë‘ ì„ íƒë˜ì—ˆëŠ”ì§€ í™•ì¸
         if (pressedOrderButton != null && pressedFoodButton != null && pressedDeliveryManButton != null)
         {
-            // Á¡¼ö 5Á¡ Ãß°¡
+            // ì ìˆ˜ 5ì  ì¶”ê°€
             totalScore += 5;
             UpdateScoreUI();
 
-            Debug.Log("¹Ì¼Ç ¿Ï·á! 5Á¡ È¹µæ.");
+            Debug.Log("ë¯¸ì…˜ ì™„ë£Œ! 5ì  íšë“.");
 
-            // ¹öÆ° ¼û±â±â ¹× ÃÊ±âÈ­ ½ÇÇà
+            // [ì¶”ê°€] ì£¼ë¬¸ ë§¤ë‹ˆì €ì—ê²Œ ì„±ê³µ ì•Œë¦¼ ì „ì†¡
+            if (orderManager != null)
+            {
+                orderManager.CompleteOrderSuccess();
+            }
+
+            // ë²„íŠ¼ ìˆ¨ê¸°ê¸° ë° ì´ˆê¸°í™” ì‹¤í–‰
             HideAndResetButtons();
         }
     }
 
     private void HideAndResetButtons()
     {
-        // 1. ¼±ÅÃµÇ¾ú´ø ¹öÆ° ¿ÀºêÁ§Æ®µéÀ» È­¸é¿¡¼­ ¼û±è
+        // 1. ì„ íƒë˜ì—ˆë˜ ë²„íŠ¼ ì˜¤ë¸Œì íŠ¸ë“¤ì„ í™”ë©´ì—ì„œ ìˆ¨ê¹€
         if (pressedOrderButton != null) pressedOrderButton.gameObject.SetActive(false);
         if (pressedFoodButton != null) pressedFoodButton.gameObject.SetActive(false);
         if (pressedDeliveryManButton != null) pressedDeliveryManButton.gameObject.SetActive(false);
 
-        // 2. ´ÙÀ½ ¹Ì¼ÇÀ» À§ÇØ °ü¸® º¯¼öµé ¸®¼Â
+        // 2. ë‹¤ìŒ ë¯¸ì…˜ì„ ìœ„í•´ ê´€ë¦¬ ë³€ìˆ˜ë“¤ ë¦¬ì…‹
         ResetSystem();
     }
 
-    private void ResetSystem()
+    // [ì¶”ê°€] ì‹œê°„ ì´ˆê³¼ ì‹œ ì™¸ë¶€(OrderQueueSystem ë“±)ì—ì„œ ë²„íŠ¼ì„ ê°•ì œë¡œ ë¦¬ì…‹í•˜ê¸° ìœ„í•œ ë©”ì„œë“œ
+    public static void ForceReset()
     {
-        // ÂüÁ¶ º¯¼ö ÃÊ±âÈ­ (ÀÌ°É ÇØÁà¾ß ´ÙÀ½ ¹öÆ°µéÀ» ´Ù½Ã Å¬¸¯ÇßÀ» ¶§ ÀÎÁöÇÔ)
+        // í˜„ì¬ ëˆŒë ¤ìˆëŠ” ë²„íŠ¼ë“¤ì˜ ìƒíƒœë¥¼ ë¦¬ì…‹í•˜ê³  ë‹¤ì‹œ í™œì„±í™”
+        if (pressedOrderButton != null)
+        {
+            pressedOrderButton.isPressed = false;
+            if (pressedOrderButton.button != null) pressedOrderButton.button.interactable = true;
+        }
+        if (pressedFoodButton != null)
+        {
+            pressedFoodButton.isPressed = false;
+            if (pressedFoodButton.button != null) pressedFoodButton.button.interactable = true;
+        }
+        if (pressedDeliveryManButton != null)
+        {
+            pressedDeliveryManButton.isPressed = false;
+            if (pressedDeliveryManButton.button != null) pressedDeliveryManButton.button.interactable = true;
+        }
+
+        // ì°¸ì¡° ë³€ìˆ˜ ì´ˆê¸°í™”
         pressedOrderButton = null;
         pressedFoodButton = null;
         pressedDeliveryManButton = null;
 
-        Debug.Log("½Ã½ºÅÛ ¸®¼Â ¿Ï·á. ´ÙÀ½ ¹öÆ°µéÀ» ¼±ÅÃÇÒ ¼ö ÀÖ½À´Ï´Ù.");
+        Debug.Log("ì‹œìŠ¤í…œ ê°•ì œ ë¦¬ì…‹ ì™„ë£Œ (ForceReset)");
+    }
+
+    private void ResetSystem()
+    {
+        // ì°¸ì¡° ë³€ìˆ˜ ì´ˆê¸°í™” (ì´ê±¸ í•´ì¤˜ì•¼ ë‹¤ìŒ ë²„íŠ¼ë“¤ì„ ë‹¤ì‹œ í´ë¦­í–ˆì„ ë•Œ ì¸ì§€í•¨)
+        pressedOrderButton = null;
+        pressedFoodButton = null;
+        pressedDeliveryManButton = null;
+
+        Debug.Log("ì‹œìŠ¤í…œ ë¦¬ì…‹ ì™„ë£Œ. ë‹¤ìŒ ë²„íŠ¼ë“¤ì„ ì„ íƒí•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
     }
 
     private void UpdateScoreUI()
