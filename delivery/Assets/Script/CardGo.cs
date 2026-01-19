@@ -13,7 +13,7 @@ public class CardGo : MonoBehaviour
     void Start() // Awake 대신 OnEnable 사용
     {
         transform.localRotation = Quaternion.Euler(0, 180f, 0);
-        Debug.Log(gameObject.name + " 카드가 뒷면으로 초기 설정됨.");
+        //Debug.Log(gameObject.name + " 카드가 뒷면으로 초기 설정됨.");
     }
 
     public void Flip()
