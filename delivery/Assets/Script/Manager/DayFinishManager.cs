@@ -46,6 +46,8 @@ public class DayFinishManager : MonoBehaviour
     void Awake()
     {
         rng = seed >= 0 ? new System.Random(seed) : new System.Random();
+        total_parent = GameObject.Find("day_total").GetComponent<Transform>();
+
     }
 
     void Start()
