@@ -5,7 +5,7 @@ using System.Collections;
 
 public class AlienAnswer : MonoBehaviour
 {
-    public AlienAppearStepped alien;
+    public Summon alien;
     //public SpeechBubble bubble;
 
     public DialogueManager dialogueManager;
