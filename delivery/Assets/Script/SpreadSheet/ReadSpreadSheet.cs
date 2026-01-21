@@ -15,7 +15,8 @@ public class ReadSpreadSheet : MonoBehaviour
     public TextMeshProUGUI mineral;
     
 
-    private bool dataReady = false; //  로딩 완료 플래그
+    private bool dataReady = false;
+    public bool DataReady => dataReady;//  로딩 완료 플래그
 
 
     [System.Serializable]

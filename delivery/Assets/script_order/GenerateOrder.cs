@@ -61,7 +61,7 @@ public class GenerateOrder : MonoBehaviour
             (1, 3)  // 추가 범주
         );
 
-        var order = new Order
+        var order = new Orders
         {
             orderId = System.Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper(),
             timestamp = System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
