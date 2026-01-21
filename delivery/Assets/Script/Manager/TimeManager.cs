@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TimeManager : MonoBehaviour
 {
@@ -15,30 +17,36 @@ public class TimeManager : MonoBehaviour
     public GameObject timeattack_UI;
 
     public UIManager uiManager;
+    public GameObject nextDayButtonObj;
 
     private int date = 1;
     private float gameTime = 0f;
-    private const float timeScale = 100f;
+
+    private float gameSpeed = 1000f;
     private const int secondsPerDay = 3 * 3600;
+
+    // 하루가 끝났는지 체크하는 플래그
+    private bool isDayEnded = false;
 
     private float limitTime = 650f;
     private bool isRunning = false;
+
 
     void Awake()
     {
         // UI 자동 연결 로직
         if (time == null)
         {
-            GameObject found = GameObject.Find("DayUI");
-            if (found != null && found.transform.childCount > 1)
-                time = found.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+            time = GameObject.Find("game_time").GetComponent<TextMeshProUGUI>();
+            //if (found != null && found.transform.childCount > 1)
+            //    time = found.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         }
 
         if (day == null)
         {
-            GameObject foundDay = GameObject.Find("DayUI");
-            if (foundDay != null && foundDay.transform.childCount > 0)
-                day = foundDay.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+            day = GameObject.Find("day_txt").GetComponent<TextMeshProUGUI>();
+            //if (foundDay != null && foundDay.transform.childCount > 0)
+            //    day = foundDay.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         }
         if (sheet == null)
             sheet = FindObjectOfType<ReadSpreadSheets>();
@@ -54,8 +62,12 @@ public class TimeManager : MonoBehaviour
 
     void Update()
     {
-        // 1. 일반 시간 흐름
-        gameTime += Time.deltaTime * timeScale;
+        // 1. 일반 시간 흐름 (하루가 끝나지 않았을 때만 시간이 흐름)
+        if (!isDayEnded)
+        {
+            gameTime += Time.deltaTime * gameSpeed;
+            CheckEndOfDay(); // 시간이 다 되었는지 체크
+        }
         UpdateDayNightUI();
 
         // 2. 타임어택 로직 (isRunning일 때만 작동)
@@ -66,7 +78,7 @@ public class TimeManager : MonoBehaviour
 
             if (limitTime > 0)
             {
-                limitTime -= Time.deltaTime * timeScale;
+                limitTime -= Time.deltaTime * gameSpeed;
                 if (limitTime < 0) limitTime = 0;
             }
             else
@@ -87,13 +99,46 @@ public class TimeManager : MonoBehaviour
             }
         }
     }
+    // 시간이 3시(secondsPerDay)에 도달했는지 확인하는 함수
+    void CheckEndOfDay()
+    {
+        // 현재까지 흐른 총 시간이 "오늘 끝날 시간(날짜 * 3시간)"을 넘었는지 확인
+        float endOfToday = date * secondsPerDay;
+
+        if (gameTime >= endOfToday)
+        {
+            // 시간을 딱 맞춰서 고정
+            gameTime = endOfToday;
+
+            // 하루 마감 상태로 전환
+            isDayEnded = true;
+
+            Debug.Log(date + "일차 업무 종료 (03:00). 시간 정지.");
+        }
+    }
+
+    public void StartNextDay()
+    {
+        // 1. 날짜 증가
+        date++;
+
+        // 2. 상태 해제 (시간이 다시 흐르도록)
+        isDayEnded = false;
+
+        // 결제 로직이나 정산
+        sheet.SaveDailyData();
+        // + 애니메이션 넣기
+
+        // 다시 메인화면으로 이동
+        SceneManager.LoadScene("main_menu");
+
+    }
 
     // 외부에서 호출하면 타이머를 시작하는 함수
     public void StartTimeAttack()
     {
         isRunning = true;
         timeattack_UI.SetActive(true);
-        //Debug.Log("타임어택 시작!");
     }
 
     // 타임 오버 시 처리
@@ -118,7 +163,7 @@ public class TimeManager : MonoBehaviour
                 // 2. 실패했다면, 특수재료가 빠진 상태(가격이 내려감)로 다시 결제를 시도합니다.
                 sheet.ApplyPurchase();
             }
-            sheet.SaveDailyData();
+            //sheet.SaveDailyData();
         }
         // ---------------------------
 
@@ -131,9 +176,21 @@ public class TimeManager : MonoBehaviour
 
     void UpdateDayNightUI()
     {
-        // 기존 로직 유지
-        int totalSeconds = Mathf.FloorToInt(gameTime / 600f) * 600;
-        date = (totalSeconds / secondsPerDay) + 1;
+        // UI에는 현재 gameTime을 기준으로 표시
+
+        // 만약 하루가 끝난 상태라면 강제로 3:00 표시 (나머지 연산하면 0:00이 되기 때문)
+        if (isDayEnded)
+        {
+            if (time != null) time.text = "03:00";
+            if (day != null) day.text = date.ToString() + " 일차";
+            return;
+        }
+
+        // 일반적인 시간 표시 계산
+        int totalSeconds = Mathf.FloorToInt(gameTime); // 소수점 버림
+
+        // 날짜 계산 (Update에서 date를 관리하므로 여기서는 표시용으로만 참고하거나 기존 date 사용)
+        // int currentDate = (totalSeconds / secondsPerDay) + 1; 
 
         int secondsToday = totalSeconds % secondsPerDay;
         int hours = secondsToday / 3600;

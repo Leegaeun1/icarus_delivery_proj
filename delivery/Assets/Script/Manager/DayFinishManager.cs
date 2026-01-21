@@ -43,25 +43,36 @@ public class DayFinishManager : MonoBehaviour
     private System.Random rng;
     private List<GameObject> spawnedReviewObjects = new List<GameObject>();
 
+    public Button nextdayBtn;
+    private TimeManager timerManager;
+
     void Awake()
     {
         rng = seed >= 0 ? new System.Random(seed) : new System.Random();
         total_parent = GameObject.Find("day_total").GetComponent<Transform>();
-
+        nextdayBtn = GameObject.Find("NextDayBtn").GetComponent<Button>();
+        timerManager = GameObject.Find("TimeManager").GetComponent<TimeManager>();
     }
 
     void Start()
     {
         StartCoroutine(GenerateReviewsSequence());
+        nextdayBtn.gameObject.SetActive(false);
+        // [수정 1] Start에서 버튼 이벤트를 미리 연결합니다.
+        if (nextdayBtn != null && timerManager != null)
+        {
+            nextdayBtn.onClick.RemoveAllListeners();
+            nextdayBtn.onClick.AddListener(() => timerManager.StartNextDay());
+        }
     }
 
     IEnumerator GenerateReviewsSequence()
     {
 
         // 저장된 재정 데이터 불러오기
-        int totalSpent = PlayerPrefs.GetInt("TotalSpent", 0);
-        int totalRevenue = PlayerPrefs.GetInt("TotalRevenue", 0);
-        int netProfit = totalRevenue - totalSpent;
+        int dailySpent = GetComponent<ReadSpreadSheets>().usedMoney; // 하루에 사용한 금약
+        int dailyRevenue = GetComponent<ReadSpreadSheets>().dailyRevenue;
+        int netProfit = dailyRevenue - dailySpent;
 
         // 0.5 종합 평가 프리팹 생성 및 텍스트 갱신
         for (int i = 0; i < resultPrefabs.Count; i++)
@@ -80,11 +91,11 @@ public class DayFinishManager : MonoBehaviour
                 {
                     if (i == 0) // 1번째 프리팹: 총 수익 (+TotalRevenue)
                     {
-                        uiText.text = "+" + totalRevenue.ToString();
+                        uiText.text = "+" + dailyRevenue.ToString();
                     }
                     else if (i == 1) // 2번째 프리팹: 총 지출 (-TotalSpent)
                     {
-                        uiText.text = "-" + totalSpent.ToString();
+                        uiText.text = "-" + dailySpent.ToString();
                     }
                     else if (i == 2) // 3번째 프리팹: 순이익 (Revenue - Spent)
                     {
@@ -106,6 +117,11 @@ public class DayFinishManager : MonoBehaviour
 
         // 3. 화면 표시
         yield return StartCoroutine(DisplayReviews(allOrders));
+
+        yield return new WaitForSeconds(1f);
+
+        // 4. 1초 뒤에 다음으로 가는 버튼 활성화
+        nextdayBtn.gameObject.SetActive(true);
     }
 
     List<Order_check> CreateAndCheckOrders()
@@ -207,4 +223,5 @@ public class DayFinishManager : MonoBehaviour
         }
         return "배달도 빠르고 맛도 무난하네요. 잘 먹었습니다.";
     }
+
 }

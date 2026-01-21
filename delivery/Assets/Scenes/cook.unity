@@ -875,6 +875,11 @@ Transform:
   - {fileID: 827639463}
   - {fileID: 630904836}
   - {fileID: 947766906}
+  - {fileID: 1888496440}
+  - {fileID: 529194882}
+  - {fileID: 1661514283}
+  - {fileID: 1252691148}
+  - {fileID: 301222679}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &189136131
@@ -1671,9 +1676,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   materials: []
+  productPrices: []
   mineral: {fileID: 205917634}
   money: 0
   usedMoney: 0
+  totalSpent: 0
+  totalRevenue: 0
+  dailyRevenue: 0
+  currentRequestName: kraken_sand
 --- !u!4 &301222679
 Transform:
   m_ObjectHideFlags: 0
@@ -1682,12 +1692,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 301222677}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 807.9606, y: 605.68616, z: -15.174934}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 627.9606, y: -304.31384, z: -15.174934}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 189136130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &301222680
 MonoBehaviour:
@@ -2091,11 +2101,11 @@ Transform:
   m_GameObject: {fileID: 529194881}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 214.4812, y: -208.73041, z: 6.934548}
+  m_LocalPosition: {x: 699.99, y: -420, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1888496440}
+  m_Father: {fileID: 189136130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &529194883
 MonoBehaviour:
@@ -2538,6 +2548,7 @@ MonoBehaviour:
   timeattack: {fileID: 1400220451}
   timeattack_UI: {fileID: 904733538}
   uiManager: {fileID: 0}
+  nextDayButtonObj: {fileID: 0}
 --- !u!4 &630904836
 Transform:
   m_ObjectHideFlags: 0
@@ -3247,7 +3258,7 @@ GameObject:
   - component: {fileID: 827552518}
   - component: {fileID: 827552517}
   m_Layer: 5
-  m_Name: time
+  m_Name: game_time
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5968,11 +5979,11 @@ Transform:
   m_GameObject: {fileID: 1252691146}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -665.5088, y: -698.7304, z: 6.934548}
+  m_LocalPosition: {x: -180, y: -910, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1888496440}
+  m_Father: {fileID: 189136130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1257578233
 PrefabInstance:
@@ -7320,7 +7331,7 @@ GameObject:
   - component: {fileID: 1400220452}
   - component: {fileID: 1400220451}
   m_Layer: 5
-  m_Name: time
+  m_Name: cnt_down_time
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8177,12 +8188,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661514282}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 485.5088, y: -211.26959, z: -6.934548}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1888496440}
+  m_Father: {fileID: 189136130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1661514284
 MonoBehaviour:
@@ -9804,15 +9815,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1888496439}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 665.5088, y: 698.7304, z: -6.934548}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 485.5088, y: -211.26959, z: -6.934548}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1252691148}
-  - {fileID: 529194882}
-  - {fileID: 1661514283}
-  m_Father: {fileID: 0}
+  m_Children: []
+  m_Father: {fileID: 189136130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1925268308
 PrefabInstance:
@@ -10506,7 +10514,7 @@ GameObject:
   - component: {fileID: 2072030538}
   - component: {fileID: 2072030537}
   m_Layer: 5
-  m_Name: day
+  m_Name: day_txt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11368,6 +11376,4 @@ SceneRoots:
   - {fileID: 1477201191}
   - {fileID: 639078251}
   - {fileID: 189136130}
-  - {fileID: 1888496440}
-  - {fileID: 301222679}
   - {fileID: 356692286}

@@ -106,6 +106,6 @@ public class CheckMenu : MonoBehaviour
             completebtn.GetComponent<Image>().sprite = errorbtn;
             Debug.Log("돈이 부족합니다.");
         }
-        sheet.SaveDailyData(); // 임시로 여기에 저장하기
+        //sheet.SaveDailyData(); // 임시로 여기에 저장하기
     }
 }

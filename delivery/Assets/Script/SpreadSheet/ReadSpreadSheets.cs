@@ -5,6 +5,7 @@ using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class ReadSpreadSheets : MonoBehaviour
 {
@@ -12,11 +13,11 @@ public class ReadSpreadSheets : MonoBehaviour
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
     public readonly string RANGE = "A2:B";
     public readonly long SHEET_ID_MATERIAL = 0;          // 재료 시트
-    public readonly long SHEET_ID_SALES = 899576211;     // [추가] 판매 가격 시트 (2열: food_name, price)
+    public readonly long SHEET_ID_SALES = 899576211;     // 판매 가격 시트 (2열: food_name, price)
 
     [Header("Data Lists")]
     public List<Food_material> materials;  // 재료 리스트
-    public List<Food_product> productPrices; // [추가] 완성품 가격 리스트
+    public List<Food_product> productPrices; // 완성품 가격 리스트
 
     [Header("Game State")]
     public TextMeshProUGUI mineral;
@@ -25,7 +26,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
     // 통계용 변수 (메모리에만 저장, 일차 종료 시 SaveDailyData로 저장)
     public int totalSpent = 0;   // 총 지출
-    public int totalRevenue = 0; // [추가] 총 수익
+    public int totalRevenue = 0; // 총 수익
 
     // 오늘 하루 동안 번 돈 (정산 전)
     public int dailyRevenue = 0;
@@ -35,6 +36,9 @@ public class ReadSpreadSheets : MonoBehaviour
 
     private bool dataReady = false;
     private string last_name = string.Empty;
+
+    private Button timeManager;
+
 
     [System.Serializable]
     public class Food_material
@@ -56,7 +60,10 @@ public class ReadSpreadSheets : MonoBehaviour
         if (mineral == null)
         {
             Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
+            mineral = GameObject.Find("money_txt").GetComponent<TextMeshProUGUI>();
         }
+        timeManager = GameObject.Find("TimeManager").GetComponent<Button>();
+
 
         // 개발 테스트용 초기화
         //PlayerPrefs.DeleteKey("Gold");
@@ -93,7 +100,7 @@ public class ReadSpreadSheets : MonoBehaviour
         materials = GetDatas<Food_material>(wwwMaterial.downloadHandler.text);
         Debug.Log("재료 데이터 로드 완료");
 
-        // 2. [추가] 판매 가격 데이터 로드 (GID: 899576211)
+        // 2. 판매 가격 데이터 로드
         UnityWebRequest wwwSales = UnityWebRequest.Get(GetTSVAddress(ADDRESS, RANGE, SHEET_ID_SALES));
         yield return wwwSales.SendWebRequest();
         productPrices = GetDatas<Food_product>(wwwSales.downloadHandler.text);
@@ -256,10 +263,6 @@ public class ReadSpreadSheets : MonoBehaviour
         // 4. UI 및 저장
         mineral.text = money.ToString();
 
-        PlayerPrefs.SetInt("Gold", money);
-        //PlayerPrefs.SetInt("TotalSpent", totalSpent); // 지출 내역 저장
-        PlayerPrefs.Save();
-
         Debug.Log($"결제 성공! 지불액: {usedMoney} / 남은 금액 : {money}/ 총 누적 지출: {totalSpent}");
 
         // 4. 다음 결제를 위해 사용된 금액(장바구니 금액) 초기화
@@ -268,7 +271,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
         return true;
     }
-    public void SaveDailyData()
+    public void SaveDailyData() // 하루가 끝날 때 저장!!!!
     {
         // 1. 모아둔 일일 수익을 플레이어 돈에 합산
         money += dailyRevenue;
