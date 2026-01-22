@@ -3,107 +3,50 @@ using UnityEngine.UI;
 
 public class pos : MonoBehaviour
 {
-    public Button posButton;
-    public GameObject shimPanel;
-    public GameObject popupPanel;
+    [Header("버튼 설정")]
+    public Button OpenButton;      // POS 열기 버튼
+    public Button closeButton;    // X (닫기) 버튼
 
-    public Button alarmButton;
-    public GameObject alarmShimPanel;
-    public GameObject alarmPopupPanel;
-
-    public Button dsButton;
-    public GameObject dsShimPanel;
-    public GameObject dsPopupPanel;
-
-    public Button daButton;
-    public GameObject daShimPanel;
-    public GameObject daPopupPanel;
+    [Header("패널 설정")]
+    public GameObject popupPanel; // 팝업 패널
 
     void Awake()
     {
-        shimPanel.SetActive(false);
-        popupPanel.SetActive(false);
-        alarmShimPanel.SetActive(false);
-        alarmPopupPanel.SetActive(false);
-        dsShimPanel.SetActive(false);
-        dsPopupPanel.SetActive(false);
-        daShimPanel.SetActive(false);
-        daPopupPanel.SetActive(false);
-
-        alarmButton.gameObject.SetActive(false);
-        dsButton.gameObject.SetActive(false);
-        daButton.gameObject.SetActive(false);
+        // 시작 시 팝업 숨김
+        if (popupPanel != null)
+        {
+            popupPanel.SetActive(false);
+        }
     }
 
     void Start()
     {
-        posButton.onClick.AddListener(OpenPopup);
-        shimPanel.GetComponent<Button>().onClick.AddListener(ClosePopup);
+        // POS 버튼 클릭 시 열기 기능 연결
+        if (OpenButton != null)
+        {
+            OpenButton.onClick.AddListener(OpenPopup);
+        }
 
-        alarmButton.onClick.AddListener(OpenAlarmPopup);
-        alarmShimPanel.GetComponent<Button>().onClick.AddListener(CloseAlarmPopup);
-
-        dsButton.onClick.AddListener(OpenDsPopup);
-        dsShimPanel.GetComponent<Button>().onClick.AddListener(CloseDsPopup);
-
-        daButton.onClick.AddListener(OpenDaPopup);
-        daShimPanel.GetComponent<Button>().onClick.AddListener(CloseDaPopup);
+        // X 버튼 클릭 시 닫기 기능 연결
+        if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(ClosePopup);
+        }
     }
 
     public void OpenPopup()
     {
-        shimPanel.SetActive(true);
-        popupPanel.SetActive(true);
-
-        alarmButton.gameObject.SetActive(true);
-        dsButton.gameObject.SetActive(true);
-        daButton.gameObject.SetActive(true);
+        if (popupPanel != null)
+        {
+            popupPanel.SetActive(true);
+        }
     }
 
     public void ClosePopup()
     {
-        shimPanel.SetActive(false);
-        popupPanel.SetActive(false);
-
-        alarmButton.gameObject.SetActive(false);
-        dsButton.gameObject.SetActive(false);
-        daButton.gameObject.SetActive(false);
-    }
-
-    public void OpenAlarmPopup()
-    {
-        alarmShimPanel.SetActive(true);
-        alarmPopupPanel.SetActive(true);
-    }
-
-    public void CloseAlarmPopup()
-    {
-        alarmShimPanel.SetActive(false);
-        alarmPopupPanel.SetActive(false);
-    }
-
-    public void OpenDsPopup()
-    {
-        dsShimPanel.SetActive(true);
-        dsPopupPanel.SetActive(true);
-    }
-
-    public void CloseDsPopup()
-    {
-        dsShimPanel.SetActive(false);
-        dsPopupPanel.SetActive(false);
-    }
-
-    public void OpenDaPopup()
-    {
-        daShimPanel.SetActive(true);
-        daPopupPanel.SetActive(true);
-    }
-
-    public void CloseDaPopup()
-    {
-        daShimPanel.SetActive(false);
-        daPopupPanel.SetActive(false);
+        if (popupPanel != null)
+        {
+            popupPanel.SetActive(false);
+        }
     }
 }
-

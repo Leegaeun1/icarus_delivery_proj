@@ -53,9 +53,9 @@ public class StageManage : MonoBehaviour
         drink_cnt = stageDict["drink"][now_stage - 1];
 
         menu.OnStageDataLoaded(main_sand_cnt, cookie_cnt, drink_cnt);
-        print(main_sand_cnt);
-        print(cookie_cnt);
-        print(drink_cnt);
+        //print(main_sand_cnt);
+        //print(cookie_cnt);
+        //print(drink_cnt);
     }
 
     T GetData<T>(string[] datas)

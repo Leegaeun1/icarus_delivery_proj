@@ -12,13 +12,13 @@ public class ItemCheck : MonoBehaviour
     private Image image;
 
     [SerializeField] 
-    public ReadSpreadSheet sheet;
+    public ReadSpreadSheets sheet;
 
     private void Start()
     {
         image = GetComponent<Image>();
         if (sheet == null)
-            sheet = FindObjectOfType<ReadSpreadSheet>();
+            sheet = FindObjectOfType<ReadSpreadSheets>();
     }
 
     public void select()
@@ -33,9 +33,7 @@ public class ItemCheck : MonoBehaviour
         {
             HandleSelection(ref selectedDrink, name);
         }
-        //else if (gameObject.transform.GetChild(0).CompareTag("special_menu")){
-        //    HandleSelection(ref selectedSpecial, name);
-        //}
+
     }
     private void HandleSelection(ref ItemCheck selectedItem, string name)
     {

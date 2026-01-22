@@ -12,6 +12,7 @@
 /[Uu]ser[Ss]ettings/
 *.log
 
+UserSettings/Layout/*.dwlt
 *.dwlt
 *.wlt
 
