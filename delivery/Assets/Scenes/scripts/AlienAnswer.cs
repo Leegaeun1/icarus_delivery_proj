@@ -5,14 +5,14 @@ using System.Collections;
 
 public class AlienAnswer : MonoBehaviour
 {
-    public Summon alien;
+    //public Summon alien;
     //public SpeechBubble bubble;
 
-    public DialogueManager dialogueManager;
+    //public DialogueManager dialogueManager;
 
     public void CallButtonPressed()
     {
-        alien.SummonAlien(); // 외계인 등장
+        //alien.SummonAlien(); // 외계인 등장
         //StartCoroutine(ShowSpeechDelayed());
     }
 

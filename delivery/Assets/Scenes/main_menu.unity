@@ -1595,9 +1595,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1153570074}
   - component: {fileID: 1153570075}
-  - component: {fileID: 1153570079}
-  - component: {fileID: 1153570078}
-  - component: {fileID: 1153570076}
   - component: {fileID: 1153570077}
   m_Layer: 0
   m_Name: DsObject
@@ -1633,7 +1630,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cf85dd7057a02845a1b2b77d8431232, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manPrefab: {fileID: 8873313237648963366, guid: 61a6c36ee762bf642b54edc85294b90d, type: 3}
+  manPrefabs:
+  - {fileID: 8873313237648963366, guid: 61a6c36ee762bf642b54edc85294b90d, type: 3}
+  - {fileID: 8873313237648963366, guid: 8060c996610774f42bcfd5e244561971, type: 3}
   manContainer: {fileID: 1465200316}
   minWait: 5
   maxWait: 15
@@ -1642,23 +1641,6 @@ MonoBehaviour:
   - "\uC8FC\uBB38\uBC88\uD638 2\uBC88\uC785\uB2C8\uB2E4"
   - "\uB208\uC54C\uC8FC\uC2A4, \uC9C0\uAD6C \uC0CC\uB4DC\uC704\uCE58 \uC138\uD2B8
     \uC8FC\uC138\uC694"
---- !u!114 &1153570076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1153570070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cf85dd7057a02845a1b2b77d8431232, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manPrefab: {fileID: 7341715907905650640, guid: 9668b303da8c13f42951a8c7bdd68606, type: 3}
-  manContainer: {fileID: 338752466}
-  minWait: 5
-  maxWait: 15
-  speechQuotes: []
 --- !u!114 &1153570077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1673,46 +1655,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonType: 2
   scoreText: {fileID: 1485157528}
---- !u!114 &1153570078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1153570070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cf85dd7057a02845a1b2b77d8431232, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manPrefab: {fileID: 2671796598941789532, guid: b4d0e97b0f3716342b0597eda36a4f8e, type: 3}
-  manContainer: {fileID: 1465200316}
-  minWait: 5
-  maxWait: 15
-  speechQuotes:
-  - "A\uB3D9 \uC0CC\uB4DC\uC704\uCE58"
-  - "\uC8FC\uBB38\uBC88\uD638 2\uBC88"
-  - "\uB208\uC54C\uC8FC\uC2A4 \uC138\uD2B8"
---- !u!114 &1153570079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1153570070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cf85dd7057a02845a1b2b77d8431232, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manPrefab: {fileID: 346079285182893653, guid: 217545fdf00571a4bbdec7b25e3f0142, type: 3}
-  manContainer: {fileID: 1465200316}
-  minWait: 5
-  maxWait: 15
-  speechQuotes:
-  - "A\uB3D9 \uC0CC\uB4DC\uC704\uCE58"
-  - "\uC8FC\uBB38\uBC88\uD638 2\uBC88"
-  - "\uB208\uC54C\uC8FC\uC2A4 \uC138\uD2B8"
 --- !u!1 &1157787500
 GameObject:
   m_ObjectHideFlags: 0
