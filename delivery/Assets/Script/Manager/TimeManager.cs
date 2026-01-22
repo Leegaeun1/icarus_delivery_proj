@@ -11,6 +11,7 @@ public class TimeManager : MonoBehaviour
     public TextMeshProUGUI day;
     public GameManager gameManager;
     public ReadSpreadSheets sheet;
+    public TextMeshProUGUI money_effect;
 
     [Header("타임어택 설정")]
     public TextMeshProUGUI timeattack;
@@ -22,14 +23,14 @@ public class TimeManager : MonoBehaviour
     private int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 1000f;
+    private float gameSpeed = 100f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
     private bool isDayEnded = false;
 
     private float limitTime = 650f;
-    private bool isRunning = false;
+    public bool isRunning = false;
 
 
     void Awake()
@@ -57,7 +58,15 @@ public class TimeManager : MonoBehaviour
             uiManager = FindObjectOfType<UIManager>();
         }
         timeattack_UI.SetActive(false);
-
+        money_effect = GameObject.Find("money_effect").GetComponent<TextMeshProUGUI>();
+    }
+    public void StopTimeAttack()
+    {
+        isRunning = false; // 시간 정지
+        if (timeattack_UI != null)
+        {
+            timeattack_UI.SetActive(false); // UI 숨기기
+        }
     }
 
     void Update()
@@ -160,24 +169,18 @@ public class TimeManager : MonoBehaviour
             {
                 Debug.Log("잔액 부족으로 특수 재료 제거됨. 남은 재료로 재결제 시도.");
 
-                // 2. 실패했다면, 특수재료가 빠진 상태(가격이 내려감)로 다시 결제를 시도합니다.
+                // 2. 실패했다면, 특수재료가 빠진 상태(가격이 내려감)로 다시 결제를 시도
                 sheet.ApplyPurchase();
             }
-            //sheet.SaveDailyData();
-        }
-        // ---------------------------
 
-        // 다음 씬으로 이동
+        }
         if (uiManager != null)
         {
             uiManager.nextScene();
         }
     }
-
     void UpdateDayNightUI()
     {
-        // UI에는 현재 gameTime을 기준으로 표시
-
         // 만약 하루가 끝난 상태라면 강제로 3:00 표시 (나머지 연산하면 0:00이 되기 때문)
         if (isDayEnded)
         {

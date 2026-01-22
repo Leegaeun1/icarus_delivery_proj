@@ -21,12 +21,14 @@ public class ReadSpreadSheets : MonoBehaviour
 
     [Header("Game State")]
     public TextMeshProUGUI mineral;
+    public TextMeshProUGUI money_effect;
     public int money;
     public int usedMoney = 0;
 
     // 통계용 변수 (메모리에만 저장, 일차 종료 시 SaveDailyData로 저장)
     public int totalSpent = 0;   // 총 지출
     public int totalRevenue = 0; // 총 수익
+    public int save_Spent = 0;
 
     // 오늘 하루 동안 번 돈 (정산 전)
     public int dailyRevenue = 0;
@@ -63,8 +65,14 @@ public class ReadSpreadSheets : MonoBehaviour
             mineral = GameObject.Find("money_txt").GetComponent<TextMeshProUGUI>();
         }
         timeManager = GameObject.Find("TimeManager").GetComponent<Button>();
-
-
+        money_effect = GameObject.Find("money_effect").GetComponent<TextMeshProUGUI>();
+        // 시작 시 효과 텍스트 투명하게 초기화
+        if (money_effect != null)
+        {
+            Color c = money_effect.color;
+            c.a = 0f;
+            money_effect.color = c;
+        }
         // 개발 테스트용 초기화
         //PlayerPrefs.DeleteKey("Gold");
         //PlayerPrefs.DeleteKey("TotalSpent");
@@ -240,6 +248,8 @@ public class ReadSpreadSheets : MonoBehaviour
             }
             return false;
         }
+        int currentSpent = usedMoney;
+        int currentRevenue = 0;
 
         // 2. 결제 진행
         money -= usedMoney;        // 현재 잔액 차감
@@ -254,6 +264,14 @@ public class ReadSpreadSheets : MonoBehaviour
             dailyRevenue += revenue;
             totalRevenue += revenue; 
             Debug.Log($"[수익] 메뉴 완성! {revenue} 골드 획득. (요청: {currentRequestName})");
+            // 돈이 추가되는것을 보여줌
+            money += revenue;
+            currentRevenue = revenue;
+            //money_effect.text = "+" + revenue.ToString();
+            //money_effect.color = Color.green;
+            //// 투명도 1f -> 0f로 돌아가기 
+            //StartCoroutine(FadeInAndOutCoroutine());
+
         }
         else
         {
@@ -264,19 +282,45 @@ public class ReadSpreadSheets : MonoBehaviour
         mineral.text = money.ToString();
 
         Debug.Log($"결제 성공! 지불액: {usedMoney} / 남은 금액 : {money}/ 총 누적 지출: {totalSpent}");
-
+        save_Spent = currentSpent;
         // 4. 다음 결제를 위해 사용된 금액(장바구니 금액) 초기화
         // 리스트(selectedNames)는 유지되지만, 비용은 지불했으므로 0으로 만듦
         usedMoney = 0;
+        StartCoroutine(SequenceTransactionEffect(currentSpent, currentRevenue));
 
         return true;
+    }
+
+    // 지출과 수익을 순서대로 보여주는 코루틴
+    IEnumerator SequenceTransactionEffect(int spent, int revenue)
+    {
+        // 1. 지출 이펙트 (빨강)
+        if (spent > 0)
+        {
+            money_effect.text = "-" + spent.ToString();
+            money_effect.color = Color.red;
+
+            // 페이드 인/아웃 실행하고 끝날 때까지 대기
+            yield return StartCoroutine(FadeEffectProcess());
+        }
+
+        // 2. 수익이 있다면 지출 이펙트 끝난 후 실행 (초록)
+        if (revenue > 0)
+        {
+            money_effect.text = "+" + revenue.ToString();
+            money_effect.color = Color.green;
+
+            yield return StartCoroutine(FadeEffectProcess());
+        }
     }
     public void SaveDailyData() // 하루가 끝날 때 저장!!!!
     {
         // 1. 모아둔 일일 수익을 플레이어 돈에 합산
-        money += dailyRevenue;
+        //money += dailyRevenue;
         // 2. UI 갱신 (정산된 금액 표시)
         mineral.text = money.ToString();
+        
+
 
         // 3. 데이터 저장
         PlayerPrefs.SetInt("Gold", money);
@@ -284,5 +328,41 @@ public class ReadSpreadSheets : MonoBehaviour
         PlayerPrefs.SetInt("TotalRevenue", totalRevenue); // 수익도 저장
         PlayerPrefs.Save();
         Debug.Log($"[일차 마감] 총 {dailyRevenue} 골드 수익 정산 완료. 현재 자산: {money}");
+    }
+
+    // 페이드 인/아웃 로직 하나만 남김
+    IEnumerator FadeEffectProcess()
+    {
+        Color c = money_effect.color;
+        c.a = 0f;
+        money_effect.color = c;
+
+        float speed = 3f; // 속도 조절
+
+        // Fade In
+        float timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * speed;
+            c.a = Mathf.Lerp(0f, 1f, timer);
+            money_effect.color = c;
+            yield return null;
+        }
+        c.a = 1f;
+        money_effect.color = c;
+
+        yield return new WaitForSeconds(0.2f); // 잠깐 대기
+
+        // Fade Out
+        timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * speed;
+            c.a = Mathf.Lerp(1f, 0f, timer);
+            money_effect.color = c;
+            yield return null;
+        }
+        c.a = 0f;
+        money_effect.color = c;
     }
 }

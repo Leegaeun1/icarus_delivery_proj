@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,21 +18,26 @@ public class CheckMenu : MonoBehaviour
     [SerializeField] private ReadSpreadSheets sheet;
     public MenuManager menuManager;
     public TimeManager timeManager;
+    public TextMeshProUGUI money_effect;
     public Sprite errorbtn;
     public Sprite combtn;
 
 
+    public float fadeSpeed = 1f;
+
     private void Awake()
     {
         if (image == null) image = GetComponent<Image>();
-        if (sheet == null) sheet = FindObjectOfType<ReadSpreadSheets>();
+        if (sheet == null) sheet = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>();
     }
 
     private void Start()
     {
+
         // 매니저 찾기
         if (menuManager == null) menuManager = FindObjectOfType<MenuManager>();
         if (timeManager == null) timeManager = FindObjectOfType<TimeManager>();
+        money_effect = GameObject.Find("money_effect").GetComponent<TextMeshProUGUI>();
 
         if (image == null && transform.childCount > 0)
         {
@@ -51,7 +58,7 @@ public class CheckMenu : MonoBehaviour
         }
     }
 
-    // 색상 변경 로직을 함수로 분리 (재사용 위해)
+    // 색상 변경 로직을 함수로 분리
     void UpdateColor()
     {
         Color selectedColor = new Color32(220, 200, 200, 255);
@@ -84,28 +91,32 @@ public class CheckMenu : MonoBehaviour
 
     public void completeBtn()
     {
-        if (completebtn == null || selectMenu == null) return;
+        if (completebtn == null || selectMenu == null || timeManager == null) return;
 
         bool isSuccess = sheet.ApplyPurchase();
 
         if (isSuccess)
         {
             completebtn.GetComponent<Image>().sprite = combtn;
-
             gameObject.SetActive(false);
             completebtn.SetActive(false);
             selectMenu.SetActive(true);
 
-            if (menuManager != null) menuManager.CreateCardStack();
-            if (timeManager != null) timeManager.StartTimeAttack();
 
-            Debug.Log("결제 성공! 진행합니다.");
+            if (menuManager != null) menuManager.CreateCardStack();
+
+            // 타임어택 시작
+            if (!timeManager.isRunning)
+                timeManager.StartTimeAttack();
+            else // 타임어택 중이면
+                timeManager.StopTimeAttack();
+
+            Debug.Log("결제 성공! 타임어택 시작 (1번째 클릭)");
         }
         else
         {
             completebtn.GetComponent<Image>().sprite = errorbtn;
             Debug.Log("돈이 부족합니다.");
         }
-        //sheet.SaveDailyData(); // 임시로 여기에 저장하기
     }
 }
