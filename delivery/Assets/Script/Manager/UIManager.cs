@@ -16,15 +16,26 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        names = CheckMenu.selectedNames;
-        menuPanel = GameObject.Find("Menu_Canvas").transform.GetChild(2).gameObject;
-        addPanel = GameObject.Find("add_Panel");
+        // 안전하게 찾기 (이름으로 찾다가 실패하면 null이 됨)
+        GameObject canvas = GameObject.Find("Menu_Canvas");
+        if (canvas != null)
+        {
+            // 자식 개수가 충분한지 확인 후 가져오기
+            if (canvas.transform.childCount > 2)
+                menuPanel = canvas.transform.GetChild(2).gameObject;
+
+            // 계층 구조가 복잡하므로 예외 처리
+            if (canvas.transform.childCount > 1 && canvas.transform.GetChild(1).childCount > 2)
+                addPanel = canvas.transform.GetChild(1).transform.GetChild(2).gameObject;
+        }
     }
     public void nextScene()
     {
-        menuPanel.SetActive(false); // 넘어가면 메뉴 선택창 안보이도록 하기 
-        addPanel.SetActive(false); // 넘어가면 추가 재료 글자 안보이도록 하기
+        // null 체크를 해야 에러가 안 나고 씬이 넘어감
+        if (menuPanel != null) menuPanel.SetActive(false);
+        if (addPanel != null) addPanel.SetActive(false);
 
+        Debug.Log("Kitchen 씬으로 이동합니다.");
         SceneManager.LoadScene("Kitchen");
     }
 

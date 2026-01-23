@@ -23,7 +23,7 @@ public class TimeManager : MonoBehaviour
     private int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 1f;
+    private float gameSpeed = 100f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
@@ -37,34 +37,31 @@ public class TimeManager : MonoBehaviour
 
     void Awake()
     {
-        //Time.timeScale = 1f;
+        // [필수] 3일차 버그 해결: 주석 해제 필수!
+        Time.timeScale = 1f;
 
-        // UI 자동 연결 로직
-        if (time == null)
-        {
-            time = GameObject.Find("game_time").GetComponent<TextMeshProUGUI>();
-            //if (found != null && found.transform.childCount > 1)
-            //    time = found.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-        }
-        if (day == null)
-        {
-            day = GameObject.Find("day_txt").GetComponent<TextMeshProUGUI>();
-            //if (foundDay != null && foundDay.transform.childCount > 0)
-            //    day = foundDay.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        }
-        if (sheet == null)
-            sheet = FindObjectOfType<ReadSpreadSheets>();
+        // [필수] 변수 초기화
         gameTime = 0f;
-        isRunning = false;
+        isRunning = false; // 시작하자마자 흐르지 않게
         isDayEnded = false;
-        limitTime = initialLimitTime;
-        // UIManager 자동 찾기
-        if (uiManager == null)
+        limitTime = initialLimitTime; // 시간 리셋
+
+        // 연결 로직 (안전하게 FindObjectOfType 사용)
+        if (time == null) time = GameObject.Find("game_time")?.GetComponent<TextMeshProUGUI>();
+        if (day == null) day = GameObject.Find("day_txt")?.GetComponent<TextMeshProUGUI>();
+
+        // 시트 연결 (가장 안전한 방법)
+        if (sheet == null) sheet = FindObjectOfType<ReadSpreadSheets>();
+
+        // UIManager 연결
+        if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
+
+        if (timeattack_UI != null) timeattack_UI.SetActive(false);
+        if (money_effect == null)
         {
-            uiManager = FindObjectOfType<UIManager>();
+            var obj = GameObject.Find("money_effect");
+            if (obj != null) money_effect = obj.GetComponent<TextMeshProUGUI>();
         }
-        timeattack_UI.SetActive(false);
-        money_effect = GameObject.Find("money_effect").GetComponent<TextMeshProUGUI>();
     }
     public void StopTimeAttack()
     {
@@ -72,6 +69,10 @@ public class TimeManager : MonoBehaviour
         if (timeattack_UI != null)
         {
             timeattack_UI.SetActive(false); // UI 숨기기
+        }
+        if (uiManager != null)
+        {
+            uiManager.nextScene();
         }
     }
 
@@ -148,7 +149,7 @@ public class TimeManager : MonoBehaviour
 
         //SceneManager.LoadScene("main_menu");
         // 초기화
-        CheckMenu.selectedNames = new List<string>();
+        CheckMenu.selectedNames.Clear();
 
         // 임시적으로 다시 cook으로 돌아와서 진행
         SceneManager.LoadScene("cook");
@@ -157,6 +158,9 @@ public class TimeManager : MonoBehaviour
     // 외부에서 호출하면 타이머를 시작하는 함수
     public void StartTimeAttack()
     {
+        isDayEnded = false;
+        limitTime = initialLimitTime; // 시간 리셋
+
         isRunning = true;
         timeattack_UI.SetActive(true);
     }
@@ -188,6 +192,11 @@ public class TimeManager : MonoBehaviour
         if (uiManager != null)
         {
             uiManager.nextScene();
+        }
+        else
+        {
+            // 혹시 UIManager가 없더라도 강제로 이동
+            SceneManager.LoadScene("Kitchen");
         }
     }
     void UpdateDayNightUI()
