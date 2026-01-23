@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 public class ReadSpreadSheets : MonoBehaviour
 {
+
+    public static ReadSpreadSheets Instance;
+
     [Header("Google Sheet Settings")]
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
     public readonly string RANGE = "A2:B";
@@ -32,6 +35,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
     // 오늘 하루 동안 번 돈 (정산 전)
     public int dailyRevenue = 0;
+    public int dailySpent = 0;
 
     // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
     public string currentRequestName = "kraken_sand";
@@ -55,7 +59,31 @@ public class ReadSpreadSheets : MonoBehaviour
         public string food_name;
         public int price;
     }
+    void Awake() // Start -> Awake로 변경하여 가장 먼저 실행되게 함
+    {
 
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 이 오브젝트를 씬이 바뀌어도 파괴하지 않음
+        }
+        else
+        {
+            Destroy(gameObject); // 이미 존재한다면 새로 생성된 것은 파괴
+            return; // 아래 초기화 로직이 실행되지 않도록 종료
+        }
+
+
+
+        // [핵심] 가장 먼저 데이터 비우기
+        CheckMenu.selectedNames.Clear();
+
+        // 일일 데이터 초기화
+        dailyRevenue = 0;
+        dailySpent = 0;
+        usedMoney = 0;
+        save_Spent = 0;
+    }
     void Start()
     {
 
@@ -77,19 +105,12 @@ public class ReadSpreadSheets : MonoBehaviour
         //PlayerPrefs.DeleteKey("Gold");
         //PlayerPrefs.DeleteKey("TotalSpent");
 
-        // 하루 시작 시 일일 수익 초기화
-        dailyRevenue = 0;
-
         // 저장된 돈 불러오기 (없으면 기본값 1000으로 시작한다고 가정 - 값 조정 필요)
-        money = PlayerPrefs.GetInt("Gold", 40);
+        money = PlayerPrefs.GetInt("Gold", 1000);
         totalSpent = PlayerPrefs.GetInt("TotalSpent", 0); // 누적 지출 불러오기
         totalRevenue = PlayerPrefs.GetInt("TotalRevenue", 0); // 수익 불러오기
 
         mineral.text = money.ToString();
-
-        // 게임 시작 시 장바구니 리스트 초기화 (이전 저장 내역 무시)
-        CheckMenu.selectedNames.Clear();
-        usedMoney = 0;
 
         StartCoroutine(LoadAllData());
     }
@@ -249,10 +270,11 @@ public class ReadSpreadSheets : MonoBehaviour
             return false;
         }
         int currentSpent = usedMoney;
-        int currentRevenue = 0;
+        //int currentRevenue = 0;
 
         // 2. 결제 진행
         money -= usedMoney;        // 현재 잔액 차감
+        dailySpent += usedMoney;
         totalSpent += usedMoney;   // 총 지출액에 누적
 
         // 3. 수익 처리 (요청한 메뉴와 일치하는지 확인 후 돈 지급)
@@ -265,8 +287,8 @@ public class ReadSpreadSheets : MonoBehaviour
             totalRevenue += revenue; 
             Debug.Log($"[수익] 메뉴 완성! {revenue} 골드 획득. (요청: {currentRequestName})");
             // 돈이 추가되는것을 보여줌
-            money += revenue;
-            currentRevenue = revenue;
+            //money += revenue;
+            //currentRevenue = revenue;
             //money_effect.text = "+" + revenue.ToString();
             //money_effect.color = Color.green;
             //// 투명도 1f -> 0f로 돌아가기 
@@ -286,13 +308,16 @@ public class ReadSpreadSheets : MonoBehaviour
         // 4. 다음 결제를 위해 사용된 금액(장바구니 금액) 초기화
         // 리스트(selectedNames)는 유지되지만, 비용은 지불했으므로 0으로 만듦
         usedMoney = 0;
-        StartCoroutine(SequenceTransactionEffect(currentSpent, currentRevenue));
+        if(this.gameObject != null && this.gameObject.activeInHierarchy)
+        {
+            StartCoroutine(SequenceTransactionEffect(currentSpent));
+        }
 
         return true;
     }
 
     // 지출과 수익을 순서대로 보여주는 코루틴
-    IEnumerator SequenceTransactionEffect(int spent, int revenue)
+    IEnumerator SequenceTransactionEffect(int spent)
     {
         // 1. 지출 이펙트 (빨강)
         if (spent > 0)
@@ -304,10 +329,13 @@ public class ReadSpreadSheets : MonoBehaviour
             yield return StartCoroutine(FadeEffectProcess());
         }
 
-        // 2. 수익이 있다면 지출 이펙트 끝난 후 실행 (초록)
-        if (revenue > 0)
+    }
+    IEnumerator DailyTransactionEffect(int dailyRevenue)
+    {
+        // 1. 수익이 있다면 지출 이펙트 끝난 후 실행 (초록)
+        if (dailyRevenue > 0)
         {
-            money_effect.text = "+" + revenue.ToString();
+            money_effect.text = "+" + dailyRevenue.ToString();
             money_effect.color = Color.green;
 
             yield return StartCoroutine(FadeEffectProcess());
@@ -316,10 +344,10 @@ public class ReadSpreadSheets : MonoBehaviour
     public void SaveDailyData() // 하루가 끝날 때 저장!!!!
     {
         // 1. 모아둔 일일 수익을 플레이어 돈에 합산
-        //money += dailyRevenue;
+        money += dailyRevenue;
         // 2. UI 갱신 (정산된 금액 표시)
         mineral.text = money.ToString();
-        
+        StartCoroutine(DailyTransactionEffect(dailyRevenue)); 
 
 
         // 3. 데이터 저장

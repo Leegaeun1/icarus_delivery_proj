@@ -624,7 +624,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14498a57d4c4f543a33b7f16d9c8548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sheet: {fileID: 301222678}
+  sheet: {fileID: 0}
 --- !u!1001 &82760493
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1075,6 +1075,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: item2
       objectReference: {fileID: 0}
+    - target: {fileID: 494300362306726749, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1297272297746383331, guid: 4d7e8ead23847d64c9948797fdb7a03c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -1251,7 +1255,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
   completebtn: {fileID: 854441710}
-  sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}
@@ -1645,7 +1648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14498a57d4c4f543a33b7f16d9c8548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sheet: {fileID: 301222678}
+  sheet: {fileID: 0}
 --- !u!1 &284215939
 GameObject:
   m_ObjectHideFlags: 0
@@ -1820,6 +1823,7 @@ MonoBehaviour:
   totalRevenue: 0
   save_Spent: 0
   dailyRevenue: 0
+  dailySpent: 0
   currentRequestName: kraken_sand
 --- !u!4 &301222679
 Transform:
@@ -2687,6 +2691,7 @@ MonoBehaviour:
   timeattack_UI: {fileID: 904733538}
   uiManager: {fileID: 0}
   nextDayButtonObj: {fileID: 0}
+  initialLimitTime: 650
   isRunning: 0
 --- !u!4 &630904836
 Transform:
@@ -2715,8 +2720,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73a8c367b3f200f4f854b0ad76766b00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menuPanel: {fileID: 691442265}
-  addPanel: {fileID: 752207570}
+  menuPanel: {fileID: 0}
+  addPanel: {fileID: 0}
 --- !u!1 &639078247
 GameObject:
   m_ObjectHideFlags: 0
@@ -2875,7 +2880,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
   completebtn: {fileID: 854441710}
-  sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}
@@ -3104,7 +3108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14498a57d4c4f543a33b7f16d9c8548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sheet: {fileID: 301222678}
+  sheet: {fileID: 0}
 --- !u!1 &752207570
 GameObject:
   m_ObjectHideFlags: 0
@@ -3116,7 +3120,7 @@ GameObject:
   - component: {fileID: 752207571}
   - component: {fileID: 752207573}
   m_Layer: 5
-  m_Name: add
+  m_Name: add_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4615,7 +4619,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14498a57d4c4f543a33b7f16d9c8548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sheet: {fileID: 301222678}
+  sheet: {fileID: 0}
 --- !u!1 &1065250328
 GameObject:
   m_ObjectHideFlags: 0
@@ -5051,7 +5055,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
   completebtn: {fileID: 854441710}
-  sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}
@@ -6828,7 +6831,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14498a57d4c4f543a33b7f16d9c8548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sheet: {fileID: 301222678}
+  sheet: {fileID: 0}
 --- !u!1001 &1288136250
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8077,7 +8080,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
   completebtn: {fileID: 854441710}
-  sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}
@@ -8304,7 +8306,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
   completebtn: {fileID: 854441710}
-  sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}
@@ -9377,7 +9378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14498a57d4c4f543a33b7f16d9c8548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sheet: {fileID: 301222678}
+  sheet: {fileID: 0}
 --- !u!1001 &1791703795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10813,7 +10814,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2109431527}
   - component: {fileID: 2109431530}
-  - component: {fileID: 2109431529}
   - component: {fileID: 2109431528}
   - component: {fileID: 2109431531}
   m_Layer: 5
@@ -10859,36 +10859,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuPanel: {fileID: 691442265}
   addPanel: {fileID: 752207570}
---- !u!114 &2109431529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2109431526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &2109431530
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10911,7 +10881,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 2109431526}
   completebtn: {fileID: 1727744}
-  sheet: {fileID: 301222678}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}

@@ -23,18 +23,22 @@ public class TimeManager : MonoBehaviour
     private int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 100f;
+    private float gameSpeed = 1f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
     private bool isDayEnded = false;
 
-    private float limitTime = 650f;
+    public float initialLimitTime = 650f; // 초기 제한 시간 저장용
+
+    private float limitTime;
     public bool isRunning = false;
 
 
     void Awake()
     {
+        //Time.timeScale = 1f;
+
         // UI 자동 연결 로직
         if (time == null)
         {
@@ -42,7 +46,6 @@ public class TimeManager : MonoBehaviour
             //if (found != null && found.transform.childCount > 1)
             //    time = found.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         }
-
         if (day == null)
         {
             day = GameObject.Find("day_txt").GetComponent<TextMeshProUGUI>();
@@ -51,7 +54,10 @@ public class TimeManager : MonoBehaviour
         }
         if (sheet == null)
             sheet = FindObjectOfType<ReadSpreadSheets>();
-
+        gameTime = 0f;
+        isRunning = false;
+        isDayEnded = false;
+        limitTime = initialLimitTime;
         // UIManager 자동 찾기
         if (uiManager == null)
         {
@@ -139,8 +145,13 @@ public class TimeManager : MonoBehaviour
         // + 애니메이션 넣기
 
         // 다시 메인화면으로 이동
-        SceneManager.LoadScene("main_menu");
 
+        //SceneManager.LoadScene("main_menu");
+        // 초기화
+        CheckMenu.selectedNames = new List<string>();
+
+        // 임시적으로 다시 cook으로 돌아와서 진행
+        SceneManager.LoadScene("cook");
     }
 
     // 외부에서 호출하면 타이머를 시작하는 함수

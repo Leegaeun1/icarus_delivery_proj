@@ -17,6 +17,8 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         names = CheckMenu.selectedNames;
+        menuPanel = GameObject.Find("Menu_Canvas").transform.GetChild(2).gameObject;
+        addPanel = GameObject.Find("add_Panel");
     }
     public void nextScene()
     {

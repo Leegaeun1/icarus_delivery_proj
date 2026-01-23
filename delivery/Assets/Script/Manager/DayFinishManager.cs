@@ -44,7 +44,7 @@ public class DayFinishManager : MonoBehaviour
     private List<GameObject> spawnedReviewObjects = new List<GameObject>();
 
     public Button nextdayBtn;
-    private TimeManager timerManager;
+    public TimeManager timerManager;
 
     void Awake()
     {
@@ -70,8 +70,8 @@ public class DayFinishManager : MonoBehaviour
     {
 
         // 저장된 재정 데이터 불러오기
-        int dailySpent = GetComponent<ReadSpreadSheets>().usedMoney; // 하루에 사용한 금약
-        int dailyRevenue = GetComponent<ReadSpreadSheets>().dailyRevenue;
+        int dailySpent = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>().dailySpent; // 하루에 사용한 금약
+        int dailyRevenue = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>().dailyRevenue;
         int netProfit = dailyRevenue - dailySpent;
 
         // 0.5 종합 평가 프리팹 생성 및 텍스트 갱신
