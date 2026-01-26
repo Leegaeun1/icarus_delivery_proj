@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -137,7 +138,7 @@ public class TimeManager : MonoBehaviour
     {
         // 1. 날짜 증가
         date++;
-
+        gameTime = 0;
         // 2. 상태 해제 (시간이 다시 흐르도록)
         isDayEnded = false;
 
@@ -150,6 +151,11 @@ public class TimeManager : MonoBehaviour
         //SceneManager.LoadScene("main_menu");
         // 초기화
         CheckMenu.selectedNames.Clear();
+
+        sheet.dailyRevenue = 0;
+        sheet.dailySpent = 0;
+        sheet.usedMoney = 0;
+        sheet.save_Spent = 0;
 
         // 임시적으로 다시 cook으로 돌아와서 진행
         SceneManager.LoadScene("cook");
