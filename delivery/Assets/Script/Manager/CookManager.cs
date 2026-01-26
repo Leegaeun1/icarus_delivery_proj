@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq; // OrderBy 사용
 using DG.Tweening;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CookManager : MonoBehaviour
 {
@@ -50,6 +52,8 @@ public class CookManager : MonoBehaviour
 
     private SpriteRenderer bagRenderer;
     private SpriteRenderer sandwichRenderer;
+    //임시로 다음날로 넘어가는 버튼
+    private Button nextDayBtn;
 
     void Start()
     {
@@ -66,6 +70,8 @@ public class CookManager : MonoBehaviour
             enabled = false;
             return;
         }
+        nextDayBtn = GameObject.Find("Canvas").transform.GetChild(0).GetComponent<Button>();
+        nextDayBtn.gameObject.SetActive(false);
 
         bagRenderer = sandbag.GetComponent<SpriteRenderer>();
         sandwichRenderer = NewSandwich.GetComponent<SpriteRenderer>();
@@ -168,12 +174,21 @@ public class CookManager : MonoBehaviour
         yield return StartCoroutine(SandwichIntoBag());
 
         // 4. 대기
-        yield return new WaitForSeconds(waitTime);
+        //yield return new WaitForSeconds(waitTime);
 
         // 6. 그 후에 다시 메인 화면으로 돌아가도록 !!!!!!!!!!!!!!!
-        //yield return StartCoroutine(nextStage());
-    }
+        //yield return StartCoroutine(finishStage());
+        nextDayBtn.gameObject.SetActive(true);
+        // [중요] 혹시 모를 중복 방지를 위해 기존 연결된 기능을 싹 지우고
+        nextDayBtn.onClick.RemoveAllListeners();
 
+        // [중요] 함수를 새로 연결합니다.
+        nextDayBtn.onClick.AddListener(finishStage);
+    }
+    public void finishStage()
+    {
+        SceneManager.LoadScene("DayFinish");
+    }
     IEnumerator DropSandwichIngredients()
     {
         if (sandwichCore == null) yield break;

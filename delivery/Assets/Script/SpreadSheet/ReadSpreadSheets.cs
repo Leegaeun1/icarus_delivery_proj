@@ -5,36 +5,46 @@ using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class ReadSpreadSheets : MonoBehaviour
 {
+
+    public static ReadSpreadSheets Instance;
+
     [Header("Google Sheet Settings")]
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
     public readonly string RANGE = "A2:B";
     public readonly long SHEET_ID_MATERIAL = 0;          // 재료 시트
-    public readonly long SHEET_ID_SALES = 899576211;     // [추가] 판매 가격 시트 (2열: food_name, price)
+    public readonly long SHEET_ID_SALES = 899576211;     // 판매 가격 시트 (2열: food_name, price)
 
     [Header("Data Lists")]
     public List<Food_material> materials;  // 재료 리스트
-    public List<Food_product> productPrices; // [추가] 완성품 가격 리스트
+    public List<Food_product> productPrices; // 완성품 가격 리스트
 
     [Header("Game State")]
     public TextMeshProUGUI mineral;
+    public TextMeshProUGUI money_effect;
     public int money;
     public int usedMoney = 0;
 
     // 통계용 변수 (메모리에만 저장, 일차 종료 시 SaveDailyData로 저장)
     public int totalSpent = 0;   // 총 지출
-    public int totalRevenue = 0; // [추가] 총 수익
+    public int totalRevenue = 0; // 총 수익
+    public int save_Spent = 0;
 
     // 오늘 하루 동안 번 돈 (정산 전)
     public int dailyRevenue = 0;
+    public int dailySpent = 0;
 
     // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
     public string currentRequestName = "kraken_sand";
 
     private bool dataReady = false;
     private string last_name = string.Empty;
+
+    private Button timeManager;
+
 
     [System.Serializable]
     public class Food_material
@@ -49,32 +59,58 @@ public class ReadSpreadSheets : MonoBehaviour
         public string food_name;
         public int price;
     }
+    void Awake() // Start -> Awake로 변경하여 가장 먼저 실행되게 함
+    {
 
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 이 오브젝트를 씬이 바뀌어도 파괴하지 않음
+        }
+        else
+        {
+            Destroy(gameObject); // 이미 존재한다면 새로 생성된 것은 파괴
+            return; // 아래 초기화 로직이 실행되지 않도록 종료
+        }
+
+
+
+        // [핵심] 가장 먼저 데이터 비우기
+        CheckMenu.selectedNames.Clear();
+
+        // 일일 데이터 초기화
+        dailyRevenue = 0;
+        dailySpent = 0;
+        usedMoney = 0;
+        save_Spent = 0;
+    }
     void Start()
     {
 
         if (mineral == null)
         {
             Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
+            mineral = GameObject.Find("money_txt").GetComponent<TextMeshProUGUI>();
         }
-
+        timeManager = GameObject.Find("TimeManager").GetComponent<Button>();
+        money_effect = GameObject.Find("money_effect").GetComponent<TextMeshProUGUI>();
+        // 시작 시 효과 텍스트 투명하게 초기화
+        if (money_effect != null)
+        {
+            Color c = money_effect.color;
+            c.a = 0f;
+            money_effect.color = c;
+        }
         // 개발 테스트용 초기화
         //PlayerPrefs.DeleteKey("Gold");
         //PlayerPrefs.DeleteKey("TotalSpent");
 
-        // 하루 시작 시 일일 수익 초기화
-        dailyRevenue = 0;
-
         // 저장된 돈 불러오기 (없으면 기본값 1000으로 시작한다고 가정 - 값 조정 필요)
-        money = PlayerPrefs.GetInt("Gold", 40);
+        money = PlayerPrefs.GetInt("Gold", 1000);
         totalSpent = PlayerPrefs.GetInt("TotalSpent", 0); // 누적 지출 불러오기
         totalRevenue = PlayerPrefs.GetInt("TotalRevenue", 0); // 수익 불러오기
 
         mineral.text = money.ToString();
-
-        // 게임 시작 시 장바구니 리스트 초기화 (이전 저장 내역 무시)
-        CheckMenu.selectedNames.Clear();
-        usedMoney = 0;
 
         StartCoroutine(LoadAllData());
     }
@@ -93,7 +129,7 @@ public class ReadSpreadSheets : MonoBehaviour
         materials = GetDatas<Food_material>(wwwMaterial.downloadHandler.text);
         Debug.Log("재료 데이터 로드 완료");
 
-        // 2. [추가] 판매 가격 데이터 로드 (GID: 899576211)
+        // 2. 판매 가격 데이터 로드
         UnityWebRequest wwwSales = UnityWebRequest.Get(GetTSVAddress(ADDRESS, RANGE, SHEET_ID_SALES));
         yield return wwwSales.SendWebRequest();
         productPrices = GetDatas<Food_product>(wwwSales.downloadHandler.text);
@@ -233,9 +269,12 @@ public class ReadSpreadSheets : MonoBehaviour
             }
             return false;
         }
+        int currentSpent = usedMoney;
+        //int currentRevenue = 0;
 
         // 2. 결제 진행
         money -= usedMoney;        // 현재 잔액 차감
+        dailySpent += usedMoney;
         totalSpent += usedMoney;   // 총 지출액에 누적
 
         // 3. 수익 처리 (요청한 메뉴와 일치하는지 확인 후 돈 지급)
@@ -247,6 +286,14 @@ public class ReadSpreadSheets : MonoBehaviour
             dailyRevenue += revenue;
             totalRevenue += revenue; 
             Debug.Log($"[수익] 메뉴 완성! {revenue} 골드 획득. (요청: {currentRequestName})");
+            // 돈이 추가되는것을 보여줌
+            //money += revenue;
+            //currentRevenue = revenue;
+            //money_effect.text = "+" + revenue.ToString();
+            //money_effect.color = Color.green;
+            //// 투명도 1f -> 0f로 돌아가기 
+            //StartCoroutine(FadeInAndOutCoroutine());
+
         }
         else
         {
@@ -256,24 +303,52 @@ public class ReadSpreadSheets : MonoBehaviour
         // 4. UI 및 저장
         mineral.text = money.ToString();
 
-        PlayerPrefs.SetInt("Gold", money);
-        //PlayerPrefs.SetInt("TotalSpent", totalSpent); // 지출 내역 저장
-        PlayerPrefs.Save();
-
         Debug.Log($"결제 성공! 지불액: {usedMoney} / 남은 금액 : {money}/ 총 누적 지출: {totalSpent}");
-
+        save_Spent = currentSpent;
         // 4. 다음 결제를 위해 사용된 금액(장바구니 금액) 초기화
         // 리스트(selectedNames)는 유지되지만, 비용은 지불했으므로 0으로 만듦
         usedMoney = 0;
+        if(this.gameObject != null && this.gameObject.activeInHierarchy)
+        {
+            StartCoroutine(SequenceTransactionEffect(currentSpent));
+        }
 
         return true;
     }
-    public void SaveDailyData()
+
+    // 지출과 수익을 순서대로 보여주는 코루틴
+    IEnumerator SequenceTransactionEffect(int spent)
+    {
+        // 1. 지출 이펙트 (빨강)
+        if (spent > 0)
+        {
+            money_effect.text = "-" + spent.ToString();
+            money_effect.color = Color.red;
+
+            // 페이드 인/아웃 실행하고 끝날 때까지 대기
+            yield return StartCoroutine(FadeEffectProcess());
+        }
+
+    }
+    IEnumerator DailyTransactionEffect(int dailyRevenue)
+    {
+        // 1. 수익이 있다면 지출 이펙트 끝난 후 실행 (초록)
+        if (dailyRevenue > 0)
+        {
+            money_effect.text = "+" + dailyRevenue.ToString();
+            money_effect.color = Color.green;
+
+            yield return StartCoroutine(FadeEffectProcess());
+        }
+    }
+    public void SaveDailyData() // 하루가 끝날 때 저장!!!!
     {
         // 1. 모아둔 일일 수익을 플레이어 돈에 합산
         money += dailyRevenue;
         // 2. UI 갱신 (정산된 금액 표시)
         mineral.text = money.ToString();
+        StartCoroutine(DailyTransactionEffect(dailyRevenue)); 
+
 
         // 3. 데이터 저장
         PlayerPrefs.SetInt("Gold", money);
@@ -281,5 +356,41 @@ public class ReadSpreadSheets : MonoBehaviour
         PlayerPrefs.SetInt("TotalRevenue", totalRevenue); // 수익도 저장
         PlayerPrefs.Save();
         Debug.Log($"[일차 마감] 총 {dailyRevenue} 골드 수익 정산 완료. 현재 자산: {money}");
+    }
+
+    // 페이드 인/아웃 로직 하나만 남김
+    IEnumerator FadeEffectProcess()
+    {
+        Color c = money_effect.color;
+        c.a = 0f;
+        money_effect.color = c;
+
+        float speed = 3f; // 속도 조절
+
+        // Fade In
+        float timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * speed;
+            c.a = Mathf.Lerp(0f, 1f, timer);
+            money_effect.color = c;
+            yield return null;
+        }
+        c.a = 1f;
+        money_effect.color = c;
+
+        yield return new WaitForSeconds(0.2f); // 잠깐 대기
+
+        // Fade Out
+        timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * speed;
+            c.a = Mathf.Lerp(1f, 0f, timer);
+            money_effect.color = c;
+            yield return null;
+        }
+        c.a = 0f;
+        money_effect.color = c;
     }
 }
