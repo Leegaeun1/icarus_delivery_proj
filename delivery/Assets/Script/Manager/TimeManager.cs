@@ -24,7 +24,7 @@ public class TimeManager : MonoBehaviour
     private int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 100f;
+    private float gameSpeed = 3000f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
@@ -34,6 +34,9 @@ public class TimeManager : MonoBehaviour
 
     private float limitTime;
     public bool isRunning = false;
+
+    // 일주일이 지났는지 확인
+    public bool isWeekEnded = false;
 
 
     void Awake()
@@ -84,6 +87,7 @@ public class TimeManager : MonoBehaviour
         {
             gameTime += Time.deltaTime * gameSpeed;
             CheckEndOfDay(); // 시간이 다 되었는지 체크
+            CheckEndOfWeek(); // 일주일이 지났는지 체크
         }
         UpdateDayNightUI();
 
@@ -116,11 +120,27 @@ public class TimeManager : MonoBehaviour
             }
         }
     }
+
+    private void CheckEndOfWeek()
+    {
+        // 현재까지 흐른 총 시간이 "오늘 끝날 시간(날짜 * 3시간)"을 넘었는지 확인
+        if (gameTime >= secondsPerDay && date % 2 == 0)
+        {
+            // 시간을 딱 맞춰서 고정
+            gameTime = secondsPerDay;
+
+            // 하루 마감 상태로 전환
+            isWeekEnded = true;
+
+            Debug.Log(date + "일주일 업무 종료. 시간 정지.");
+        }
+    }
+
     // 시간이 3시(secondsPerDay)에 도달했는지 확인하는 함수
     void CheckEndOfDay()
     {
         // 현재까지 흐른 총 시간이 "오늘 끝날 시간(날짜 * 3시간)"을 넘었는지 확인
-        float endOfToday = date * secondsPerDay;
+        float endOfToday = secondsPerDay;
 
         if (gameTime >= endOfToday)
         {
@@ -137,14 +157,18 @@ public class TimeManager : MonoBehaviour
     public void StartNextDay()
     {
         // 1. 날짜 증가
-        date++;
+        if (!isWeekEnded)
+        {
+            date++;
+            isDayEnded = false;
+        }
+
         gameTime = 0;
         // 2. 상태 해제 (시간이 다시 흐르도록)
-        isDayEnded = false;
+        
 
         // 결제 로직이나 정산
         sheet.SaveDailyData();
-        // + 애니메이션 넣기
 
         // 다시 메인화면으로 이동
 
@@ -157,8 +181,18 @@ public class TimeManager : MonoBehaviour
         sheet.usedMoney = 0;
         sheet.save_Spent = 0;
 
-        // 임시적으로 다시 cook으로 돌아와서 진행
-        SceneManager.LoadScene("cook");
+        if (isWeekEnded) { // 일주일이 끝났을 때 
+            SceneManager.LoadScene("Round_Finish");
+            isWeekEnded = false;
+            return;
+        }
+        else
+        {
+            // 임시적으로 다시 cook으로 돌아와서 진행
+            SceneManager.LoadScene("cook");
+        }
+
+            
     }
 
     // 외부에서 호출하면 타이머를 시작하는 함수
@@ -214,6 +248,13 @@ public class TimeManager : MonoBehaviour
             if (day != null) day.text = date.ToString() + " 일차";
             return;
         }
+        if (isWeekEnded)
+        {
+            if (time != null) time.text = "03:00";
+            if (day != null) day.text = date.ToString() + " 일차";
+
+            return;
+        }
 
         // 일반적인 시간 표시 계산
         int totalSeconds = Mathf.FloorToInt(gameTime); // 소수점 버림
@@ -222,6 +263,7 @@ public class TimeManager : MonoBehaviour
         // int currentDate = (totalSeconds / secondsPerDay) + 1; 
 
         int secondsToday = totalSeconds % secondsPerDay;
+        if (isDayEnded || isWeekEnded) secondsToday = secondsPerDay;
         int hours = secondsToday / 3600;
         int minutes = (secondsToday % 3600) / 60;
 

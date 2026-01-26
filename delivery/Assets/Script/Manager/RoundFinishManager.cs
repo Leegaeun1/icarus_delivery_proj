@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RoundFinishManager : MonoBehaviour
@@ -17,11 +18,26 @@ public class RoundFinishManager : MonoBehaviour
     public int max_star = 4;
     public GameObject star_prefab;
     public GameObject star_parent;
+    public Button nextdayBtn;
+    public TimeManager timerManager;
+
     List<GameObject> createdStars = new List<GameObject>();
+    void Awake()
+    {
+        nextdayBtn = GameObject.Find("NextDayBtn").GetComponent<Button>();
+        timerManager = GameObject.Find("TimeManager").GetComponent<TimeManager>();
+    }
 
     void Start()
     {
         StartCoroutine(GenerateReviewsSequence());
+        nextdayBtn.gameObject.SetActive(false);
+        // [수정 1] Start에서 버튼 이벤트를 미리 연결합니다.
+        if (nextdayBtn != null && timerManager != null)
+        {
+            nextdayBtn.onClick.RemoveAllListeners();
+            nextdayBtn.onClick.AddListener(() => timerManager.StartNextDay());
+        }
     }
 
     IEnumerator GenerateReviewsSequence()
@@ -67,6 +83,10 @@ public class RoundFinishManager : MonoBehaviour
 
             yield return new WaitForSeconds(0.5f);
         }
+        yield return new WaitForSeconds(1f);
+
+        // 4. 1초 뒤에 다음으로 가는 버튼 활성화
+        nextdayBtn.gameObject.SetActive(true);
 
     }
     IEnumerator review_star()
