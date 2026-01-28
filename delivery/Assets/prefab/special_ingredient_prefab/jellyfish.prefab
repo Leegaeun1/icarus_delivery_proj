@@ -148,6 +148,12 @@ MonoBehaviour:
   selectMenu: {fileID: 552763208053246032}
   completebtn: {fileID: 0}
   sheet: {fileID: 0}
+  menuManager: {fileID: 0}
+  timeManager: {fileID: 0}
+  money_effect: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
+  fadeSpeed: 1
 --- !u!1 &734635502213886175
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,7 +450,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5029548538338453806}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ae27266651067143bdd1b7233709311, type: 3}
   m_Name: 
@@ -452,6 +458,12 @@ MonoBehaviour:
   selectMenu: {fileID: 6049799516021121695}
   completebtn: {fileID: 8084662623312533552}
   sheet: {fileID: 0}
+  menuManager: {fileID: 0}
+  timeManager: {fileID: 0}
+  money_effect: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
+  fadeSpeed: 1
 --- !u!114 &-7199833764320482742
 MonoBehaviour:
   m_ObjectHideFlags: 0

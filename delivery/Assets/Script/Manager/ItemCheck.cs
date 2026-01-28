@@ -17,9 +17,30 @@ public class ItemCheck : MonoBehaviour
     private void Start()
     {
         image = GetComponent<Image>();
+
         if (sheet == null)
-            sheet = FindObjectOfType<ReadSpreadSheets>();
+        {
+            // 인스턴스가 아직 할당되지 않았다면 찾아옴
+            sheet = ReadSpreadSheets.Instance;
+
+            // 만약 인스턴스가 아직도 null이라면 (정말 드문 경우) 직접 오브젝트를 찾아봄
+            if (sheet == null)
+            {
+                sheet = FindObjectOfType<ReadSpreadSheets>();
+            }
+        }
+
+        if (sheet != null)
+        {
+            Debug.Log($"{this.name}: ReadSpreadSheets 연결 성공");
+        }
+        else
+        {
+            Debug.LogError($"{this.name}: ReadSpreadSheets를 찾을 수 없습니다!");
+        }
     }
+
+
 
     public void select()
     {
