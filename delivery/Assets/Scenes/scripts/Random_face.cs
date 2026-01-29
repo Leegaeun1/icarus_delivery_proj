@@ -25,6 +25,16 @@ public class Random_face : MonoBehaviour
     public Vector3 noseOffset = new Vector3(0f, 0.1f, 0f);
     public Vector3 earOffset = new Vector3(0f, 0f, 0f);
 
+    public FaceData GetCurrentFaceData()
+    {
+        FaceData data = new FaceData();
+        data.eye = eyesRenderer.sprite;
+        data.mouth = mouthRenderer.sprite;
+        data.nose = noseRenderer.sprite;
+        data.ear = earsRenderer.sprite;
+        return data;
+    }
+
     void Start()
     {
         // 시작 시 모든 부위 숨기기
