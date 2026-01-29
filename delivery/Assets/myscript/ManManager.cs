@@ -1,43 +1,54 @@
-using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class ManManager : MonoBehaviour
 {
-    [Header("설정")]
-    public GameObject manPrefab;
+    [Header("손님 프리팹 리스트")]
+    public GameObject[] manPrefabs;
     public Transform manContainer;
-    public float minWait = 5f, maxWait = 15f;
-    public string[] speechQuotes = { "A동 샌드위치", "주문번호 2번", "눈알주스 세트" };
+
+    [Header("효과 설정")]
+    public float fadeInDuration = 1.0f;
 
     private GameObject currentMan;
 
-    void Start() => StartCoroutine(WaitAndSpawn());
-
-    // 대기 후 생성 루틴
-    IEnumerator WaitAndSpawn()
+    public void SpawnMan(string orderName)
     {
-        yield return new WaitForSeconds(Random.Range(minWait, maxWait));
+        if (currentMan != null) return;
 
-        if (currentMan == null && manPrefab != null)
-        {
-            currentMan = Instantiate(manPrefab, manContainer);
+        int randomIndex = Random.Range(0, manPrefabs.Length);
+        currentMan = Instantiate(manPrefabs[randomIndex], manContainer);
 
-            // 말풍선 텍스트 설정
-            var speechText = currentMan.GetComponentInChildren<TextMeshProUGUI>();
-            if (speechText != null && speechQuotes.Length > 0)
-                speechText.text = speechQuotes[Random.Range(0, speechQuotes.Length)];
-        }
+        var speechText = currentMan.GetComponentInChildren<TextMeshProUGUI>();
+        if (speechText != null) speechText.text = orderName;
+
+        CanvasGroup canvasGroup = currentMan.GetComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = currentMan.AddComponent<CanvasGroup>();
+
+        StartCoroutine(FadeInRoutine(canvasGroup));
     }
 
-    // 외부(주문 완료 시)에서 호출할 함수
-    public void CompleteMan()
+    private IEnumerator FadeInRoutine(CanvasGroup cg)
+    {
+        float elapsedTime = 0f;
+        cg.alpha = 0f;
+        while (elapsedTime < fadeInDuration)
+        {
+            if (cg == null) yield break; // 중간에 파괴될 경우 방지
+            cg.alpha = Mathf.Lerp(0f, 1f, elapsedTime / fadeInDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        if (cg != null) cg.alpha = 1f;
+    }
+
+    public void DestroyMan()
     {
         if (currentMan != null)
         {
             Destroy(currentMan);
             currentMan = null;
-            StartCoroutine(WaitAndSpawn()); // 다음 사람 대기 시작
         }
     }
 }
