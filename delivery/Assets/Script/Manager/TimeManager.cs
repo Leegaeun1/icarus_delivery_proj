@@ -24,7 +24,7 @@ public class TimeManager : MonoBehaviour
     public int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 1000f;
+    private float gameSpeed = 500f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
@@ -41,10 +41,9 @@ public class TimeManager : MonoBehaviour
 
     void Awake()
     {
-        // [필수] 3일차 버그 해결: 주석 해제 필수!
         Time.timeScale = 1f;
 
-        // [필수] 변수 초기화
+        //  변수 초기화
         gameTime = 0f;
         isRunning = false; // 시작하자마자 흐르지 않게
         isDayEnded = false;
@@ -182,6 +181,8 @@ public class TimeManager : MonoBehaviour
         if (isWeekEnded) { // 일주일이 끝났을 때 
             SceneManager.LoadScene("Round_Finish");
             isWeekEnded = false;
+            // 초기화
+            
             return;
         }
         else
