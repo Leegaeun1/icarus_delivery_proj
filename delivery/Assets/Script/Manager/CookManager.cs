@@ -54,6 +54,8 @@ public class CookManager : MonoBehaviour
     private SpriteRenderer sandwichRenderer;
     //임시로 다음날로 넘어가는 버튼
     private Button nextDayBtn;
+    private TimeManager timeManager;
+    private ReadSpreadSheets sheet;
 
     void Start()
     {
@@ -75,7 +77,8 @@ public class CookManager : MonoBehaviour
 
         bagRenderer = sandbag.GetComponent<SpriteRenderer>();
         sandwichRenderer = NewSandwich.GetComponent<SpriteRenderer>();
-
+        timeManager = GameObject.Find("TimeManager").GetComponent<TimeManager>();
+        sheet = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>();
         // 선택된 재료 확인
         selectedIngredientsNames = CheckMenu.selectedNames;
         if (selectedIngredientsNames == null || selectedIngredientsNames.Count == 0)
@@ -179,15 +182,34 @@ public class CookManager : MonoBehaviour
         // 6. 그 후에 다시 메인 화면으로 돌아가도록 !!!!!!!!!!!!!!!
         //yield return StartCoroutine(finishStage());
         nextDayBtn.gameObject.SetActive(true);
-        // [중요] 혹시 모를 중복 방지를 위해 기존 연결된 기능을 싹 지우고
+
+        // 혹시 모를 중복 방지를 위해 기존 연결된 기능을 싹 지우고
         nextDayBtn.onClick.RemoveAllListeners();
 
-        // [중요] 함수를 새로 연결합니다.
+        // 함수를 새로 연결합니다.
         nextDayBtn.onClick.AddListener(finishStage);
     }
     public void finishStage()
     {
-        SceneManager.LoadScene("DayFinish");
+        // 1. 최종 채점 및 정산 실행
+        sheet.CheckFinalResult();
+
+        sheet.is_menu_incorrect = false;
+        sheet.menu_num += 1; // 요청 증가 ( 임시 )!!
+        // 2. 씬 전환 처리
+        if (timeManager.isDayEnded)
+        {
+            SceneManager.LoadScene("DayFinish");
+        }
+        else
+        {
+            // 뒷정리
+            CheckMenu.selectedNames.Clear();
+            sheet.tmp_selected.Clear();
+            // 다음 요리를 위해 오답 플래그 초기화
+
+            SceneManager.LoadScene("cook");
+        }
     }
     IEnumerator DropSandwichIngredients()
     {

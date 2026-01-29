@@ -2681,7 +2681,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &839548949
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4165,6 +4165,7 @@ MonoBehaviour:
   review_prefab: {fileID: 503701468804424237, guid: 5c35a96aca0a20e47a1e7e5db2256c3b, type: 3}
   review_flip_prefab: {fileID: 5492139591429297078, guid: 5455e475b9d237a4a9eadf3be1954ab3, type: 3}
   review_parent: {fileID: 733048523}
+  day_txt: {fileID: 0}
   FinalIngredients: []
   ExcludeRequest: []
   IncludeRequest: []

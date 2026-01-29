@@ -1848,7 +1848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45fa69c5d43c6e343b1c206460d7e5da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  now_stage: 3
+  now_stage: 1
   main_sand_cnt: 0
   cookie_cnt: 0
   drink_cnt: 0
@@ -2055,7 +2055,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &485789974
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2730,8 +2730,11 @@ MonoBehaviour:
   timeattack_UI: {fileID: 904733538}
   uiManager: {fileID: 0}
   nextDayButtonObj: {fileID: 0}
+  date: 1
+  isDayEnded: 0
   initialLimitTime: 650
   isRunning: 0
+  isWeekEnded: 0
 --- !u!4 &630904836
 Transform:
   m_ObjectHideFlags: 0
