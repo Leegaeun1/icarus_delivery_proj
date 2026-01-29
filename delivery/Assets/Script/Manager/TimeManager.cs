@@ -24,11 +24,11 @@ public class TimeManager : MonoBehaviour
     private int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 3000f;
+    private float gameSpeed = 100f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
-    private bool isDayEnded = false;
+    public bool isDayEnded = false;
 
     public float initialLimitTime = 650f; // 초기 제한 시간 저장용
 

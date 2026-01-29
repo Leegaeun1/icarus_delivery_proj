@@ -145,6 +145,7 @@ public class CheckMenu : MonoBehaviour
         Debug.Log("선택된 목록: " + string.Join(", ", selectedNames));
     }
 
+
     public void completeBtn()
     {
         if (sheet == null) _sheet = ReadSpreadSheets.Instance;
@@ -160,13 +161,11 @@ public class CheckMenu : MonoBehaviour
             completebtn.SetActive(false);
             if (!timeManager.isRunning)
             {
-
                 // 1. 카드를 새로 생성합니다.
                 if (menuManager != null) menuManager.CreateCardStack();
 
                 // 2. 메뉴판을 켭니다.
                 selectMenu.SetActive(true);
-
                 // 3. 타이머를 시작합니다.
                 timeManager.StartTimeAttack();
 

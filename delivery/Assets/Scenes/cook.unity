@@ -1848,7 +1848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45fa69c5d43c6e343b1c206460d7e5da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  now_stage: 3
+  now_stage: 1
   main_sand_cnt: 0
   cookie_cnt: 0
   drink_cnt: 0
@@ -2732,6 +2732,7 @@ MonoBehaviour:
   nextDayButtonObj: {fileID: 0}
   initialLimitTime: 650
   isRunning: 0
+  isWeekEnded: 0
 --- !u!4 &630904836
 Transform:
   m_ObjectHideFlags: 0
