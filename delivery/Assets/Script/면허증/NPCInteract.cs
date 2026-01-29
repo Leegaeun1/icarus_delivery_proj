@@ -1,26 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems; // UI 클릭 감지를 위해 추가
 
-public class NPCInteract : MonoBehaviour
+// IPointerClickHandler를 추가하여 UI 방식의 클릭도 지원하게 만듭니다.
+public class NPCInteract : MonoBehaviour, IPointerClickHandler
 {
-    private Random_face myFace;
-    private IDCardUI idCardUI;
-
-    void Start()
-    {
-        myFace = GetComponent<Random_face>();
-        idCardUI = FindObjectOfType<IDCardUI>();
-    }
-
-    // 마우스로 NPC를 클릭했을 때 실행 (NPC에 Collider 2D가 있어야 함)
+    // 1. 기존 물리 방식 (Canvas 밖으로 뺄 경우 대비)
     void OnMouseDown()
     {
-        if (myFace != null && idCardUI != null)
+        Debug.Log("<color=cyan>물리 방식(OnMouseDown) 클릭 감지!</color>");
+        ExecuteClick();
+    }
+
+    // 2. UI 방식 (현재 캐릭터가 Canvas 안에 있을 때 작동)
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Debug.Log("<color=yellow>UI 방식(OnPointerClick) 클릭 감지!</color>");
+        ExecuteClick();
+    }
+
+    void ExecuteClick()
+    {
+        Random_face myFace = GetComponent<Random_face>();
+        IDCardUI ui = FindObjectOfType<IDCardUI>(true);
+
+        if (myFace != null && ui != null)
         {
-            // NPC의 얼굴 데이터를 추출해서 UI에 전달
-            FaceData currentData = myFace.GetCurrentFaceData();
-            idCardUI.ShowCard(currentData, "REG-7749");
+            ui.ShowCard(myFace.GetCurrentFaceData(), "REG-" + Random.Range(1000, 9999));
+        }
+        else
+        {
+            if (myFace == null) Debug.LogError("Random_face를 찾을 수 없습니다!");
+            if (ui == null) Debug.LogError("IDCardUI를 찾을 수 없습니다!");
         }
     }
 }
