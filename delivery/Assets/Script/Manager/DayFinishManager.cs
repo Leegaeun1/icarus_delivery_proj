@@ -17,6 +17,7 @@ public class DayFinishManager : MonoBehaviour
     public GameObject review_prefab;
     public GameObject review_flip_prefab;
     public GameObject review_parent;
+    public TextMeshProUGUI Days_txt;
 
 
     [Header("입력 데이터 (인스펙터 설정)")]
@@ -52,12 +53,18 @@ public class DayFinishManager : MonoBehaviour
         total_parent = GameObject.Find("day_total").GetComponent<Transform>();
         nextdayBtn = GameObject.Find("NextDayBtn").GetComponent<Button>();
         timerManager = GameObject.Find("TimeManager").GetComponent<TimeManager>();
+
+        Days_txt = GameObject.Find("result_Panel").transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
+
+
     }
 
     void Start()
     {
         StartCoroutine(GenerateReviewsSequence());
         nextdayBtn.gameObject.SetActive(false);
+        print(GameObject.Find("Days").name);
+        print("아아아아ㅏ아ㅏㅏ아ㅏ");
         // [수정 1] Start에서 버튼 이벤트를 미리 연결합니다.
         if (nextdayBtn != null && timerManager != null)
         {
@@ -73,7 +80,7 @@ public class DayFinishManager : MonoBehaviour
         int dailySpent = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>().dailySpent; // 하루에 사용한 금약
         int dailyRevenue = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>().dailyRevenue;
         int netProfit = dailyRevenue - dailySpent;
-
+        Days_txt.text = timerManager.date.ToString() + "일차";
         // 0.5 종합 평가 프리팹 생성 및 텍스트 갱신
         for (int i = 0; i < resultPrefabs.Count; i++)
         {
@@ -111,7 +118,7 @@ public class DayFinishManager : MonoBehaviour
         // 1. 기존 리뷰 청소
         foreach (var obj in spawnedReviewObjects) if (obj != null) Destroy(obj);
         spawnedReviewObjects.Clear();
-
+        
         // 2. 데이터 가공 및 판정 (OrderChecker 사용)
         List<Order_check> allOrders = CreateAndCheckOrders();
 
