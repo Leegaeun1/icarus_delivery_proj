@@ -21,10 +21,10 @@ public class TimeManager : MonoBehaviour
     public UIManager uiManager;
     public GameObject nextDayButtonObj;
 
-    private int date = 1;
+    public int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 100f;
+    private float gameSpeed = 1000f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
@@ -162,10 +162,8 @@ public class TimeManager : MonoBehaviour
             date++;
             isDayEnded = false;
         }
-
-        gameTime = 0;
         // 2. 상태 해제 (시간이 다시 흐르도록)
-        
+        gameTime = 0;
 
         // 결제 로직이나 정산
         sheet.SaveDailyData();

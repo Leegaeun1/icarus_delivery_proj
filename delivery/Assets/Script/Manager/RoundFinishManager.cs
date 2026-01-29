@@ -85,6 +85,12 @@ public class RoundFinishManager : MonoBehaviour
         }
         yield return new WaitForSeconds(1f);
 
+        // 전체 수익과 사용 금액 초기화
+        var sheet = FindObjectOfType<ReadSpreadSheets>();
+        sheet.totalRevenue = 0;
+        sheet.totalSpent = 0;
+
+
         // 4. 1초 뒤에 다음으로 가는 버튼 활성화
         nextdayBtn.gameObject.SetActive(true);
 

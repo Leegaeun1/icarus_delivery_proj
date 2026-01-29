@@ -145,6 +145,17 @@ public class CheckMenu : MonoBehaviour
         Debug.Log("선택된 목록: " + string.Join(", ", selectedNames));
     }
 
+    public IEnumerator StartCardStack()
+    {
+        // 1. 메뉴판을 켭니다.
+        selectMenu.SetActive(true);
+        // 2. 카드를 새로 생성합니다.
+        if (menuManager != null) yield return menuManager.StartCoroutine(menuManager.CreateCardStack());
+
+        // 3. 타이머를 시작합니다.
+        timeManager.StartTimeAttack();
+        
+    }
 
     public void completeBtn()
     {
@@ -159,15 +170,17 @@ public class CheckMenu : MonoBehaviour
             completebtn.GetComponent<Image>().sprite = combtn;
             gameObject.SetActive(false);
             completebtn.SetActive(false);
+
             if (!timeManager.isRunning)
             {
-                // 1. 카드를 새로 생성합니다.
-                if (menuManager != null) menuManager.CreateCardStack();
-
-                // 2. 메뉴판을 켭니다.
-                selectMenu.SetActive(true);
-                // 3. 타이머를 시작합니다.
-                timeManager.StartTimeAttack();
+                if (menuManager != null)
+                {
+                    menuManager.StartCoroutine(StartCardStack());
+                }
+                else
+                {
+                    Debug.LogError("MenuManager가 없어서 게임을 시작할 수 없습니다.");
+                }
 
                 Debug.Log(">> 게임 시작! (카드 생성 O, 메뉴판 ON)");
             }
@@ -178,11 +191,13 @@ public class CheckMenu : MonoBehaviour
 
                 Debug.Log(">> 게임 정지! (카드 생성 X)");
             }
+
         }
         else
         {
             completebtn.GetComponent<Image>().sprite = errorbtn;
             Debug.Log("돈이 부족합니다.");
         }
+
     }
 }
