@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -38,7 +39,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public int dailySpent = 0;
 
     // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
-    public List<string> currentRequestName = new List<string> { "kraken_sand", "eye_drink" };
+    public List<string> currentRequestName = new List<string> {};
 
     private bool dataReady = false;
     private string last_name = string.Empty;
@@ -80,7 +81,7 @@ public class ReadSpreadSheets : MonoBehaviour
             Destroy(gameObject); // 이미 존재한다면 새로 생성된 것은 파괴
             return; // 아래 초기화 로직이 실행되지 않도록 종료
         }
-        currentRequestName = new List<string> { "kraken_sand", "eye_drink" };
+        currentRequestName = new List<string> {};
         // 가장 먼저 데이터 비우기
         CheckMenu.selectedNames.Clear();
         // 선택한 옳은 메뉴도 비우기
@@ -276,7 +277,6 @@ public class ReadSpreadSheets : MonoBehaviour
     {
         is_menu_incorrect = false;
         int finalRevenue = 0; // 이번 요리의 예상 수익
-
         List<string> requestList = new List<string>(currentRequestName);
         List<string> myIngredients = new List<string>(CheckMenu.selectedNames);
 

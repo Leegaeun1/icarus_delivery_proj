@@ -196,6 +196,7 @@ public class CookManager : MonoBehaviour
 
         sheet.is_menu_incorrect = false;
         sheet.menu_num += 1; // 요청 증가 ( 임시 )!!
+        sheet.currentRequestName.Clear();
         // 2. 씬 전환 처리
         if (timeManager.isDayEnded)
         {

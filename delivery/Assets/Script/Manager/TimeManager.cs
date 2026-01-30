@@ -193,6 +193,7 @@ public class TimeManager : MonoBehaviour
         sheet.dailySpent = 0;
         sheet.usedMoney = 0;
         sheet.save_Spent = 0;
+        sheet.currentRequestName.Clear();
 
         if (isWeekEnded) { // 일주일이 끝났을 때 
             SceneManager.LoadScene("Round_Finish");
@@ -204,6 +205,7 @@ public class TimeManager : MonoBehaviour
         else
         {
             // 임시적으로 다시 cook으로 돌아와서 진행
+            sheet.currentRequestName.Clear();
             SceneManager.LoadScene("cook");
         }
 
@@ -250,6 +252,7 @@ public class TimeManager : MonoBehaviour
         }
         else
         {
+            sheet.currentRequestName.Clear();
             // 혹시 UIManager가 없더라도 강제로 이동
             SceneManager.LoadScene("Kitchen");
         }

@@ -1820,7 +1820,13 @@ MonoBehaviour:
   save_Spent: 0
   dailyRevenue: 0
   dailySpent: 0
-  currentRequestName: kraken_sand
+  currentRequestName: []
+  is_menu_incorrect: 0
+  menu_incorrect: 0
+  menu_num: 0
+  stand_money: 300
+  tmp_selected: []
+  delivery_incorrect: 1
 --- !u!4 &301222679
 Transform:
   m_ObjectHideFlags: 0
@@ -6156,6 +6162,7 @@ MonoBehaviour:
   cardsToDisplay: 3
   cardSpacing: 60
   dealInterval: 0.25
+  correctmenu: 
 --- !u!4 &1252691148
 Transform:
   m_ObjectHideFlags: 0
