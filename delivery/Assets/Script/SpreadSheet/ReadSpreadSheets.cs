@@ -92,6 +92,33 @@ public class ReadSpreadSheets : MonoBehaviour
         usedMoney = 0;
         save_Spent = 0;
     }
+
+    // ReadSpreadSheets 클래스 안에 추가하세요.
+    public void ResetGameData()
+    {
+        // 1. 디스크에 저장된 데이터 삭제
+        PlayerPrefs.DeleteKey("Gold");
+        PlayerPrefs.DeleteKey("TotalSpent");
+        PlayerPrefs.DeleteKey("TotalRevenue");
+        PlayerPrefs.Save(); // 즉시 반영
+
+        // 2. 현재 메모리에 떠있는 변수 값들도 초기화
+        money = 1000; // 초기 자금
+        totalSpent = 0;
+        totalRevenue = 0;
+        dailyRevenue = 0;
+        dailySpent = 0;
+        usedMoney = 0;
+
+        menu_incorrect = 0;
+        delivery_incorrect = 0;
+
+        // UI 갱신 (만약 현재 씬에 있다면)
+        if (mineral != null) mineral.text = money.ToString();
+        
+        Debug.Log(">> 모든 데이터가 초기화되었습니다.");
+    }
+
     void Start()
     {
 

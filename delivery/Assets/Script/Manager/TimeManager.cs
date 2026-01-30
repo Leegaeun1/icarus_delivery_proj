@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -37,6 +38,21 @@ public class TimeManager : MonoBehaviour
 
     // 일주일이 지났는지 확인
     public bool isWeekEnded = false;
+
+    public void ResetTimeData()
+    {
+
+        date = 1;
+        gameTime = 0f;
+        isDayEnded = false;
+        initialLimitTime = 650f;
+        isRunning = false;
+        isWeekEnded = false;
+        // UI 갱신 (만약 현재 씬에 있다면)
+        if (day != null) day.text = date.ToString();
+
+        Debug.Log(">> 모든 데이터가 초기화되었습니다.");
+    }
 
 
     void Awake()
