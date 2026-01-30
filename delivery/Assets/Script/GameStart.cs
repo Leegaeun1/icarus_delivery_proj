@@ -18,4 +18,9 @@ public class GameStart : MonoBehaviour
         SceneManager.LoadScene("main_menu");
 
     }
+
+    public void exitGame()
+    {
+        Application.Quit();
+    }
 }
