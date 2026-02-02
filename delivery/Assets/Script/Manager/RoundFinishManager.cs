@@ -55,13 +55,13 @@ public class RoundFinishManager : MonoBehaviour
             // 예: 10개 중 2개 틀림 -> 오답률 0.2 -> 정답률 0.8 (80%)
             float errorRate = (float)(sheet.menu_incorrect + sheet.delivery_incorrect) / (float)sheet.menu_num;
             float accuracyScore = Mathf.Clamp01(1.0f - errorRate);
-
+            print(sheet.menu_incorrect);
             // 3. 매출 달성률 계산 (현재 수익 / 목표 수익)
             // 예: 목표 300, 수익 300 -> 1.0 (100%)
             float revenueRatio = 0f;
             if (sheet.stand_money > 0)
             {
-                revenueRatio = (float)sheet.totalRevenue / (float)sheet.stand_money;
+                revenueRatio = (float)Mathf.Max(0,sheet.totalRevenue - sheet.totalSpent) / (float)sheet.stand_money;
                 revenueRatio = Mathf.Clamp01(revenueRatio); // 최대 100%까지만 인정 (원하면 제거 가능)
             }
 
