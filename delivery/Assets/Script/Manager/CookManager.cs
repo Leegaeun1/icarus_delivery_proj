@@ -74,7 +74,6 @@ public class CookManager : MonoBehaviour
         }
         nextDayBtn = GameObject.Find("Canvas").transform.GetChild(0).GetComponent<Button>();
         nextDayBtn.gameObject.SetActive(false);
-
         bagRenderer = sandbag.GetComponent<SpriteRenderer>();
         sandwichRenderer = NewSandwich.GetComponent<SpriteRenderer>();
         timeManager = GameObject.Find("TimeManager").GetComponent<TimeManager>();
@@ -193,7 +192,7 @@ public class CookManager : MonoBehaviour
     {
         // 1. 최종 채점 및 정산 실행
         sheet.CheckFinalResult();
-
+        //CheckMenu.SaveSelectedMenuToManager();
         sheet.is_menu_incorrect = false;
         sheet.menu_num += 1; // 요청 증가 ( 임시 )!!
         sheet.currentRequestName.Clear();
