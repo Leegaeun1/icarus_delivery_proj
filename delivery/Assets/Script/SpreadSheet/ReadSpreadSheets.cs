@@ -38,8 +38,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public int dailyRevenue = 0;
     public int dailySpent = 0;
 
-    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
-    public List<string> currentRequestName = new List<string> {};
+    
 
     private bool dataReady = false;
     private string last_name = string.Empty;
@@ -54,6 +53,11 @@ public class ReadSpreadSheets : MonoBehaviour
     public List<string> tmp_selected = new List<string>();
     public int delivery_incorrect = 1;
 
+    [Header("주문 관리")]
+    public List<string> CurrentRequest_Include = new List<string>();
+    public List<string> CurrentRequest_Exclude = new List<string>();
+    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
+    public List<string> currentRequestName = new List<string> { };
 
     [System.Serializable]
     public class Food_material
@@ -110,10 +114,12 @@ public class ReadSpreadSheets : MonoBehaviour
         dailyRevenue = 0;
         dailySpent = 0;
         usedMoney = 0;
-
+        menu_num = 0;
         menu_incorrect = 0;
         delivery_incorrect = 0;
-
+        if (currentRequestName != null) currentRequestName.Clear();
+        if (CheckMenu.selectedNames != null) CheckMenu.selectedNames.Clear();
+        if (tmp_selected != null) tmp_selected.Clear();
         // UI 갱신 (만약 현재 씬에 있다면)
         if (mineral != null) mineral.text = money.ToString();
         
@@ -441,10 +447,10 @@ public class ReadSpreadSheets : MonoBehaviour
     public void SaveDailyData() // 하루가 끝날 때 저장!!!!
     {
         // 1. 모아둔 일일 수익을 플레이어 돈에 합산
-        money += dailyRevenue;
+        //money += dailyRevenue;
         // 2. UI 갱신 (정산된 금액 표시)
         mineral.text = money.ToString();
-        StartCoroutine(DailyTransactionEffect(dailyRevenue)); 
+        //StartCoroutine(DailyTransactionEffect(dailyRevenue)); 
 
 
         // 3. 데이터 저장

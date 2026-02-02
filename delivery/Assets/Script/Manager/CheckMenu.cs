@@ -54,19 +54,46 @@ public class CheckMenu : MonoBehaviour
        
     }
 
+    // CheckMenu.cs
 
+    public void SaveSelectedMenuToManager()
+    {
+        if (GameManager.Instance == null) return;
+        // _sheet가 연결 안 되어있을 경우를 대비해 프로퍼티 호출
+        if (_sheet == null) _sheet = this.sheet;
+
+        // 포장지(StringList) 생성
+        DayFinishManager.StringList allItems = new DayFinishManager.StringList();
+
+        // selectedNames에 있는 걸 통째로 복사해서 넣음
+        allItems.ingredients = new List<string>(selectedNames);
+
+        // GameManager의 PendingFinalIngredients에 추가
+        GameManager.Instance.PendingFinalIngredients.Add(allItems);
+
+        // 2. 주문서(요청사항) 저장 
+
+        // (A) 포함 요청 (Include)
+        DayFinishManager.StringList incList = new DayFinishManager.StringList();
+        if (_sheet != null)
+        {
+            incList.ingredients = new List<string>(_sheet.CurrentRequest_Include);
+        }
+        GameManager.Instance.PendingIncludeRequest.Add(incList);
+
+        // (B) 제외 요청 (Exclude)
+        DayFinishManager.StringList excList = new DayFinishManager.StringList();
+        if (_sheet != null)
+        {
+            excList.ingredients = new List<string>(_sheet.CurrentRequest_Exclude);
+        }
+        GameManager.Instance.PendingExcludeRequest.Add(excList);
+
+        Debug.Log($"[저장 완료] 분류 없이 총 {allItems.ingredients.Count}개의 항목을 FinalIngredients에 저장했습니다.");
+    }
     private void OnEnable()
     {
         if (image == null) image = GetComponent<Image>();
-
-
-
-        //if (sheet == null)
-        //{
-        //    sheet = ReadSpreadSheets.Instance;
-        //    if (sheet == null)  sheet = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>();
-        //}
-
 
         // 매니저 찾기
         if (menuManager == null) menuManager = FindObjectOfType<MenuManager>();
@@ -80,17 +107,6 @@ public class CheckMenu : MonoBehaviour
             if (childImg != null) image = childImg;
         }
 
-        // 게임 시작 시, 내가 이미 선택된 목록에 있는지 확인하여 UI 갱신
-        //if (transform.childCount > 0)
-        //{
-        //    string myName = transform.GetChild(0).name;
-        //    if (selectedNames.Contains(myName))
-        //    {
-        //        isSelect = true;
-        //        //UpdateColor(); // 색상 켜기
-        //    }
-        //}
-
         if (transform.childCount > 0)
         {
             string myName = transform.GetChild(0).name;
@@ -101,10 +117,6 @@ public class CheckMenu : MonoBehaviour
             {
                 isSelect = true;
             }
-            //else
-            //{
-            //    isSelect = false; // [추가] 리스트에 없으면 선택 해제
-            //}
             UpdateColor();
         }
 
@@ -167,6 +179,7 @@ public class CheckMenu : MonoBehaviour
 
         if (isSuccess)
         {
+            //SaveSelectedMenuToManager();
             completebtn.GetComponent<Image>().sprite = combtn;
             gameObject.SetActive(false);
             completebtn.SetActive(false);
@@ -188,7 +201,7 @@ public class CheckMenu : MonoBehaviour
             {
                 // 1. 타이머를 멈춥니다.
                 timeManager.StopTimeAttack();
-
+                SaveSelectedMenuToManager();
                 Debug.Log(">> 게임 정지! (카드 생성 X)");
             }
 
