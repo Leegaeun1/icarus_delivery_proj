@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -37,6 +38,21 @@ public class TimeManager : MonoBehaviour
 
     // 일주일이 지났는지 확인
     public bool isWeekEnded = false;
+
+    public void ResetTimeData()
+    {
+
+        date = 1;
+        gameTime = 0f;
+        isDayEnded = false;
+        initialLimitTime = 650f;
+        isRunning = false;
+        isWeekEnded = false;
+        // UI 갱신 (만약 현재 씬에 있다면)
+        if (day != null) day.text = date.ToString();
+
+        Debug.Log(">> 모든 데이터가 초기화되었습니다.");
+    }
 
 
     void Awake()
@@ -177,6 +193,7 @@ public class TimeManager : MonoBehaviour
         sheet.dailySpent = 0;
         sheet.usedMoney = 0;
         sheet.save_Spent = 0;
+        sheet.currentRequestName.Clear();
 
         if (isWeekEnded) { // 일주일이 끝났을 때 
             SceneManager.LoadScene("Round_Finish");
@@ -188,6 +205,7 @@ public class TimeManager : MonoBehaviour
         else
         {
             // 임시적으로 다시 cook으로 돌아와서 진행
+            sheet.currentRequestName.Clear();
             SceneManager.LoadScene("cook");
         }
 
@@ -234,6 +252,7 @@ public class TimeManager : MonoBehaviour
         }
         else
         {
+            sheet.currentRequestName.Clear();
             // 혹시 UIManager가 없더라도 강제로 이동
             SceneManager.LoadScene("Kitchen");
         }

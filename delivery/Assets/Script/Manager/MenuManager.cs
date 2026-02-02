@@ -25,7 +25,7 @@ public class MenuManager : MonoBehaviour
     private List<GameObject> cardStack; // 더미에 쌓아둘 카드 리스트
     private int[] num; // 올바른 메뉴가 아닌 카드들의 인덱스
     private int correctCardIndex = -1; // 카드의 실제 special_menus 내 인덱스
-    private string correctmenu;
+    public string correctmenu;
 
     void Start()
     {
@@ -69,6 +69,7 @@ public class MenuManager : MonoBehaviour
         {
             correctCardIndex = Random.Range(0, special_menus.Length);
             correctmenu = special_menus[correctCardIndex].name;
+            ReadSpreadSheets.Instance.currentRequestName.Add(correctmenu+"_sand");
             if (correctmenu != null) {
                 if (correctmenu == "tuna" || correctmenu == "anchovy") // 히든재료아니면 계속 다시 돌아야함
                     continue;
