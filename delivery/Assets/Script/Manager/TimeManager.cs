@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ public class TimeManager : MonoBehaviour
     public GameManager gameManager;
     public ReadSpreadSheets sheet;
     public TextMeshProUGUI money_effect;
+    public CheckMenu check_menu;
 
     [Header("타임어택 설정")]
     public TextMeshProUGUI timeattack;
@@ -38,6 +40,21 @@ public class TimeManager : MonoBehaviour
     // 일주일이 지났는지 확인
     public bool isWeekEnded = false;
 
+    public void ResetTimeData()
+    {
+
+        date = 1;
+        gameTime = 0f;
+        isDayEnded = false;
+        initialLimitTime = 650f;
+        isRunning = false;
+        isWeekEnded = false;
+        // UI 갱신 (만약 현재 씬에 있다면)
+        if (day != null) day.text = date.ToString();
+
+        Debug.Log(">> 모든 데이터가 초기화되었습니다.");
+    }
+
 
     void Awake()
     {
@@ -52,7 +69,7 @@ public class TimeManager : MonoBehaviour
         // 연결 로직 (안전하게 FindObjectOfType 사용)
         if (time == null) time = GameObject.Find("game_time")?.GetComponent<TextMeshProUGUI>();
         if (day == null) day = GameObject.Find("day_txt")?.GetComponent<TextMeshProUGUI>();
-
+        if (check_menu == null) check_menu = FindObjectOfType<CheckMenu>();
         // 시트 연결 (가장 안전한 방법)
         if (sheet == null) sheet = FindObjectOfType<ReadSpreadSheets>();
 
@@ -106,7 +123,7 @@ public class TimeManager : MonoBehaviour
                 // 시간 종료 시
                 EndTimer();
             }
-
+            
             // UI 갱신
             if (timeattack != null)
             {
@@ -168,7 +185,7 @@ public class TimeManager : MonoBehaviour
         sheet.SaveDailyData();
 
         // 다시 메인화면으로 이동
-
+        
         //SceneManager.LoadScene("main_menu");
         // 초기화
         CheckMenu.selectedNames.Clear();
@@ -177,7 +194,8 @@ public class TimeManager : MonoBehaviour
         sheet.dailySpent = 0;
         sheet.usedMoney = 0;
         sheet.save_Spent = 0;
-
+        sheet.currentRequestName.Clear();
+        
         if (isWeekEnded) { // 일주일이 끝났을 때 
             SceneManager.LoadScene("Round_Finish");
             isWeekEnded = false;
@@ -188,6 +206,7 @@ public class TimeManager : MonoBehaviour
         else
         {
             // 임시적으로 다시 cook으로 돌아와서 진행
+            sheet.currentRequestName.Clear();
             SceneManager.LoadScene("cook");
         }
 
@@ -207,6 +226,7 @@ public class TimeManager : MonoBehaviour
     // 타임 오버 시 처리
     private void EndTimer()
     {
+        
         limitTime = 0;
         isRunning = false;
         timeattack_UI.SetActive(false);
@@ -228,12 +248,29 @@ public class TimeManager : MonoBehaviour
             }
 
         }
+        if (check_menu == null)
+        {
+            check_menu = FindObjectOfType<CheckMenu>();
+        }
+
+        // check_menu가 존재할 때만 저장 함수 실행
+        if (check_menu != null)
+        {
+            check_menu.SaveSelectedMenuToManager();
+        }
+        else
+        {
+            // 만약 CheckMenu를 못 찾았다면, 에러 때문에 멈추지 않게 로그만 띄우고 넘어감
+            Debug.LogWarning("[TimeManager] CheckMenu를 찾을 수 없어 저장을 건너뜁니다.");
+        }
+
         if (uiManager != null)
         {
             uiManager.nextScene();
         }
         else
         {
+            sheet.currentRequestName.Clear();
             // 혹시 UIManager가 없더라도 강제로 이동
             SceneManager.LoadScene("Kitchen");
         }

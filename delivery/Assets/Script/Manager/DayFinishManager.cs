@@ -56,15 +56,38 @@ public class DayFinishManager : MonoBehaviour
 
         Days_txt = GameObject.Find("result_Panel").transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
 
-
+        LoadDataFromGameManager();
     }
+    void LoadDataFromGameManager()
+    {
+        if (GameManager.Instance == null) return;
 
+        // [안전 장치] 리스트가 혹시 null이면 새로 만듭니다.
+        if (this.FinalIngredients == null) this.FinalIngredients = new List<StringList>();
+        if (this.ExcludeRequest == null) this.ExcludeRequest = new List<StringList>();
+        if (this.IncludeRequest == null) this.IncludeRequest = new List<StringList>();
+        if (this.RequestedSpecials == null) this.RequestedSpecials = new List<string>();
+        if (this.ProvidedSpecials == null) this.ProvidedSpecials = new List<string>();
+
+        // 1. 데이터 이어붙이기 (AddRange)
+        // 기존에 데이터가 있더라도 유지하면서, GameManager의 데이터를 뒤에 추가합니다.
+        this.FinalIngredients.AddRange(GameManager.Instance.PendingFinalIngredients);
+        this.ExcludeRequest.AddRange(GameManager.Instance.PendingExcludeRequest);
+        this.IncludeRequest.AddRange(GameManager.Instance.PendingIncludeRequest);
+
+
+        // 2. 가져온 후 GameManager의 임시 저장소 비우기 (중복 방지)
+        GameManager.Instance.PendingFinalIngredients.Clear();
+        GameManager.Instance.PendingExcludeRequest.Clear();
+        GameManager.Instance.PendingIncludeRequest.Clear();
+
+        Debug.Log($"[DayFinishManager] 데이터 로드 완료. 총 주문 수: {this.FinalIngredients.Count}");
+    }
     void Start()
     {
         StartCoroutine(GenerateReviewsSequence());
         nextdayBtn.gameObject.SetActive(false);
         print(GameObject.Find("Days").name);
-        print("아아아아ㅏ아ㅏㅏ아ㅏ");
         // [수정 1] Start에서 버튼 이벤트를 미리 연결합니다.
         if (nextdayBtn != null && timerManager != null)
         {
@@ -158,7 +181,7 @@ public class DayFinishManager : MonoBehaviour
     }
     IEnumerator DisplayReviews(List<Order_check> orders)
     {
-        // [추가된 로직] 주문이 하나도 없을 경우 (샌드위치를 만들지 않음)
+        // 주문이 하나도 없을 경우 (샌드위치를 만들지 않음)
         if (orders.Count == 0)
         {
             if (review_prefab != null)

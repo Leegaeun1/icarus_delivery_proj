@@ -1,54 +1,54 @@
-using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class ManManager : MonoBehaviour
 {
-    [Header("설정")]
-    // 1. 여러 프리팹을 넣을 수 있도록 배열로 변경
+    [Header("손님 프리팹 리스트")]
     public GameObject[] manPrefabs;
     public Transform manContainer;
-    public float minWait = 5f, maxWait = 15f;
-    public string[] speechQuotes = { "A동 샌드위치", "주문번호 2번", "눈알주스 세트" };
+
+    [Header("효과 설정")]
+    public float fadeInDuration = 1.0f;
 
     private GameObject currentMan;
 
-    void Start() => StartCoroutine(WaitAndSpawn());
-
-    IEnumerator WaitAndSpawn()
+    public void SpawnMan(string orderName)
     {
-        yield return new WaitForSeconds(Random.Range(minWait, maxWait));
+        if (currentMan != null) return;
 
-        // 프리팹 배열이 비어있지 않은지 확인
-        if (currentMan == null && manPrefabs != null && manPrefabs.Length > 0)
-        {
-            // 2. 배열 중 하나를 랜덤으로 골라서 생성
-            int randomIndex = Random.Range(0, manPrefabs.Length);
-            currentMan = Instantiate(manPrefabs[randomIndex], manContainer);
+        int randomIndex = Random.Range(0, manPrefabs.Length);
+        currentMan = Instantiate(manPrefabs[randomIndex], manContainer);
 
-            Debug.Log("<color=green>캐릭터 생성 성공!</color> 이름: " + currentMan.name);
+        var speechText = currentMan.GetComponentInChildren<TextMeshProUGUI>();
+        if (speechText != null) speechText.text = orderName;
 
-            // 3. 생성된 사람의 Random_face 컴포넌트 실행
-            Random_face faceScript = currentMan.GetComponent<Random_face>();
-            if (faceScript != null)
-            {
-                faceScript.ShowAllRandomParts(); // 모든 부위 랜덤 설정 함수 호출
-            }
+        CanvasGroup canvasGroup = currentMan.GetComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = currentMan.AddComponent<CanvasGroup>();
 
-            // 말풍선 텍스트 설정
-            var speechText = currentMan.GetComponentInChildren<TextMeshProUGUI>();
-            if (speechText != null && speechQuotes.Length > 0)
-                speechText.text = speechQuotes[Random.Range(0, speechQuotes.Length)];
-        }
+        StartCoroutine(FadeInRoutine(canvasGroup));
     }
 
-    public void CompleteMan()
+    private IEnumerator FadeInRoutine(CanvasGroup cg)
+    {
+        float elapsedTime = 0f;
+        cg.alpha = 0f;
+        while (elapsedTime < fadeInDuration)
+        {
+            if (cg == null) yield break; // 중간에 파괴될 경우 방지
+            cg.alpha = Mathf.Lerp(0f, 1f, elapsedTime / fadeInDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        if (cg != null) cg.alpha = 1f;
+    }
+
+    public void DestroyMan()
     {
         if (currentMan != null)
         {
             Destroy(currentMan);
             currentMan = null;
-            StartCoroutine(WaitAndSpawn());
         }
     }
 }

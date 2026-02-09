@@ -20,6 +20,12 @@ public class GameManager : MonoBehaviour
 
     public float ElapsedTime => Time.time - startTime;
 
+    [Header("데이터 전달용 (다음 씬으로 넘겨줄 데이터)")]
+    public List<DayFinishManager.StringList> PendingFinalIngredients = new();
+    public List<DayFinishManager.StringList> PendingExcludeRequest = new();
+    public List<DayFinishManager.StringList> PendingIncludeRequest = new();
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -138,5 +144,23 @@ public class GameManager : MonoBehaviour
             bool isActive = targetPanel.activeSelf;
             targetPanel.SetActive(!isActive);
         }
+    }
+
+    public void AddOrderToNextDayResult(List<string> finalIngredients, List<string> excludes, List<string> includes)
+    {
+        // 1. FinalIngredients (내가 만든 결과물) 저장
+        DayFinishManager.StringList finalList = new DayFinishManager.StringList();
+        finalList.ingredients = new List<string>(finalIngredients);
+        PendingFinalIngredients.Add(finalList);
+
+        // 2. ExcludeRequest (빼달라는 요청) 저장
+        DayFinishManager.StringList excList = new DayFinishManager.StringList();
+        excList.ingredients = new List<string>(excludes);
+        PendingExcludeRequest.Add(excList);
+
+        // 3. IncludeRequest (넣어달라는 요청) 저장
+        DayFinishManager.StringList incList = new DayFinishManager.StringList();
+        incList.ingredients = new List<string>(includes); // 받아온 includes 저장
+        PendingIncludeRequest.Add(incList);
     }
 }

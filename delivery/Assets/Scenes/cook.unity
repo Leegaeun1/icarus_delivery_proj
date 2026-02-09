@@ -1820,7 +1820,13 @@ MonoBehaviour:
   save_Spent: 0
   dailyRevenue: 0
   dailySpent: 0
-  currentRequestName: kraken_sand
+  currentRequestName: []
+  is_menu_incorrect: 0
+  menu_incorrect: 0
+  menu_num: 0
+  stand_money: 300
+  tmp_selected: []
+  delivery_incorrect: 1
 --- !u!4 &301222679
 Transform:
   m_ObjectHideFlags: 0
@@ -2241,7 +2247,8 @@ Transform:
   m_LocalPosition: {x: 699.99, y: -420, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 597692007}
   m_Father: {fileID: 189136130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &529194883
@@ -2642,11 +2649,12 @@ Transform:
   m_GameObject: {fileID: 597692005}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -80, y: 142.90582, z: 0}
+  m_LocalPosition: {x: 6.8270264, y: 190.78424, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 623671367}
+  m_Children:
+  - {fileID: 1317357276}
+  m_Father: {fileID: 529194882}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &623671366
 GameObject:
@@ -2677,8 +2685,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 856627698}
-  - {fileID: 1317357276}
-  - {fileID: 597692007}
   - {fileID: 1661514283}
   - {fileID: 1263899346}
   - {fileID: 1210171085}
@@ -6156,6 +6162,7 @@ MonoBehaviour:
   cardsToDisplay: 3
   cardSpacing: 60
   dealInterval: 0.25
+  correctmenu: 
 --- !u!4 &1252691148
 Transform:
   m_ObjectHideFlags: 0
@@ -7045,11 +7052,11 @@ Transform:
   m_GameObject: {fileID: 1317357275}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -960, y: -540, z: 0}
+  m_LocalPosition: {x: -880, y: -682.9058, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 623671367}
+  m_Father: {fileID: 597692007}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1317357277
 AudioSource:

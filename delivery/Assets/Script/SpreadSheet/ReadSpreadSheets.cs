@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -37,8 +38,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public int dailyRevenue = 0;
     public int dailySpent = 0;
 
-    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
-    public List<string> currentRequestName = new List<string> { "kraken_sand", "eye_drink" };
+    
 
     private bool dataReady = false;
     private string last_name = string.Empty;
@@ -53,6 +53,11 @@ public class ReadSpreadSheets : MonoBehaviour
     public List<string> tmp_selected = new List<string>();
     public int delivery_incorrect = 1;
 
+    [Header("주문 관리")]
+    public List<string> CurrentRequest_Include = new List<string>();
+    public List<string> CurrentRequest_Exclude = new List<string>();
+    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
+    public List<string> currentRequestName = new List<string> { };
 
     [System.Serializable]
     public class Food_material
@@ -80,7 +85,7 @@ public class ReadSpreadSheets : MonoBehaviour
             Destroy(gameObject); // 이미 존재한다면 새로 생성된 것은 파괴
             return; // 아래 초기화 로직이 실행되지 않도록 종료
         }
-        currentRequestName = new List<string> { "kraken_sand", "eye_drink" };
+        currentRequestName = new List<string> {};
         // 가장 먼저 데이터 비우기
         CheckMenu.selectedNames.Clear();
         // 선택한 옳은 메뉴도 비우기
@@ -92,6 +97,35 @@ public class ReadSpreadSheets : MonoBehaviour
         usedMoney = 0;
         save_Spent = 0;
     }
+
+    // ReadSpreadSheets 클래스 안에 추가하세요.
+    public void ResetGameData()
+    {
+        // 1. 디스크에 저장된 데이터 삭제
+        PlayerPrefs.DeleteKey("Gold");
+        PlayerPrefs.DeleteKey("TotalSpent");
+        PlayerPrefs.DeleteKey("TotalRevenue");
+        PlayerPrefs.Save(); // 즉시 반영
+
+        // 2. 현재 메모리에 떠있는 변수 값들도 초기화
+        money = 1000; // 초기 자금
+        totalSpent = 0;
+        totalRevenue = 0;
+        dailyRevenue = 0;
+        dailySpent = 0;
+        usedMoney = 0;
+        menu_num = 0;
+        menu_incorrect = 0;
+        delivery_incorrect = 0;
+        if (currentRequestName != null) currentRequestName.Clear();
+        if (CheckMenu.selectedNames != null) CheckMenu.selectedNames.Clear();
+        if (tmp_selected != null) tmp_selected.Clear();
+        // UI 갱신 (만약 현재 씬에 있다면)
+        if (mineral != null) mineral.text = money.ToString();
+        
+        Debug.Log(">> 모든 데이터가 초기화되었습니다.");
+    }
+
     void Start()
     {
 
@@ -249,7 +283,6 @@ public class ReadSpreadSheets : MonoBehaviour
     {
         is_menu_incorrect = false;
         int finalRevenue = 0; // 이번 요리의 예상 수익
-
         List<string> requestList = new List<string>(currentRequestName);
         List<string> myIngredients = new List<string>(CheckMenu.selectedNames);
 
@@ -414,10 +447,10 @@ public class ReadSpreadSheets : MonoBehaviour
     public void SaveDailyData() // 하루가 끝날 때 저장!!!!
     {
         // 1. 모아둔 일일 수익을 플레이어 돈에 합산
-        money += dailyRevenue;
+        //money += dailyRevenue;
         // 2. UI 갱신 (정산된 금액 표시)
         mineral.text = money.ToString();
-        StartCoroutine(DailyTransactionEffect(dailyRevenue)); 
+        //StartCoroutine(DailyTransactionEffect(dailyRevenue)); 
 
 
         // 3. 데이터 저장
