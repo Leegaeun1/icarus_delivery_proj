@@ -22,6 +22,7 @@ public class ReadSpreadSheets : MonoBehaviour
     [Header("Data Lists")]
     public List<Food_material> materials;  // 재료 리스트
     public List<Food_product> productPrices; // 완성품 가격 리스트
+    public Dictionary<string, string> menuVocab = new Dictionary<string, string>();
 
     [Header("Game State")]
     public TextMeshProUGUI mineral;
@@ -63,6 +64,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public class Food_material
     {
         public string name;
+        public string kor_name;
         public int cost;
     }
 
@@ -70,7 +72,19 @@ public class ReadSpreadSheets : MonoBehaviour
     public class Food_product // 완성품 (수익)
     {
         public string food_name;
+        public string kor_name;
         public int price;
+    }
+    public void ClearRequests()
+    {
+        // 리스트가 null일 경우를 대비해 null 체크를 하거나, 
+        // Awake에서 이미 초기화되었다면 바로 Clear()만 해도 됩니다.
+
+        if (CurrentRequest_Include != null) CurrentRequest_Include.Clear();
+        if (CurrentRequest_Exclude != null) CurrentRequest_Exclude.Clear();
+        if (currentRequestName != null) currentRequestName.Clear();
+
+        Debug.Log("이전 주문 데이터를 모두 초기화했습니다.");
     }
     void Awake() // Start -> Awake로 변경하여 가장 먼저 실행되게 함
     {
@@ -177,7 +191,39 @@ public class ReadSpreadSheets : MonoBehaviour
         productPrices = GetDatas<Food_product>(wwwSales.downloadHandler.text);
         Debug.Log("판매 가격 데이터 로드 완료");
 
+        // 3. [NEW] 로드된 데이터를 바탕으로 사전(Dictionary) 만들기
+        MakeDictionary();
+
+        Debug.Log("데이터 로드 및 한글 매핑 완료");
         dataReady = true;
+    }
+    // 데이터를 딕셔너리에 몰아넣는 함수
+    void MakeDictionary()
+    {
+        menuVocab.Clear();
+
+        // 1) 재료 이름 등록 (예: "피클" -> "pickle")
+        foreach (var mat in materials)
+        {
+            if (!menuVocab.ContainsKey(mat.kor_name))
+            {
+                menuVocab.Add(mat.kor_name, mat.name);
+            }
+        }
+
+        // 2) 완성품 이름 등록 (예: "크라켄 샌드위치" -> "kraken_sand")
+        // *주의: 판매 시트(Sheet_ID_SALES)에도 B열에 한글 이름을 추가해야 작동합니다.
+        foreach (var prod in productPrices)
+        {
+            if (!menuVocab.ContainsKey(prod.kor_name))
+            {
+                menuVocab.Add(prod.kor_name, prod.food_name);
+            }
+        }
+
+        // 3) 시트에 없는 특수 단어들만 수동으로 추가 (필요하다면)
+        // 예: "빼고", "없이" 같은 문법적 단어는 시트에 없다면 여기서 추가
+        menuVocab.TryAdd("빼고", "EXCLUDE_KEYWORD"); 
     }
     T GetData<T>(string[] datas) // TSV 한 행을 T타입 객체로 변환하는 함수 
     {
