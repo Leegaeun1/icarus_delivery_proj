@@ -51,7 +51,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public int menu_num = 0;
     public int stand_money = 300;
     public List<string> tmp_selected = new List<string>();
-    public int delivery_correct = 1;
+    public int delivery_incorrect = 1;
 
     [Header("주문 관리")]
     public List<string> CurrentRequest_Include = new List<string>();
@@ -116,7 +116,7 @@ public class ReadSpreadSheets : MonoBehaviour
         usedMoney = 0;
         menu_num = 0;
         menu_incorrect = 0;
-        delivery_correct = 0;
+        delivery_incorrect = 0;
         if (currentRequestName != null) currentRequestName.Clear();
         if (CheckMenu.selectedNames != null) CheckMenu.selectedNames.Clear();
         if (tmp_selected != null) tmp_selected.Clear();
