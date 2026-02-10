@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class ReadSpreadSheet : MonoBehaviour
 {
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
-    public readonly string RANGE = "A2:B";
+    public readonly string RANGE = "A2:C";
     public readonly long SHEET_ID = 899576211;
     public List<Food_material> materials;
     public TextMeshProUGUI mineral;
