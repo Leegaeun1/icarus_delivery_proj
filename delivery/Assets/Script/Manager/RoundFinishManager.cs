@@ -53,7 +53,7 @@ public class RoundFinishManager : MonoBehaviour
         {
             // 2. 정확도 비율 계산 (틀린 개수 / 전체 개수) -> float 캐스팅 필수!
             // 예: 10개 중 2개 틀림 -> 오답률 0.2 -> 정답률 0.8 (80%)
-            float errorRate = (float)(sheet.menu_incorrect + (sheet.menu_num-sheet.delivery_correct)) / (float)sheet.menu_num;
+            float errorRate = (float)(sheet.menu_incorrect + sheet.delivery_incorrect) / (float)sheet.menu_num;
             float accuracyScore = Mathf.Clamp01(1.0f - errorRate);
             print(sheet.menu_incorrect);
             // 3. 매출 달성률 계산 (현재 수익 / 목표 수익)
@@ -126,7 +126,7 @@ public class RoundFinishManager : MonoBehaviour
                     }
                     else if (i == 4) // 5번째 프리팹: 잘못된 배달
                     {
-                        string sign = (sheet.menu_num-sheet.delivery_correct).ToString();
+                        string sign = sheet.delivery_incorrect.ToString();
                         uiText.text = sign;
                     }
                 }
@@ -139,7 +139,7 @@ public class RoundFinishManager : MonoBehaviour
 
         sheet.totalRevenue = 0;
         sheet.totalSpent = 0;
-        sheet.delivery_correct = 0;
+        sheet.delivery_incorrect = 0;
         sheet.menu_incorrect = 0;
         // 4. 1초 뒤에 다음으로 가는 버튼 활성화
         if (star_cnt < 1)
