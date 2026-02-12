@@ -108,8 +108,12 @@ public class OrrerManager : MonoBehaviour
 
     public void OnClickStartCooking()
     {
-        if (activeOrders.Count == 0) return;
-
+        // [범인 1] 주문이 하나도 없으면 여기서 그냥 끝남 (로그도 안 찍힘)
+        if (activeOrders.Count == 0)
+        {
+            Debug.Log("주문이 없어서 시작하지 못함"); // 확인용 로그 추가
+            return;
+        }
         string selectedOrder = activeOrders[currentViewIndex];
 
         // 싱글톤 데이터 세팅 (데이터 전달을 위한 초기화)
@@ -117,7 +121,15 @@ public class OrrerManager : MonoBehaviour
         {
             ReadSpreadSheets.Instance.ClearRequests();
             ParseOrder(selectedOrder); // 아래 파싱 로직 호출
-            SceneManager.LoadScene("CookScene");
+                                       // 1. 포함된 재료(Include) 확인
+            string includeLog = string.Join(", ", ReadSpreadSheets.Instance.CurrentRequest_Include);
+            Debug.Log($"<color=green>[주문 데이터 확인]</color> 포함해야 할 재료: {includeLog}");
+
+            // 2. 제외된 재료(Exclude) 확인 (필요하다면)
+            string excludeLog = string.Join(", ", ReadSpreadSheets.Instance.CurrentRequest_Exclude);
+            Debug.Log($"<color=red>[주문 데이터 확인]</color> 빼야 할 재료: {excludeLog}");
+            //SceneManager.LoadScene("CookScene");
+            Debug.Log("씬 이동 막고 테스트 중: 여기까지 코드가 오나요?");
         }
         else
         {
