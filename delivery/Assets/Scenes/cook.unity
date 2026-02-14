@@ -874,7 +874,6 @@ Transform:
   - {fileID: 947766906}
   - {fileID: 1888496440}
   - {fileID: 529194882}
-  - {fileID: 301222679}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &189136131
@@ -1812,7 +1811,7 @@ MonoBehaviour:
   materials: []
   productPrices: []
   mineral: {fileID: 205917634}
-  money_effect: {fileID: 0}
+  money_effect: {fileID: 284215941}
   money: 0
   usedMoney: 0
   totalSpent: 0
@@ -1820,13 +1819,15 @@ MonoBehaviour:
   save_Spent: 0
   dailyRevenue: 0
   dailySpent: 0
-  currentRequestName: []
   is_menu_incorrect: 0
   menu_incorrect: 0
   menu_num: 0
   stand_money: 300
   tmp_selected: []
   delivery_incorrect: 1
+  CurrentRequest_Include: []
+  CurrentRequest_Exclude: []
+  currentRequestName: []
 --- !u!4 &301222679
 Transform:
   m_ObjectHideFlags: 0
@@ -1836,11 +1837,11 @@ Transform:
   m_GameObject: {fileID: 301222677}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 627.9606, y: -304.31384, z: -15.174934}
+  m_LocalPosition: {x: 807.9606, y: 605.68616, z: -15.174934}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 189136130}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &301222680
 MonoBehaviour:
@@ -2268,6 +2269,9 @@ MonoBehaviour:
   boardWindow: {fileID: 0}
   cookBoardButton: {fileID: 0}
   audio_source: {fileID: 856627697}
+  PendingFinalIngredients: []
+  PendingExcludeRequest: []
+  PendingIncludeRequest: []
 --- !u!1 &546039452
 GameObject:
   m_ObjectHideFlags: 0
@@ -2732,6 +2736,7 @@ MonoBehaviour:
   gameManager: {fileID: 529194883}
   sheet: {fileID: 0}
   money_effect: {fileID: 0}
+  check_menu: {fileID: 0}
   timeattack: {fileID: 1400220451}
   timeattack_UI: {fileID: 904733538}
   uiManager: {fileID: 0}
@@ -11541,5 +11546,6 @@ SceneRoots:
   - {fileID: 1477201191}
   - {fileID: 639078251}
   - {fileID: 189136130}
+  - {fileID: 301222679}
   - {fileID: 356692286}
   - {fileID: 1252691148}

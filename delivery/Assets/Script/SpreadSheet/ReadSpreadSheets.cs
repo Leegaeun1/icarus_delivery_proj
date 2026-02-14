@@ -15,7 +15,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
     [Header("Google Sheet Settings")]
     public readonly string ADDRESS = "https://docs.google.com/spreadsheets/d/1SUvkrIiBEfRl-J2_887gtT8MJNJgfKvjd-QEr4NglY0";
-    public readonly string RANGE = "A2:B";
+    public readonly string RANGE = "A2:C";
     public readonly long SHEET_ID_MATERIAL = 0;          // 재료 시트
     public readonly long SHEET_ID_SALES = 899576211;     // 판매 가격 시트 (2열: food_name, price)
 
@@ -86,23 +86,36 @@ public class ReadSpreadSheets : MonoBehaviour
 
         Debug.Log("이전 주문 데이터를 모두 초기화했습니다.");
     }
-    void Awake() // Start -> Awake로 변경하여 가장 먼저 실행되게 함
+    void Awake()
     {
-
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 이 오브젝트를 씬이 바뀌어도 파괴하지 않음
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            Destroy(gameObject); // 이미 존재한다면 새로 생성된 것은 파괴
-            return; // 아래 초기화 로직이 실행되지 않도록 종료
+            Destroy(gameObject);
+            return;
         }
-        currentRequestName = new List<string> {};
-        // 가장 먼저 데이터 비우기
+
+        // [핵심 수정] new List로 새로 만들지 말고, null 체크 후 Clear()로 청소만 합니다.
+        // 이렇게 해야 인스펙터에 보이는 리스트와 코드가 쓰는 리스트가 일치하게 됩니다.
+
+        if (currentRequestName == null) currentRequestName = new List<string>();
+        currentRequestName.Clear();
+
+        if (CurrentRequest_Include == null) CurrentRequest_Include = new List<string>();
+        CurrentRequest_Include.Clear();
+
+        if (CurrentRequest_Exclude == null) CurrentRequest_Exclude = new List<string>();
+        CurrentRequest_Exclude.Clear();
+
+        // 다른 리스트들도 안전하게 초기화
+        if (CheckMenu.selectedNames == null) CheckMenu.selectedNames = new List<string>();
         CheckMenu.selectedNames.Clear();
-        // 선택한 옳은 메뉴도 비우기
+
+        if (tmp_selected == null) tmp_selected = new List<string>();
         tmp_selected.Clear();
 
         // 일일 데이터 초기화
@@ -110,6 +123,8 @@ public class ReadSpreadSheets : MonoBehaviour
         dailySpent = 0;
         usedMoney = 0;
         save_Spent = 0;
+
+        Debug.Log(">> 모든 데이터 리스트가 깨끗하게 초기화되었습니다.");
     }
 
     // ReadSpreadSheets 클래스 안에 추가하세요.
@@ -170,12 +185,11 @@ public class ReadSpreadSheets : MonoBehaviour
 
         StartCoroutine(LoadAllData());
     }
-
     public static string GetTSVAddress(string address, string range, long sheetId)
     {
-        return $"{address}/export?format=tsv&range={range}&gid={sheetId}";
+        // [수정] &dummy={시간}을 붙여서 매번 주소가 다르게 보이게 만듭니다. (캐시 무시 강제 다운로드)
+        return $"{address}/export?format=tsv&range={range}&gid={sheetId}&dummy={System.DateTime.Now.Ticks}";
     }
-
     // 두 개의 시트를 순차적으로 로딩
     private IEnumerator LoadAllData()
     {
@@ -234,21 +248,30 @@ public class ReadSpreadSheets : MonoBehaviour
         {
             try
             {
+                // [방어 1] 데이터 개수보다 필드가 많으면 패스 (인덱스 초과 방지)
+                if (i >= datas.Length) continue;
+
+                // [방어 2: 핵심!] 앞뒤 공백 제거 후 빈 값 체크
+                // datas[i]를 직접 쓰지 않고, 깨끗하게 씻은 cellData를 씁니다.
+                string cellData = datas[i].Trim();
+                if (string.IsNullOrEmpty(cellData)) continue;
+
                 Type type = fields[i].FieldType;
 
                 if (string.IsNullOrEmpty(datas[i]))
                     continue;
 
+                // 아래부터는 datas[i] 대신 cellData를 사용합니다!
                 if (type == typeof(int))
-                    fields[i].SetValue(data, int.Parse(datas[i]));
+                    fields[i].SetValue(data, int.Parse(cellData));
                 else if (type == typeof(float))
-                    fields[i].SetValue(data, float.Parse(datas[i]));
+                    fields[i].SetValue(data, float.Parse(cellData));
                 else if (type == typeof(bool))
-                    fields[i].SetValue(data, bool.Parse(datas[i]));
+                    fields[i].SetValue(data, bool.Parse(cellData));
                 else if (type == typeof(string))
-                    fields[i].SetValue(data, datas[i]);
+                    fields[i].SetValue(data, cellData);
                 else
-                    fields[i].SetValue(data, Enum.Parse(type, datas[i]));
+                    fields[i].SetValue(data, Enum.Parse(type, cellData));
             }
             catch (Exception e)
             {

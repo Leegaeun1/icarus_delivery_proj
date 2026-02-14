@@ -34,8 +34,6 @@ public class FoodManager : MonoBehaviour
             GameObject selectedFood = foodPrefabs[randomIndex];
 
             Instantiate(selectedFood, foodContainer);
-
-            Debug.Log($"<color=orange>음식 생성 완료:</color> {selectedFood.name} (대기시간: {randomWait:F2}초)");
         }
         else
         {
