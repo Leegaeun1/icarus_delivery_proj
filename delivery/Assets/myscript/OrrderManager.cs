@@ -81,6 +81,7 @@ public class OrrderManager : MonoBehaviour
     public void ClosePopup()
     {
         receiptPopup.SetActive(false);
+        OnClickStartCooking();
         if (activeOrders.Count > 0 && receiptIconBtn != null)
         {
             receiptIconBtn.gameObject.SetActive(true);
