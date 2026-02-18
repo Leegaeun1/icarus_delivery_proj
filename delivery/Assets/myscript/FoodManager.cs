@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class FoodManager : MonoBehaviour
 {
     [Header("음식 프리팹 설정")]
-    // 여러 종류의 음식 프리팹을 넣을 수 있습니다 (Ramen, Pizza 등)
     public GameObject[] foodPrefabs;
 
     [Header("생성 위치")]
@@ -16,24 +16,43 @@ public class FoodManager : MonoBehaviour
 
     void Start()
     {
-        // 게임이 시작되면 랜덤 생성 루틴을 시작합니다.
-        StartCoroutine(SpawnFoodRoutine());
+        if (CheckMenu.selectedNames != null && CheckMenu.selectedNames.Count > 0)
+        {
+            StartCoroutine(SpawnFoodRoutine());
+        }
+        else
+        {
+            Debug.Log("<color=white>선택된 항목이 없어 음식을 생성하지 않습니다.</color>");
+        }
     }
 
     IEnumerator SpawnFoodRoutine()
     {
-        // 1. 0~3초 사이의 랜덤한 시간을 기다립니다.
         float randomWait = Random.Range(minWait, maxWait);
         yield return new WaitForSeconds(randomWait);
 
-        // 2. 프리팹 배열이 비어있는지 확인합니다.
         if (foodPrefabs != null && foodPrefabs.Length > 0)
         {
-            // 3. 배열 중 하나를 랜덤으로 골라 생성합니다.
             int randomIndex = Random.Range(0, foodPrefabs.Length);
             GameObject selectedFood = foodPrefabs[randomIndex];
 
-            Instantiate(selectedFood, foodContainer);
+            // 1. 음식 프리팹 생성 및 변수에 할당
+            GameObject spawnedFood = Instantiate(selectedFood, foodContainer);
+
+            // 2. 생성된 음식에서 버튼 컴포넌트를 찾아 이벤트 연결
+            Button foodButton = spawnedFood.GetComponent<Button>();
+            if (foodButton != null)
+            {
+                foodButton.onClick.RemoveAllListeners();
+                foodButton.onClick.AddListener(() => {
+                    if (DeliveryFinalManager.Instance != null)
+                    {
+                        DeliveryFinalManager.Instance.ConfirmDelivery();
+                        Debug.Log("<color=cyan>음식 봉투 클릭:</color> 검증 프로세스 시작");
+                        Destroy(spawnedFood);
+                    }
+                });
+            }
 
             Debug.Log($"<color=orange>음식 생성 완료:</color> {selectedFood.name} (대기시간: {randomWait:F2}초)");
         }

@@ -1,20 +1,22 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CharacterWatcher : MonoBehaviour
 {
-    [Header("모니터링 대상")]
+    [Header("모니터링 및 설정")]
     public Transform manContainer;
+    public Transform targetContainer1; // 면허증 사진 칸
+    public Transform targetContainer2; // 배달원 확인 사진 칸
 
-    [Header("복사본 설정 (면허증 위치)")]
-    public Transform targetContainer;
+    [Header("위조용 캐릭터 리스트")]
+    public List<GameObject> allCharacterPrefabs;
 
-    [Header("캐릭터 정밀 조정")]
     public Vector2 customPosition = Vector2.zero;
     public float customScale = 1.0f;
 
     private GameObject lastDetectedMan;
-    private GameObject clonedMan;
+    private GameObject clonedMan1, clonedMan2;
 
     void Update()
     {
@@ -23,48 +25,65 @@ public class CharacterWatcher : MonoBehaviour
             GameObject currentMan = manContainer.GetChild(0).gameObject;
             if (currentMan != lastDetectedMan)
             {
-                CloneToPanel(currentMan);
+                
+                CloneToPanel(currentMan, targetContainer2, ref clonedMan2, "Real_Photo");
+
+                
+                GameObject photoSource = currentMan;
+
+                if (LicenseInfoManager.Instance != null && LicenseInfoManager.Instance.isPhotoForgery)
+                {
+                    
+                    List<GameObject> candidates = allCharacterPrefabs.FindAll(p => p.name != currentMan.name.Replace("(Clone)", "").Trim());
+                    if (candidates.Count > 0)
+                    {
+                        photoSource = candidates[Random.Range(0, candidates.Count)];
+                        Debug.Log("<color=red>[사진 위조]</color> 다른 캐릭터의 외형을 사용합니다.");
+                    }
+                }
+
+                CloneToPanel(photoSource, targetContainer1, ref clonedMan1, "License_Photo");
                 lastDetectedMan = currentMan;
             }
         }
         else
         {
-            if (clonedMan != null) Destroy(clonedMan);
+            if (clonedMan1 != null) Destroy(clonedMan1);
+            if (clonedMan2 != null) Destroy(clonedMan2);
             lastDetectedMan = null;
         }
     }
 
-    void CloneToPanel(GameObject original)
+    void CloneToPanel(GameObject original, Transform container, ref GameObject cloneRef, string cloneName)
     {
-        if (clonedMan != null) Destroy(clonedMan);
+        if (container == null) return;
+        if (cloneRef != null) Destroy(cloneRef);
 
-        // 1. 프리팹 전체 복사
-        clonedMan = Instantiate(original, targetContainer);
-        clonedMan.name = "Cloned_Photo";
+        
+        cloneRef = Instantiate(original, container);
+        cloneRef.name = cloneName;
 
-        // 2. 기능성 스크립트만 제거 (이미지는 유지)
-        // GetComponentsInChildren을 사용하여 자식 오브젝트의 스크립트까지 모두 제거합니다.
-        MonoBehaviour[] allScripts = clonedMan.GetComponentsInChildren<MonoBehaviour>();
+        
+        MonoBehaviour[] allScripts = cloneRef.GetComponentsInChildren<MonoBehaviour>();
         foreach (var script in allScripts)
         {
-            // Image, RectTransform, CanvasRenderer, TextMeshPro는 UI 렌더링에 필요하므로 제외
             if (script is Image || script is CanvasRenderer || script is TMPro.TextMeshProUGUI || script is RectTransform)
             {
                 continue;
             }
-            Destroy(script); // 그 외 모든 커스텀 기능 삭제
+            Destroy(script);
         }
 
-        // 3. UI 위치 및 크기 강제 초기화
-        RectTransform rt = clonedMan.GetComponent<RectTransform>();
+        
+        RectTransform rt = cloneRef.GetComponent<RectTransform>();
         if (rt != null)
         {
             rt.anchoredPosition = customPosition;
             rt.localScale = new Vector3(customScale, customScale, 1f);
         }
 
-        // 4. 모든 이미지 투명도 강제 복구 (원본이 페이드 중이었을 경우 대비)
-        Image[] images = clonedMan.GetComponentsInChildren<Image>();
+       
+        Image[] images = cloneRef.GetComponentsInChildren<Image>();
         foreach (var img in images)
         {
             Color c = img.color;
@@ -72,10 +91,9 @@ public class CharacterWatcher : MonoBehaviour
             img.color = c;
         }
 
-        // 5. CanvasGroup이 남아있다면 투명도 조절
-        CanvasGroup cg = clonedMan.GetComponent<CanvasGroup>();
+        CanvasGroup cg = cloneRef.GetComponent<CanvasGroup>();
         if (cg != null) cg.alpha = 1f;
 
-        clonedMan.transform.SetAsLastSibling();
+        cloneRef.transform.SetAsLastSibling();
     }
 }
