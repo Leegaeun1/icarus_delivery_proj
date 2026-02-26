@@ -34,18 +34,33 @@ public class DeliveryFinalManager : MonoBehaviour
 
         if (isSuccess)
         {
-            foreach (string item in excludeReq)
+            if (LicenseInfoManager.Instance != null && LicenseInfoManager.Instance.isForgery)
             {
-                if (playerList.Contains(item)) { isSuccess = false; failReason = $"제외항목포함: {item}"; break; }
+                // 위조범인데 '승인'을 눌러버린 경우 (실패 처리하거나 감점)
+                Debug.Log("<color=red>위조범을 통과시켰습니다!</color>");
+                ScoreManager.Instance.AddScore(100, true, false);
             }
-        }
+            else
+            {
+                // 정상 배달원이고 음식도 잘 만든 경우
+                ScoreManager.Instance.AddScore(100, true, true);
+            }
 
-        if (isSuccess)
+            Debug.Log("<color=green>배달 성공!</color>");
+            if (statusText != null) statusText.text = "STATUS: VALID";
+
+            // 배달 성공 점수 100점 추가
+            if (ScoreManager.Instance != null)
+                ScoreManager.Instance.AddScore(100, true, true);
+        }
+        else
         {
-            foreach (string sand in mainOrder)
-            {
-                if (!playerList.Contains(sand)) { isSuccess = false; failReason = $"메인메뉴({sand}) 누락"; break; }
-            }
+            Debug.Log($"<color=red>배달 실패: {failReason}</color>");
+            if (statusText != null) statusText.text = "STATUS: INVALID";
+
+            // 배달 실패 시 50점 감점
+            if (ScoreManager.Instance != null)
+                ScoreManager.Instance.AddScore(100, true, false);
         }
 
         // 2. 결과 UI 반영

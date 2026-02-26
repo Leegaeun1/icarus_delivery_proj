@@ -52,7 +52,7 @@ public class StageManage : MonoBehaviour
         cookie_cnt = stageDict["cookie"][now_stage - 1];
         drink_cnt = stageDict["drink"][now_stage - 1];
 
-        menu.OnStageDataLoaded(main_sand_cnt, cookie_cnt, drink_cnt);
+        //menu.OnStageDataLoaded(main_sand_cnt, cookie_cnt, drink_cnt);
         //print(main_sand_cnt);
         //print(cookie_cnt);
         //print(drink_cnt);
