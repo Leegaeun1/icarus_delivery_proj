@@ -145,16 +145,28 @@ public class CheckMenu : MonoBehaviour
 
     public void player_select()
     {
+
+        string ingredientName = (transform.childCount > 0) ? transform.GetChild(0).name : gameObject.name;
+        ingredientName = ingredientName.Replace("(Clone)", "").Trim();
+        string finalName = ingredientName;
+
         if (transform.childCount == 0 || sheet == null) return;
+
+        if (transform.parent != null && transform.parent.name == "CardStackParent")
+        {
+            finalName = ingredientName + "_sand";
+            if (!selectedNames.Contains(finalName)) selectedNames.Add(finalName);
+        }
+
         if (sheet == null) _sheet = ReadSpreadSheets.Instance;
 
-        string ingredientName = transform.GetChild(0).name;
+        ingredientName = transform.GetChild(0).name;
 
         isSelect = !isSelect;
         UpdateColor(); // 색상 변경
 
         sheet.OnIngredientToggled(ingredientName, isSelect);
-        Debug.Log("선택된 목록: " + string.Join(", ", selectedNames));
+        Debug.Log($"[클릭 감지] {ingredientName} | 선택 목록: {string.Join(", ", selectedNames)}");
     }
 
     public IEnumerator StartCardStack()

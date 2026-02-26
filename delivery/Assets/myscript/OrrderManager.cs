@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
+// SceneManager는 MenutoCook에서 사용하므로 여기선 지웠습니다.
 
-public class OrrerManager : MonoBehaviour
+public class OrrderManager : MonoBehaviour
 {
     [Header("UI References")]
-    // 아이콘이 버튼 역할을 해야 하므로 Button 컴포넌트를 직접 참조하는 것이 좋습니다.
     public Button receiptIconBtn;
     public GameObject receiptPopup;
     public Button receiptCloseButton;
     public TextMeshProUGUI orderTextUI;
 
     [Header("Order Settings")]
-    public string[] possibleOrders = new string[]
-    {
-        "피클이랑 칠리 빼고 크라켄 샌드위치랑 눈알 스무디 주세요.",
-        "양배추 빼고 히드라 버거 하나 주세요.",
-        "갤럭시 음료랑 불가사리 쿠키 주세요. 아, 머스타드는 빼고요.",
-        "마녀 스프랑 불꽃 쿠키 주세요."
-    };
-
+    public string[] possibleOrders = new string[] {
+    "피클이랑 칠리 빼고 크라켄 샌드위치랑 눈알 스무디 주세요.",
+    "양배추 빼고 히드라 샌드위치 하나 주세요.",
+    "은하수 스무디랑 불가사리 쿠키 주세요.",
+    "불사조 샌드위치랑 불꽃 쿠키 주세요."
+     };
     public List<string> activeOrders = new List<string>();
     private int currentViewIndex = 0;
 
@@ -32,7 +29,7 @@ public class OrrerManager : MonoBehaviour
         if (receiptPopup != null) receiptPopup.SetActive(false);
         if (receiptIconBtn != null) receiptIconBtn.gameObject.SetActive(false);
 
-        // 2. [UI 연결] 인스펙터 대신 코드에서 리스너를 직접 연결 (더 안전함)
+        // 2. 버튼 리스너 연결
         if (receiptIconBtn != null)
         {
             receiptIconBtn.onClick.RemoveAllListeners();
@@ -45,7 +42,7 @@ public class OrrerManager : MonoBehaviour
             receiptCloseButton.onClick.AddListener(ClosePopup);
         }
 
-        // 3. 주문 생성 시작
+        // 3. 주문 생성 루틴 시작
         StartCoroutine(SpawnOrderRoutine());
     }
 
@@ -61,7 +58,10 @@ public class OrrerManager : MonoBehaviour
         activeOrders.Clear();
         for (int i = 0; i < orderCount; i++)
         {
-            activeOrders.Add(possibleOrders[Random.Range(0, possibleOrders.Length)]);
+            if (possibleOrders.Length > 0)
+            {
+                activeOrders.Add(possibleOrders[Random.Range(0, possibleOrders.Length)]);
+            }
         }
 
         if (receiptIconBtn != null) receiptIconBtn.gameObject.SetActive(true);
@@ -71,9 +71,7 @@ public class OrrerManager : MonoBehaviour
 
     public void OpenPopup()
     {
-        // 모든 조건이 맞으면 4번이 뜨고 화면에 나타남
         receiptPopup.SetActive(true);
-        // (선택사항) 아이콘 숨기기
         if (receiptIconBtn != null) receiptIconBtn.gameObject.SetActive(false);
 
         currentViewIndex = 0;
@@ -83,7 +81,8 @@ public class OrrerManager : MonoBehaviour
     public void ClosePopup()
     {
         receiptPopup.SetActive(false);
-        if (activeOrders.Count > 0)
+        OnClickStartCooking();
+        if (activeOrders.Count > 0 && receiptIconBtn != null)
         {
             receiptIconBtn.gameObject.SetActive(true);
         }
@@ -104,54 +103,126 @@ public class OrrerManager : MonoBehaviour
         }
     }
 
-    // ================= [요리 시작 및 파싱 - 그대로 유지됨] =================
+    // ================= [요리 시작 및 데이터 처리 (스마트 파싱 로직)] =================
 
     public void OnClickStartCooking()
     {
         if (activeOrders.Count == 0) return;
+        if (ReadSpreadSheets.Instance == null) return;
 
         string selectedOrder = activeOrders[currentViewIndex];
 
-        // 싱글톤 데이터 세팅 (데이터 전달을 위한 초기화)
-        if (ReadSpreadSheets.Instance != null)
-        {
-            ReadSpreadSheets.Instance.ClearRequests();
-            ParseOrder(selectedOrder); // 아래 파싱 로직 호출
-            SceneManager.LoadScene("CookScene");
-        }
-        else
-        {
-            Debug.LogError("ReadSpreadSheets 인스턴스를 찾을 수 없습니다!");
-        }
+        // 1. 데이터 초기화
+        ReadSpreadSheets.Instance.ClearRequests();
+
+        // 2. 주문장 분석 (파싱)
+        ParseOrder(selectedOrder);
+    }
+
+    // 임시 데이터를 담아둘 작은 클래스
+    private class ParsedItem
+    {
+        public string name;
+        public string engID;
+        public int index; // 문장에서 단어가 발견된 위치
     }
 
     void ParseOrder(string sentence)
     {
         var vocab = ReadSpreadSheets.Instance.menuVocab;
-        if (vocab == null || vocab.Count == 0) return;
 
-        // "빼고", "없이" 단어를 기준으로 앞뒤 분리
-        string[] parts = sentence.Split(new string[] { "빼고", "없이", "제외" }, System.StringSplitOptions.RemoveEmptyEntries);
-
-        string excludePart = parts.Length > 1 ? parts[0] : "";
-        string includePart = parts.Length > 1 ? parts[1] : parts[0];
-
-        foreach (var kvp in vocab)
+        // [디버깅 추가] 사전이 진짜 들어왔는지 확인
+        if (vocab == null || vocab.Count == 0)
         {
-            string korName = kvp.Key;
-            string engID = kvp.Value;
+            Debug.LogError($"[오류] 단어 사전이 비어있습니다! (현재 개수: 0)");
+            return;
+        }
+        else
+        {
+            Debug.Log($"[점검] 단어 사전 로드됨 (총 {vocab.Count}개 단어)");
+        }
 
-            // 1. 제외 리스트에 추가
-            if (excludePart.Contains(korName))
+        Debug.Log($"[파싱 시작] 원본 문장: {sentence}");
+
+        // 1. 긴 단어부터 매칭되도록 정렬 (예: '해파리'보다 '해파리 샌드위치' 우선)
+        List<string> sortedKeys = new List<string>(vocab.Keys);
+        sortedKeys.Sort((a, b) => b.Length.CompareTo(a.Length));
+
+        List<ParsedItem> foundItems = new List<ParsedItem>();
+        string tempSentence = sentence; // 인덱스 검색용 임시 문장
+
+        // 2. 문장에서 메뉴/재료 이름 찾기
+        foreach (string korName in sortedKeys)
+        {
+            if (string.IsNullOrEmpty(korName)) continue;
+
+            int idx = tempSentence.IndexOf(korName);
+            if (idx != -1)
             {
-                ReadSpreadSheets.Instance.CurrentRequest_Exclude.Add(engID);
-            }
-            // 2. 포함 리스트에 추가
-            else if (includePart.Contains(korName))
-            {
-                ReadSpreadSheets.Instance.CurrentRequest_Include.Add(engID);
-                ReadSpreadSheets.Instance.currentRequestName.Add(engID);
+                // 찾은 단어를 리스트에 보관
+                foundItems.Add(new ParsedItem { name = korName, engID = vocab[korName], index = idx });
+
+                // 중복 검색 방지를 위해 찾은 단어를 같은 길이의 별표(*)로 치환 
+                // (길이를 유지해야 다른 단어들의 위치 인덱스가 꼬이지 않음)
+                tempSentence = tempSentence.Replace(korName, new string('*', korName.Length));
             }
         }
+
+        // 3. "빼고", "없이", "제외" 키워드가 등장하는 위치 찾기
+        List<int> excludeIndexes = new List<int>();
+        string[] excludeKeywords = { "빼고", "없이", "제외" };
+        foreach (var keyword in excludeKeywords)
+        {
+            int idx = sentence.IndexOf(keyword);
+            while (idx != -1)
+            {
+                excludeIndexes.Add(idx);
+                idx = sentence.IndexOf(keyword, idx + keyword.Length);
+            }
+        }
+
+        // 4. 찾은 아이템들을 문장에 나타난 순서대로 정렬
+        foundItems.Sort((a, b) => a.index.CompareTo(b.index));
+
+        // 5. 포함 / 제외 분류 로직 (한국어 문맥 파악)
+        foreach (var item in foundItems)
+        {
+            bool isExclude = false;
+
+            // 이 메뉴 단어보다 '뒤에' 나오는 가장 가까운 "빼고" 키워드를 찾음
+            int closestExcludeIdx = -1;
+            int minDistance = int.MaxValue;
+
+            foreach (int exIdx in excludeIndexes)
+            {
+                if (exIdx > item.index && (exIdx - item.index) < minDistance)
+                {
+                    minDistance = exIdx - item.index;
+                    closestExcludeIdx = exIdx;
+                }
+            }
+
+            // [핵심 로직] 메뉴 단어와 "빼고" 키워드의 거리가 가깝다면 (15글자 이내) '제외'로 판정!
+            // 예: "양배추(0) 빼고(4)" -> 거리 4 (제외 O)
+            // 예: "은하수 스무디(0) ... 머스타드(20) 빼고(26)" -> 스무디 거리 26 (제외 X), 머스타드 거리 6 (제외 O)
+            if (closestExcludeIdx != -1 && minDistance < 15)
+            {
+                isExclude = true;
+            }
+
+            if (isExclude)
+            {
+                ReadSpreadSheets.Instance.CurrentRequest_Exclude.Add(item.engID);
+                Debug.Log($"[결과] 제외 리스트에 추가됨: {item.name} ({item.engID})");
+            }
+            else
+            {
+                ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
+                ReadSpreadSheets.Instance.currentRequestName.Add(item.engID);
+                Debug.Log($"[결과] 포함(주문) 리스트에 추가됨: {item.name} ({item.engID})");
+            }
+        }
+
+        Debug.Log($"[최종 파싱 완료] 포함: {ReadSpreadSheets.Instance.CurrentRequest_Include.Count}개 / 제외: {ReadSpreadSheets.Instance.CurrentRequest_Exclude.Count}개");
     }
 }
