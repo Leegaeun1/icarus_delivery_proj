@@ -26,7 +26,7 @@ public class TimeManager : MonoBehaviour
     public int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 500f;
+    private float gameSpeed = 60f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
@@ -207,7 +207,8 @@ public class TimeManager : MonoBehaviour
         {
             // 임시적으로 다시 cook으로 돌아와서 진행
             sheet.currentRequestName.Clear();
-            SceneManager.LoadScene("cook");
+            SceneManager.LoadScene("main_menu");
+            Debug.Log("테스트 확인용");
         }
 
             
