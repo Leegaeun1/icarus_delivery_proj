@@ -14,6 +14,8 @@ public class FoodManager : MonoBehaviour
     public float minWait = 0f;
     public float maxWait = 3f;
 
+
+
     void Start()
     {
         if (CheckMenu.selectedNames != null && CheckMenu.selectedNames.Count > 0)
@@ -36,10 +38,20 @@ public class FoodManager : MonoBehaviour
             int randomIndex = Random.Range(0, foodPrefabs.Length);
             GameObject selectedFood = foodPrefabs[randomIndex];
 
-            // 생성만 합니다. 판정은 FoodDragHandler가 담당합니다.
+            // 1. 음식 생성
             Instantiate(selectedFood, foodContainer);
 
-            Debug.Log($"<color=orange>음식 생성 완료 (드래그 가능):</color> {selectedFood.name}");
+            // 2. 배달원 동시 소환
+            if (ManManager.Instance != null)
+            {
+                var sheet = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>();
+                string orderText = (sheet != null && sheet.currentRequestName.Count > 0)
+                                   ? sheet.currentRequestName[0] : "주문 내용 없음";
+
+                ManManager.Instance.SpawnMan(orderText);
+            }
+
+            Debug.Log("<color=orange>음식, 배달원 생성</color>");
         }
     }
 }

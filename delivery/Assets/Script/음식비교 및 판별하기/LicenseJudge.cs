@@ -29,6 +29,11 @@ public class LicenseJudge : MonoBehaviour
             CheckMenu.selectedNames.Clear();
         }
 
+        if (ManManager.Instance != null)
+        {
+            ManManager.Instance.DestroyMan();
+        }
+
         sheet.menu_num++; // 전체 주문 수 증가
     }
 
@@ -36,23 +41,29 @@ public class LicenseJudge : MonoBehaviour
     public void RejectDelivery()
     {
         var sheet = GameObject.Find("sheet").GetComponent<ReadSpreadSheets>();
-        if (sheet == null || LicenseInfoManager.Instance == null) return;
-
         bool isForgery = LicenseInfoManager.Instance.isForgery;
 
+        // 1. 위조 판정 및 에러 횟수 조절
         if (isForgery)
         {
-            // 위조범을 잘 거절한 경우 -> 에러 감소
             if (sheet.delivery_incorrect > 0) sheet.delivery_incorrect--;
-            Debug.Log("<color=green>검거 성공:</color> 위조범 거절.");
+            Debug.Log("<color=green>성공: 위조범을 내보냈습니다.</color>");
         }
         else
         {
-            // 진짜를 잘못 거절한 경우 -> 에러 증가
             sheet.delivery_incorrect++;
-            Debug.Log("<color=red>검거 실패:</color> 선량한 배달원 거절!");
+            Debug.Log("<color=red>실패: 정상 배달원을 내보냈습니다.</color>");
         }
 
-        sheet.menu_num++;
+        // 2. 현재 배달원 제거 및 새 배달원 소환
+        if (ManManager.Instance != null)
+        {
+            // 기존 배달원 삭제
+            ManManager.Instance.DestroyMan();
+
+            // 즉시 새로운 배달원 소환 (무작위 캐릭터)
+            string orderText = (sheet.currentRequestName.Count > 0) ? sheet.currentRequestName[0] : "";
+            ManManager.Instance.SpawnMan(orderText);
+        }
     }
 }

@@ -11,6 +11,14 @@ public class ManManager : MonoBehaviour
     [Header("효과 설정")]
     public float fadeInDuration = 1.0f;
 
+    public static ManManager Instance;
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
     private GameObject currentMan;
 
     public void SpawnMan(string orderName)
