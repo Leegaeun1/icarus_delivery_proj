@@ -14,13 +14,13 @@ public class OrderQueueSystem : MonoBehaviour
     public float timeLimit = 10.0f;
 
     [Header("Auto Generation Settings")]
-    [SerializeField] private int maxTotalOrders = 3; // 총 생성할 주문 수
-    [SerializeField] private float minInterval = 5.0f; // 최소 간격
-    [SerializeField] private float maxInterval = 10.0f; // 최대 간격
+    [SerializeField] private int maxTotalOrders = 3;
+    [SerializeField] private float minInterval = 5.0f;
+    [SerializeField] private float maxInterval = 10.0f;
 
     private Queue<string> orderQueue = new Queue<string>();
     private bool isWorking = false;
-    private int generatedCount = 0; // 현재까지 생성된 주문 수
+    private int generatedCount = 0;
     private Coroutine currentOrderCoroutine;
 
     void Awake() => Instance = this;
@@ -29,14 +29,11 @@ public class OrderQueueSystem : MonoBehaviour
     {
         if (pendingIcon != null) pendingIcon.SetActive(false);
 
-        // [추가] 게임 시작 시 주문 생성 루틴 시작
         StartCoroutine(GenerateOrdersRoutine());
     }
 
-    // [추가] 랜덤 주문 생성 루틴
     IEnumerator GenerateOrdersRoutine()
     {
-        // 1. 첫 생성 대기 (0~3초)
         yield return new WaitForSeconds(Random.Range(0f, 3.0f));
 
         while (generatedCount < maxTotalOrders)
@@ -44,20 +41,27 @@ public class OrderQueueSystem : MonoBehaviour
             generatedCount++;
             string orderName = "Order #" + generatedCount;
 
-            // 기존에 잘 만들어두신 AddNewOrder를 호출하여 큐 로직 실행
-            AddNewOrder(orderName);
+            var sheet = GameObject.Find("sheet")?.GetComponent<ReadSpreadSheets>();
+            if (sheet != null)
+            {
+                sheet.currentRequestName.Clear();
+                sheet.currentRequestName.Add(orderName);
+                Debug.Log($"<color=yellow>데이터 생성 완료:</color> {orderName}");
+            }
 
-            // 3개가 다 생성되었다면 루틴 종료
+            // AddNewOrder(orderName);
+
             if (generatedCount >= maxTotalOrders) break;
 
-            // 2. 다음 주문까지 랜덤 대기 (5~10초)
+
             float nextWait = Random.Range(minInterval, maxInterval);
             yield return new WaitForSeconds(nextWait);
         }
     }
 
-    // --- 기존 로직 유지 ---
+    // --- 비활성화 및 원형 보존 ---
 
+    /* 
     public void AddNewOrder(string orderName)
     {
         if (isWorking)
@@ -75,27 +79,28 @@ public class OrderQueueSystem : MonoBehaviour
     IEnumerator ProcessOrderRoutine(string orderName)
     {
         isWorking = true;
-        ButtonKeeper.ForceReset();
+        // ButtonKeeper.ForceReset();
 
-        if (manManager != null) manManager.SpawnMan(orderName);
+        // if (manManager != null) manManager.SpawnMan(orderName);
 
-        Debug.Log($"<color=cyan>주문 시작:</color> {orderName}");
+        Debug.Log($"<color=cyan>주문 데이터 준비됨:</color> {orderName}");
 
-        yield return new WaitForSeconds(timeLimit);
+        // yield return new WaitForSeconds(timeLimit);
 
-        Debug.Log($"<color=red>시간 초과!</color>");
-        MoveToNextOrder();
+        // Debug.Log($"<color=red>시간 초과!</color>");
+        // MoveToNextOrder();
+        yield return null;
     }
-
+    */
     public void CompleteOrderSuccess()
     {
-        if (isWorking)
+        /*if (isWorking)
         {
             if (currentOrderCoroutine != null) StopCoroutine(currentOrderCoroutine);
             MoveToNextOrder();
-        }
+        }*/
     }
-
+    /*
     private void MoveToNextOrder()
     {
         isWorking = false;
@@ -117,4 +122,5 @@ public class OrderQueueSystem : MonoBehaviour
     {
         if (pendingIcon != null) pendingIcon.SetActive(orderQueue.Count > 0);
     }
+    */
 }
