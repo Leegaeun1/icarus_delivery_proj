@@ -204,11 +204,10 @@ public class CookManager : MonoBehaviour
         else
         {
             // 뒷정리
-            CheckMenu.selectedNames.Clear();
             sheet.tmp_selected.Clear();
             // 다음 요리를 위해 오답 플래그 초기화
 
-            SceneManager.LoadScene("cook");
+            SceneManager.LoadScene("main_menu");
         }
     }
     IEnumerator DropSandwichIngredients()

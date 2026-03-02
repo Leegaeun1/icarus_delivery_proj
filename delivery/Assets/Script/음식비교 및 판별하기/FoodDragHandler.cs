@@ -38,19 +38,14 @@ public class FoodDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // 대상이 ManContainer이거나 그 자식(배달원 캐릭터)인 경우
         if (target != null && (target.name == "Man Container" || target.transform.IsChildOf(GameObject.Find("Man Container").transform)))
         {
-            // 1. 배달 검증 실행
-            if (DeliveryFinalManager.Instance != null)
+            // 1. 배달 검증 실행 (새로운 매니저 호출)
+            if (LicenseJudge.Instance != null)
             {
-                DeliveryFinalManager.Instance.ConfirmDelivery();
+                LicenseJudge.Instance.AcceptDelivery();
             }
 
-            // 2. 음식 오브젝트 파괴 (사라짐)
+            // 2. 음식 오브젝트 파괴
             Destroy(gameObject);
-        }
-        else
-        {
-            // 배달원에게 닿지 않았다면 제자리로 복귀
-            rectTransform.anchoredPosition = startPosition;
         }
     }
 }
