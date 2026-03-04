@@ -25,7 +25,7 @@ public class MenuManager : MonoBehaviour
     private List<GameObject> cardStack; // 더미에 쌓아둘 카드 리스트
     private int[] num; // 올바른 메뉴가 아닌 카드들의 인덱스
     private int correctCardIndex = -1; // 카드의 실제 special_menus 내 인덱스
-    private string correctmenu;
+    public string correctmenu;
 
     void Start()
     {
@@ -69,6 +69,7 @@ public class MenuManager : MonoBehaviour
         {
             correctCardIndex = Random.Range(0, special_menus.Length);
             correctmenu = special_menus[correctCardIndex].name;
+            ReadSpreadSheets.Instance.currentRequestName.Add(correctmenu+"_sand");
             if (correctmenu != null) {
                 if (correctmenu == "tuna" || correctmenu == "anchovy") // 히든재료아니면 계속 다시 돌아야함
                     continue;
@@ -101,19 +102,19 @@ public class MenuManager : MonoBehaviour
         num = tempNumList.ToArray();
     }
 
-    public void CreateCardStack()
+    public IEnumerator CreateCardStack()
     {
         Debug.Log("[MenuManager] CreateCardStack 호출됨.");
 
         if (num == null || special_menus == null)
         {
             Debug.LogError("[MenuManager] num 배열 또는 special_menus 배열이 초기화되지 않았습니다.");
-            return;
+            yield break;
         }
         if (num.Length == 0 || special_menus.Length == 0 || correctCardIndex < 0)
         {
             Debug.LogWarning("[MenuManager] 배치할 카드가 부족하거나 정답 카드 인덱스가 유효하지 않습니다.");
-            return;
+            yield break;
         }
 
         // 카드 크기 체크
@@ -125,7 +126,7 @@ public class MenuManager : MonoBehaviour
         else
         {
             Debug.LogError("[MenuManager] 첫 번째 카드 프리팹에 RectTransform이 없습니다. UI 프리팹인지 확인하세요.");
-            return;
+            yield break;
         }
 
         // 배치할 카드 개수 결정
@@ -133,7 +134,7 @@ public class MenuManager : MonoBehaviour
         if (actualCardsToDisplay <= 0)
         {
             Debug.LogWarning("[MenuManager] 표시할 카드 수가 0입니다.");
-            return;
+            yield break;
         }
 
         // 카드 인덱스 목록 생성 (정답 + 랜덤 오답)
@@ -161,7 +162,7 @@ public class MenuManager : MonoBehaviour
         }
 
         // 카드 펼치기
-        StartCoroutine(DealCards(cardWidth, actualCardsToDisplay));
+        yield return StartCoroutine(DealCards(cardWidth, actualCardsToDisplay));
     }
 
     IEnumerator DealCards(float cardWidth, int actualCardsToDisplay)
@@ -217,6 +218,7 @@ public class MenuManager : MonoBehaviour
 
             yield return new WaitForSeconds(dealInterval);
         }
+        yield return new WaitForSeconds(1f);
     }
 
     IEnumerator AnimateCard(RectTransform card, Vector2 targetPosition, float duration)

@@ -4,57 +4,104 @@ using UnityEngine;
 
 public class Random_face : MonoBehaviour
 {
-    // 눈
+    // [기존 변수 유지]
     public Sprite[] eyes;
     public SpriteRenderer eyesRenderer;
 
-    // 입
     public Sprite[] mouths;
     public SpriteRenderer mouthRenderer;
 
-    // 귀
     public Sprite[] ears;
     public SpriteRenderer earsRenderer;
 
-    // 코
     public Sprite[] noses;
     public SpriteRenderer noseRenderer;
 
-    // 기본 설정값
     public Vector3 desiredScale = new Vector3(1f, 1f, 1f);
     public Vector3 eyeOffset = new Vector3(0f, 0.5f, 0f);
 
-    void Start()
-    {
-        // 시작 시 눈 숨기기
-        if (eyesRenderer != null)
-            eyesRenderer.enabled = false;
+    // [추가된 위치 변수] - 인스펙터에서 각 부위의 위치를 맞추기 위해 사용합니다.
+    public Vector3 mouthOffset = new Vector3(0f, -0.3f, 0f);
+    public Vector3 noseOffset = new Vector3(0f, 0.1f, 0f);
+    public Vector3 earOffset = new Vector3(0f, 0f, 0f);
 
-        // 아직 기능 없지만, 미리 꺼둬도 됨
-        if (mouthRenderer != null)
-            mouthRenderer.enabled = false;
-        if (earsRenderer != null)
-            earsRenderer.enabled = false;
-        if (noseRenderer != null)
-            noseRenderer.enabled = false;
+    public FaceData GetCurrentFaceData()
+    {
+        FaceData data = new FaceData();
+        data.eye = eyesRenderer.sprite;
+        data.mouth = mouthRenderer.sprite;
+        data.nose = noseRenderer.sprite;
+        data.ear = earsRenderer.sprite;
+        return data;
     }
 
-    // 버튼에 연결할 함수 (현재는 눈만)
+    void Start()
+    {
+        // 시작 시 모든 부위 숨기기
+        if (eyesRenderer != null) eyesRenderer.enabled = false;
+        if (mouthRenderer != null) mouthRenderer.enabled = false;
+        if (earsRenderer != null) earsRenderer.enabled = false;
+        if (noseRenderer != null) noseRenderer.enabled = false;
+    }
+
+    // 눈 랜덤 출력 (기존 유지)
     public void ShowRandomEyes()
     {
         if (eyes.Length > 0 && eyesRenderer != null)
         {
             int idx = Random.Range(0, eyes.Length);
             eyesRenderer.sprite = eyes[idx];
-
-            // 크기 조절
             eyesRenderer.transform.localScale = desiredScale;
             eyesRenderer.transform.localPosition = eyeOffset;
-
-            // 렌더러 켜기
             eyesRenderer.enabled = true;
         }
     }
 
-    // 나중에 입/귀/코 랜덤으로 뽑는 함수도 여기 추가 가능
+    // [추가] 입 랜덤 출력
+    public void ShowRandomMouth()
+    {
+        if (mouths.Length > 0 && mouthRenderer != null)
+        {
+            int idx = Random.Range(0, mouths.Length);
+            mouthRenderer.sprite = mouths[idx];
+            mouthRenderer.transform.localScale = desiredScale;
+            mouthRenderer.transform.localPosition = mouthOffset; // 입 오프셋 적용
+            mouthRenderer.enabled = true;
+        }
+    }
+
+    // [추가] 코 랜덤 출력
+    public void ShowRandomNose()
+    {
+        if (noses.Length > 0 && noseRenderer != null)
+        {
+            int idx = Random.Range(0, noses.Length);
+            noseRenderer.sprite = noses[idx];
+            noseRenderer.transform.localScale = desiredScale;
+            noseRenderer.transform.localPosition = noseOffset; // 코 오프셋 적용
+            noseRenderer.enabled = true;
+        }
+    }
+
+    // [추가] 귀 랜덤 출력
+    public void ShowRandomEars()
+    {
+        if (ears.Length > 0 && earsRenderer != null)
+        {
+            int idx = Random.Range(0, ears.Length);
+            earsRenderer.sprite = ears[idx];
+            earsRenderer.transform.localScale = desiredScale;
+            earsRenderer.transform.localPosition = earOffset; // 귀 오프셋 적용
+            earsRenderer.enabled = true;
+        }
+    }
+
+    // [추가] 모든 얼굴 부위를 한 번에 랜덤으로 생성하는 함수
+    public void ShowAllRandomParts()
+    {
+        ShowRandomEyes();
+        ShowRandomMouth();
+        ShowRandomNose();
+        ShowRandomEars();
+    }
 }

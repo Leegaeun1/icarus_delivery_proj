@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Kitchen.unity
     guid: bb50ee5090782e345b52cd20c2d0e7c1
+  - enabled: 1
+    path: Assets/Scenes/DayFinish.unity
+    guid: c1bc1485dfa9c6649b41292626aaae45
+  - enabled: 1
+    path: Assets/Scenes/Round_Finish.unity
+    guid: f883f7132e5966342a219959b689fdc0
   m_configObjects: {}
