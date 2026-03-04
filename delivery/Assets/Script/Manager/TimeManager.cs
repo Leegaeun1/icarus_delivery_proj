@@ -205,10 +205,9 @@ public class TimeManager : MonoBehaviour
         }
         else
         {
-            // 임시적으로 다시 cook으로 돌아와서 진행
             sheet.currentRequestName.Clear();
             SceneManager.LoadScene("main_menu");
-            Debug.Log("테스트 확인용");
+            //Debug.Log("테스트 확인용");
         }
 
             

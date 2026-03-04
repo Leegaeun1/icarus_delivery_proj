@@ -1,10 +1,17 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LicenseJudge : MonoBehaviour
 {
     public static LicenseJudge Instance;
+    public TimeManager timeManager;
 
-    void Awake() { Instance = this; }
+    void Awake() { 
+        
+        Instance = this;
+        timeManager = GameObject.Find("TimeManager").GetComponent<TimeManager>();
+
+    }
 
     // 음식을 배달원에게 전달했을 때 호출 (승인)
     public void AcceptDelivery()
@@ -35,6 +42,11 @@ public class LicenseJudge : MonoBehaviour
         }
 
         sheet.menu_num++; // 전체 주문 수 증가
+        // 시간 끝이면 
+        if (timeManager.isDayEnded)
+        {
+            SceneManager.LoadScene("DayFinish");
+        }
     }
 
     // 거절 버튼 클릭 시 호출
