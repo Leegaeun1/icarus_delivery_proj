@@ -205,8 +205,6 @@ public class OrrderManager : MonoBehaviour
         foreach (var item in foundItems)
         {
             bool isExclude = false;
-
-            // 이 메뉴 단어보다 '뒤에' 나오는 가장 가까운 "빼고" 키워드를 찾음
             int closestExcludeIdx = -1;
             int minDistance = int.MaxValue;
 
@@ -219,24 +217,49 @@ public class OrrderManager : MonoBehaviour
                 }
             }
 
-            // [핵심 로직] 메뉴 단어와 "빼고" 키워드의 거리가 가깝다면 (15글자 이내) '제외'로 판정!
-            // 예: "양배추(0) 빼고(4)" -> 거리 4 (제외 O)
-            // 예: "은하수 스무디(0) ... 머스타드(20) 빼고(26)" -> 스무디 거리 26 (제외 X), 머스타드 거리 6 (제외 O)
-            if (closestExcludeIdx != -1 && minDistance < 15)
-            {
-                isExclude = true;
-            }
+            if (closestExcludeIdx != -1 && minDistance < 15) isExclude = true;
 
             if (isExclude)
             {
                 ReadSpreadSheets.Instance.CurrentRequest_Exclude.Add(item.engID);
-                Debug.Log($"[결과] 제외 리스트에 추가됨: {item.name} ({item.engID})");
+                Debug.Log($"[제외] {item.name} ({item.engID})");
             }
             else
             {
-                ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
-                //ReadSpreadSheets.Instance.currentRequestName.Add(item.engID);
-                Debug.Log($"[결과] 포함(주문) 리스트에 추가됨: {item.name} ({item.engID})");
+                // 만약 샌드위치를 주문했다면, 기본 재료들을 Include에 자동 추가
+                if (item.name.Contains("샌드위치"))
+                {
+                    // 샌드위치 본체 ID 추가
+                    ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
+
+                    // 기본 재료 리스트
+                    string[] defaultIngredients = { "chili", "cabbage", "pickle", "mustard" };
+
+                    foreach (string ing in defaultIngredients)
+                    {
+                        // 이번 주문에서 '빼달라고 한(Exclude)' 재료가 아닐 때만 Include에 추가
+                        bool isRequiredToExclude = false;
+                        foreach (var exItem in foundItems)
+                        {
+                            if (exItem.engID == ing && sentence.Contains(exItem.name + " 빼고"))
+                            {
+                                isRequiredToExclude = true;
+                                break;
+                            }
+                        }
+
+                        if (!isRequiredToExclude)
+                        {
+                            ReadSpreadSheets.Instance.CurrentRequest_Include.Add(ing);
+                        }
+                    }
+                }
+                else
+                {
+                    // 샌드위치가 아닌 단품(쿠키, 스무디 등) 추가
+                    ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
+                }
+                Debug.Log($"[포함] {item.name} ({item.engID})");
             }
         }
 
