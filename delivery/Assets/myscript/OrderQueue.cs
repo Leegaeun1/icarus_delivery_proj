@@ -45,7 +45,7 @@ public class OrderQueueSystem : MonoBehaviour
             if (sheet != null)
             {
                 sheet.currentRequestName.Clear();
-                sheet.currentRequestName.Add(orderName);
+                //sheet.currentRequestName.Add(orderName);
                 Debug.Log($"<color=yellow>데이터 생성 완료:</color> {orderName}");
             }
 

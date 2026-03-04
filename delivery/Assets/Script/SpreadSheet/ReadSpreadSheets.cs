@@ -237,7 +237,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
         // 3) 시트에 없는 특수 단어들만 수동으로 추가 (필요하다면)
         // 예: "빼고", "없이" 같은 문법적 단어는 시트에 없다면 여기서 추가
-        menuVocab.TryAdd("빼고", "EXCLUDE_KEYWORD"); 
+        //menuVocab.TryAdd("빼고", "EXCLUDE_KEYWORD"); 
     }
     T GetData<T>(string[] datas) // TSV 한 행을 T타입 객체로 변환하는 함수 
     {

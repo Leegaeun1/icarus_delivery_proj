@@ -65,19 +65,42 @@ public class MenuManager : MonoBehaviour
         select_menu.SetActive(false);
 
         // --- 정답 카드 선택 ---
-        while (true)
+        foreach(var item in ReadSpreadSheets.Instance.CurrentRequest_Include)
         {
-            correctCardIndex = Random.Range(0, special_menus.Length);
-            correctmenu = special_menus[correctCardIndex].name;
-            ReadSpreadSheets.Instance.currentRequestName.Add(correctmenu+"_sand");
-            if (correctmenu != null) {
-                if (correctmenu == "tuna" || correctmenu == "anchovy") // 히든재료아니면 계속 다시 돌아야함
-                    continue;
-                else
-                    break;
+            if (item.Contains("_sand"))
+            {
+                correctmenu = item.ToString();
             }
-
         }
+
+
+        for (int i = 0; i < special_menus.Length; i++)
+        {
+            if (special_menus[i].name == correctmenu)
+            {
+                correctCardIndex = i;
+                break;
+            }
+        }
+
+        if (correctCardIndex == -1)
+        {
+            Debug.LogError($"[MenuManager] {correctmenu} 이름의 프리팹을 찾지 못했습니다.");
+            return;
+        }
+        //while (true)
+        //{
+        //    correctCardIndex = Random.Range(0, special_menus.Length);
+        //    correctmenu = special_menus[correctCardIndex].name;
+        //    //ReadSpreadSheets.Instance.currentRequestName.Add(correctmenu+"_sand");
+        //    if (correctmenu != null) {
+        //        if (correctmenu == "tuna" || correctmenu == "anchovy") // 히든재료아니면 계속 다시 돌아야함
+        //            continue;
+        //        else
+        //            break;
+        //    }
+
+        //}
 
         // --- 정답 카드 이름 UI 표시 ---
         TextMeshProUGUI menuNameText = special_menus[correctCardIndex].transform

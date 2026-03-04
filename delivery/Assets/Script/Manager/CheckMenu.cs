@@ -62,6 +62,12 @@ public class CheckMenu : MonoBehaviour
         // _sheet가 연결 안 되어있을 경우를 대비해 프로퍼티 호출
         if (_sheet == null) _sheet = this.sheet;
 
+        if (_sheet != null)
+        {
+            // 선택된 메뉴 리스트를 복사하여 전달
+            _sheet.currentRequestName = new List<string>(selectedNames);
+        }
+
         // 포장지(StringList) 생성
         DayFinishManager.StringList allItems = new DayFinishManager.StringList();
 
@@ -150,6 +156,7 @@ public class CheckMenu : MonoBehaviour
         ingredientName = ingredientName.Replace("(Clone)", "").Trim();
         string finalName = ingredientName;
 
+        if (sheet == null) _sheet = ReadSpreadSheets.Instance;
         if (transform.childCount == 0 || sheet == null) return;
 
         if (transform.parent != null && transform.parent.name == "CardStackParent")
@@ -158,7 +165,7 @@ public class CheckMenu : MonoBehaviour
             if (!selectedNames.Contains(finalName)) selectedNames.Add(finalName);
         }
 
-        if (sheet == null) _sheet = ReadSpreadSheets.Instance;
+        
 
         ingredientName = transform.GetChild(0).name;
 

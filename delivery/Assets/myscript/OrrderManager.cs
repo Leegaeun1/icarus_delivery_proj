@@ -17,7 +17,7 @@ public class OrrderManager : MonoBehaviour
     public string[] possibleOrders = new string[] {
     "피클이랑 칠리 빼고 크라켄 샌드위치랑 눈알 스무디 주세요.",
     "양배추 빼고 히드라 샌드위치 하나 주세요.",
-    "은하수 스무디랑 불가사리 쿠키 주세요.",
+    "칠리 빼고 마녀 샌드위치랑 은하수 스무디랑 불가사리 쿠키 주세요.",
     "불사조 샌드위치랑 불꽃 쿠키 주세요."
      };
     public List<string> activeOrders = new List<string>();
@@ -218,7 +218,7 @@ public class OrrderManager : MonoBehaviour
             else
             {
                 ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
-                ReadSpreadSheets.Instance.currentRequestName.Add(item.engID);
+                //ReadSpreadSheets.Instance.currentRequestName.Add(item.engID);
                 Debug.Log($"[결과] 포함(주문) 리스트에 추가됨: {item.name} ({item.engID})");
             }
         }
