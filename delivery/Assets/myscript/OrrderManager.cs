@@ -14,15 +14,24 @@ public class OrrderManager : MonoBehaviour
     public TextMeshProUGUI orderTextUI;
 
     [Header("Order Settings")]
-    public string[] possibleOrders = new string[] {
-    "피클이랑 칠리 빼고 크라켄 샌드위치랑 눈알 스무디 주세요.",
-    "양배추 빼고 히드라 샌드위치 하나 주세요.",
-    "칠리 빼고 마녀 샌드위치랑 은하수 스무디랑 불가사리 쿠키 주세요.",
-    "불사조 샌드위치랑 불꽃 쿠키 주세요."
-     };
+    public List<string> possibleOrders = new List<string>(){};
     public List<string> activeOrders = new List<string>();
     private int currentViewIndex = 0;
-
+    private void OnValidate()
+    {
+        // 인스펙터 리스트가 비어있을 때만 코드의 값을 강제로 넣고 싶다면
+        if (possibleOrders == null || possibleOrders.Count == 0)
+        {
+            possibleOrders = new List<string>()
+            {
+                "피클이랑 칠리 빼고 크라켄 샌드위치랑 눈알 스무디 주세요.",
+                "양배추 빼고 히드라 샌드위치 하나 주세요.",
+                "칠리 빼고 마녀 샌드위치랑 은하수 스무디랑 불가사리 쿠키 주세요.",
+                "불사조 샌드위치랑 불꽃 쿠키 주세요.",
+                "머스타드 빼고 해파리 샌드위치 주세요."
+            };
+        }
+    }
     void Start()
     {
         // 1. 초기 UI 상태 설정
@@ -48,7 +57,15 @@ public class OrrderManager : MonoBehaviour
 
     IEnumerator SpawnOrderRoutine()
     {
-        yield return new WaitForSeconds(Random.Range(1.0f, 7.0f));
+        // [수정] 사전 데이터가 로드될 때까지 대기 (최대 5초)
+        float timeout = 5f;
+        while (ReadSpreadSheets.Instance.menuVocab.Count == 0 && timeout > 0)
+        {
+            yield return new WaitForSeconds(0.5f);
+            timeout -= 0.5f;
+        }
+
+        yield return new WaitForSeconds(Random.Range(1.0f, 3.0f)); // 약간의 랜덤 대기
         GenerateRandomOrders();
     }
 
@@ -58,9 +75,9 @@ public class OrrderManager : MonoBehaviour
         activeOrders.Clear();
         for (int i = 0; i < orderCount; i++)
         {
-            if (possibleOrders.Length > 0)
+            if (possibleOrders.Count > 0)
             {
-                activeOrders.Add(possibleOrders[Random.Range(0, possibleOrders.Length)]);
+                activeOrders.Add(possibleOrders[Random.Range(0, possibleOrders.Count)]);
             }
         }
 

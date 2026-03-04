@@ -3186,9 +3186,11 @@ MonoBehaviour:
     \uB208\uC54C \uC2A4\uBB34\uB514 \uC8FC\uC138\uC694."
   - "\uC591\uBC30\uCD94 \uBE7C\uACE0 \uD788\uB4DC\uB77C \uC0CC\uB4DC\uC704\uCE58
     \uD558\uB098 \uC8FC\uC138\uC694."
-  - "\uC740\uD558\uC218 \uC2A4\uBB34\uB514\uB791 \uBD88\uAC00\uC0AC\uB9AC \uCFE0\uD0A4
-    \uC8FC\uC138\uC694."
+  - "\uCE60\uB9AC \uBE7C\uACE0 \uB9C8\uB140 \uC0CC\uB4DC\uC704\uCE58\uB791 \uC740\uD558\uC218
+    \uC2A4\uBB34\uB514\uB791 \uBD88\uAC00\uC0AC\uB9AC \uCFE0\uD0A4 \uC8FC\uC138\uC694."
   - "\uBD88\uC0AC\uC870 \uC0CC\uB4DC\uC704\uCE58\uB791 \uBD88\uAF43 \uCFE0\uD0A4
+    \uC8FC\uC138\uC694."
+  - "\uBA38\uC2A4\uD0C0\uB4DC \uBE7C\uACE0 \uD574\uD30C\uB9AC \uC0CC\uB4DC\uC704\uCE58
     \uC8FC\uC138\uC694."
   activeOrders: []
 --- !u!1 &583244204 stripped
@@ -6460,6 +6462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe957452ade150b47a6a8a61b753d427, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeManager: {fileID: 0}
 --- !u!1 &1203648214
 GameObject:
   m_ObjectHideFlags: 0
