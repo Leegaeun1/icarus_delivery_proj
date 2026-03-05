@@ -147,7 +147,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 552763208053246032}
   completebtn: {fileID: 0}
-  sheet: {fileID: 0}
+  menuManager: {fileID: 0}
+  timeManager: {fileID: 0}
+  money_effect: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
+  fadeSpeed: 1
 --- !u!1 &734635502213886175
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +456,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 6049799516021121695}
   completebtn: {fileID: 8084662623312533552}
-  sheet: {fileID: 0}
+  menuManager: {fileID: 0}
+  timeManager: {fileID: 0}
+  money_effect: {fileID: 0}
+  errorbtn: {fileID: 0}
+  combtn: {fileID: 0}
+  fadeSpeed: 1
 --- !u!114 &-7199833764320482742
 MonoBehaviour:
   m_ObjectHideFlags: 0
