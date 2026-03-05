@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     public List<DayFinishManager.StringList> PendingFinalIngredients = new();
     public List<DayFinishManager.StringList> PendingExcludeRequest = new();
     public List<DayFinishManager.StringList> PendingIncludeRequest = new();
-
+    public List<bool> PendingIsDeliverySuccess = new List<bool>();
 
     private void Awake()
     {

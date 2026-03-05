@@ -147,7 +147,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 552763208053246032}
   completebtn: {fileID: 0}
-  sheet: {fileID: 0}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}
@@ -457,7 +456,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectMenu: {fileID: 6049799516021121695}
   completebtn: {fileID: 8084662623312533552}
-  sheet: {fileID: 0}
   menuManager: {fileID: 0}
   timeManager: {fileID: 0}
   money_effect: {fileID: 0}

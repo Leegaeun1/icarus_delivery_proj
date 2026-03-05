@@ -197,18 +197,11 @@ public class CookManager : MonoBehaviour
         sheet.menu_num += 1; // 요청 증가 ( 임시 )!!
         sheet.currentRequestName.Clear();
         // 2. 씬 전환 처리
-        if (timeManager.isDayEnded)
-        {
-            SceneManager.LoadScene("DayFinish");
-        }
-        else
-        {
-            // 뒷정리
-            sheet.tmp_selected.Clear();
-            // 다음 요리를 위해 오답 플래그 초기화
+        // 뒷정리
+        sheet.tmp_selected.Clear();
+        // 다음 요리를 위해 오답 플래그 초기화
 
-            SceneManager.LoadScene("main_menu");
-        }
+        SceneManager.LoadScene("main_menu");
     }
     IEnumerator DropSandwichIngredients()
     {

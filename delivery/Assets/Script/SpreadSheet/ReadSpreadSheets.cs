@@ -57,7 +57,7 @@ public class ReadSpreadSheets : MonoBehaviour
     [Header("주문 관리")]
     public List<string> CurrentRequest_Include = new List<string>();
     public List<string> CurrentRequest_Exclude = new List<string>();
-    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
+    // 내가 클릭한 것
     public List<string> currentRequestName = new List<string> { };
 
     [System.Serializable]
@@ -160,7 +160,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
         if (mineral == null)
         {
-            Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
+            //Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
             mineral = GameObject.Find("money_txt").GetComponent<TextMeshProUGUI>();
         }
         timeManager = GameObject.Find("TimeManager").GetComponent<Button>();
@@ -187,7 +187,6 @@ public class ReadSpreadSheets : MonoBehaviour
     }
     public static string GetTSVAddress(string address, string range, long sheetId)
     {
-        // [수정] &dummy={시간}을 붙여서 매번 주소가 다르게 보이게 만듭니다. (캐시 무시 강제 다운로드)
         return $"{address}/export?format=tsv&range={range}&gid={sheetId}&dummy={System.DateTime.Now.Ticks}";
     }
     // 두 개의 시트를 순차적으로 로딩
@@ -205,7 +204,7 @@ public class ReadSpreadSheets : MonoBehaviour
         productPrices = GetDatas<Food_product>(wwwSales.downloadHandler.text);
         Debug.Log("판매 가격 데이터 로드 완료");
 
-        // 3. [NEW] 로드된 데이터를 바탕으로 사전(Dictionary) 만들기
+        // 3. 로드된 데이터를 바탕으로 사전(Dictionary) 만들기
         MakeDictionary();
 
         Debug.Log("데이터 로드 및 한글 매핑 완료");
@@ -237,7 +236,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
         // 3) 시트에 없는 특수 단어들만 수동으로 추가 (필요하다면)
         // 예: "빼고", "없이" 같은 문법적 단어는 시트에 없다면 여기서 추가
-        menuVocab.TryAdd("빼고", "EXCLUDE_KEYWORD"); 
+        //menuVocab.TryAdd("빼고", "EXCLUDE_KEYWORD"); 
     }
     T GetData<T>(string[] datas) // TSV 한 행을 T타입 객체로 변환하는 함수 
     {
@@ -348,69 +347,81 @@ public class ReadSpreadSheets : MonoBehaviour
     }
 
     // 요리가 끝난 시점(Finish 버튼 클릭)에 최종 점검 및 수익 계산을 하는 함수
+
     public int CheckFinalResult()
     {
         is_menu_incorrect = false;
-        int finalRevenue = 0; // 이번 요리의 예상 수익
-        List<string> requestList = new List<string>(currentRequestName);
-        List<string> myIngredients = new List<string>(CheckMenu.selectedNames);
+        int finalRevenue = 0;
 
-        // --- (검증 로직은 동일) ---
+        // 1. 정답지 설정 (손님이 넣어달라고 한 것들)
+        List<string> requestList = new List<string>(CurrentRequest_Include);
+
+        // 2. 내 제출안 설정 (플레이어가 클릭한 것들)
+        List<string> myIngredients = new List<string>(currentRequestName);
+
+        // [검사 1] 제외 리스트(Exclude) 검사: 내가 선택한 것에 '빼야 할 것'이 들어있는가?
+        foreach (string forbidden in CurrentRequest_Exclude)
+        {
+            if (myIngredients.Contains(forbidden))
+            {
+                Debug.Log($"[오답] 제외해야 할 재료({forbidden})를 넣었습니다.");
+                is_menu_incorrect = true;
+                break;
+            }
+        }
+        if (is_menu_incorrect) return 0;
+
+        // [검사 2] 포함 리스트(Include) 검사: 손님이 주문한 게 내 제출안에 다 있는가?
         for (int i = requestList.Count - 1; i >= 0; i--)
         {
-            string reqName = requestList[i];
-            if (string.IsNullOrEmpty(reqName)) continue;
+            string req = requestList[i];
+            bool found = false;
 
-            bool foundIngredient = false;
             for (int j = myIngredients.Count - 1; j >= 0; j--)
             {
-                string ingredient = myIngredients[j];
-                if (reqName.Contains(ingredient))
+                if (myIngredients[j] == req)
                 {
-                    // 매칭 성공: 가격 합산
-                    var product = productPrices.Find(p => p.food_name == reqName);
-                    if (product != null)
-                    {
-                        finalRevenue += product.price; // 여기서는 계산만 함
-                    }
+                    // 수익 계산 (완성품 ID일 때만 가격 추가)
+                    var product = productPrices.Find(p => p.food_name == req);
+                    if (product != null) finalRevenue += product.price;
 
                     myIngredients.RemoveAt(j);
                     requestList.RemoveAt(i);
-                    foundIngredient = true;
+                    found = true;
                     break;
                 }
             }
-            if (!foundIngredient) is_menu_incorrect = true;
+            if (!found)
+            {
+                Debug.Log($"[오답] 필요한 재료/메뉴({req})가 없습니다.");
+                is_menu_incorrect = true;
+            }
         }
 
-        if (myIngredients.Count > 0) is_menu_incorrect = true;
+        // [검사 3] 불필요한 추가 재료 검사: 주문하지 않은 게 남아있는가?
+        if (myIngredients.Count > 0)
+        {
+            Debug.Log($"[오답] 주문하지 않은 재료가 더 들어있습니다: {string.Join(", ", myIngredients)}");
+            is_menu_incorrect = true;
+        }
 
-        // 결과에 따른 실제 돈 지급 로직
-
+        // 최종 결과 적용
         if (is_menu_incorrect)
         {
-            menu_incorrect += 1;
-            Debug.Log(">> 최종 결과: 오답입니다. (수익 없음 or 패널티)");
-
+            menu_incorrect++;
+            Debug.Log(">> 최종 결과: 오답");
+            return 0;
         }
         else
         {
-            Debug.Log($">> 최종 결과: 정답입니다! (+{finalRevenue} Gold)");
-
-        }
-        if (finalRevenue > 0)
-        {
-            money += finalRevenue;           // 내 돈에 추가
-            dailyRevenue += finalRevenue;    // 오늘 총 수익에 추가
-            totalRevenue += finalRevenue;    // 전체 통계에 추가
-
-            mineral.text = money.ToString(); // UI 갱신
-
-            // 수익 이펙트 실행 (초록색 글씨)
+            money += finalRevenue;
+            mineral.text = money.ToString();
+            dailyRevenue += finalRevenue;
+            totalRevenue += finalRevenue;
+            Debug.Log($">> 최종 결과: 정답! (+{finalRevenue} Gold)");
             StartCoroutine(DailyTransactionEffect(finalRevenue));
+            return finalRevenue;
         }
-
-        return finalRevenue;
     }
 
     public void OnIngredientToggled(string ingredientName, bool isSelected)
@@ -446,6 +457,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public bool ApplyPurchase()
     {
         // 1. 잔액 확인
+        print("실행함!00");
         if (money < usedMoney)
         {
             Debug.LogWarning("잔액 부족!");
@@ -458,6 +470,7 @@ public class ReadSpreadSheets : MonoBehaviour
                 if (material != null)
                 {
                     usedMoney -= material.cost;
+                    
                 }
                 last_name = string.Empty;
             }

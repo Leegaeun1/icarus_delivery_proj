@@ -1413,7 +1413,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 719.11, y: -282}
+  m_AnchoredPosition: {x: 712.3, y: -286.6}
   m_SizeDelta: {x: 130, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &233633810
@@ -1492,8 +1492,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: b2b83610c1756dc4da2e86ef0ee42fc7, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -3186,10 +3186,16 @@ MonoBehaviour:
     \uB208\uC54C \uC2A4\uBB34\uB514 \uC8FC\uC138\uC694."
   - "\uC591\uBC30\uCD94 \uBE7C\uACE0 \uD788\uB4DC\uB77C \uC0CC\uB4DC\uC704\uCE58
     \uD558\uB098 \uC8FC\uC138\uC694."
-  - "\uC740\uD558\uC218 \uC2A4\uBB34\uB514\uB791 \uBD88\uAC00\uC0AC\uB9AC \uCFE0\uD0A4
-    \uC8FC\uC138\uC694."
+  - "\uCE60\uB9AC \uBE7C\uACE0 \uB9C8\uB140 \uC0CC\uB4DC\uC704\uCE58\uB791 \uC740\uD558\uC218
+    \uC2A4\uBB34\uB514\uB791 \uBD88\uAC00\uC0AC\uB9AC \uCFE0\uD0A4 \uC8FC\uC138\uC694."
   - "\uBD88\uC0AC\uC870 \uC0CC\uB4DC\uC704\uCE58\uB791 \uBD88\uAF43 \uCFE0\uD0A4
     \uC8FC\uC138\uC694."
+  - "\uBA38\uC2A4\uD0C0\uB4DC \uBE7C\uACE0 \uD574\uD30C\uB9AC \uC0CC\uB4DC\uC704\uCE58
+    \uC8FC\uC138\uC694."
+  - "\uBA38\uC2A4\uD0C0\uB4DC\uB791 \uCE60\uB9AC\uB791 \uD53C\uD074 \uBE7C\uACE0
+    \uD589\uC131 \uC0CC\uB4DC\uC704\uCE58 \uC8FC\uC138\uC694."
+  - "\uC591\uBC30\uCD94 \uBE7C\uACE0 \uD574\uD30C\uB9AC \uC0CC\uB4DC\uC704\uCE58\uB791
+    \uBD88\uAC00\uC0AC\uB9AC \uCFE0\uD0A4 \uC8FC\uC138\uC694."
   activeOrders: []
 --- !u!1 &583244204 stripped
 GameObject:
@@ -6460,6 +6466,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe957452ade150b47a6a8a61b753d427, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeManager: {fileID: 0}
 --- !u!1 &1203648214
 GameObject:
   m_ObjectHideFlags: 0
