@@ -64,13 +64,19 @@ public class MenuManager : MonoBehaviour
         check_menu.SetActive(true);
         select_menu.SetActive(false);
 
+        List<string> sand_list = new List<string>() { "jellyfish","hydra","kraken","planet","witch","phoenix"};
+
         // --- 정답 카드 선택 ---
         foreach(var item in ReadSpreadSheets.Instance.CurrentRequest_Include)
         {
-            if (item.Contains("_sand"))
-            {
-                correctmenu = item.ToString();
+            foreach (string s in sand_list) {
+                if (item.Contains(s))
+                {
+                    correctmenu = s.ToString();
+                }
+
             }
+            
         }
 
 

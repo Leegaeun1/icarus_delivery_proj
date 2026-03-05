@@ -151,31 +151,30 @@ public class CheckMenu : MonoBehaviour
 
     public void player_select()
     {
-
+        // 1. 이름 추출 및 정리
         string ingredientName = (transform.childCount > 0) ? transform.GetChild(0).name : gameObject.name;
         ingredientName = ingredientName.Replace("(Clone)", "").Trim();
+
+        // 2. 이름 결정 (샌드위치 재료라면 _sand를 붙임 - 필요할 경우에만)
         string finalName = ingredientName;
-
-        if (sheet == null) _sheet = ReadSpreadSheets.Instance;
-        if (transform.childCount == 0 || sheet == null) return;
-
         if (transform.parent != null && transform.parent.name == "CardStackParent")
         {
             finalName = ingredientName + "_sand";
-            if (!selectedNames.Contains(finalName)) selectedNames.Add(finalName);
         }
 
-        
+        if (sheet == null) _sheet = ReadSpreadSheets.Instance;
+        if (sheet == null) return;
 
-        ingredientName = transform.GetChild(0).name;
-
+        // 3. 상태 반전 및 UI 업데이트
         isSelect = !isSelect;
-        UpdateColor(); // 색상 변경
+        UpdateColor();
 
-        sheet.OnIngredientToggled(ingredientName, isSelect);
-        Debug.Log($"[클릭 감지] {ingredientName} | 선택 목록: {string.Join(", ", selectedNames)}");
+        // 4. 리스트 추가/제거는 무조건 이 함수 안에서만 처리되도록 합니다.
+        sheet.OnIngredientToggled(finalName, isSelect);
+
+        // 5. 디버깅 출력 (이제 selectedNames는 OnIngredientToggled 내부에서 관리됨)
+        Debug.Log($"[클릭 감지] {finalName} | 현재 상태: {isSelect} | 전체 목록: {string.Join(", ", selectedNames)}");
     }
-
     public IEnumerator StartCardStack()
     {
         // 1. 메뉴판을 켭니다.

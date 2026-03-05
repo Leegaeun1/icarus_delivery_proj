@@ -69,6 +69,9 @@ public class DayFinishManager : MonoBehaviour
         if (this.RequestedSpecials == null) this.RequestedSpecials = new List<string>();
         if (this.ProvidedSpecials == null) this.ProvidedSpecials = new List<string>();
 
+        if (this.IsDeliverySuccessList == null) this.IsDeliverySuccessList = new List<bool>();
+        this.IsDeliverySuccessList.AddRange(GameManager.Instance.PendingIsDeliverySuccess);
+
         // 1. 데이터 이어붙이기 (AddRange)
         // 기존에 데이터가 있더라도 유지하면서, GameManager의 데이터를 뒤에 추가합니다.
         this.FinalIngredients.AddRange(GameManager.Instance.PendingFinalIngredients);
@@ -80,7 +83,7 @@ public class DayFinishManager : MonoBehaviour
         GameManager.Instance.PendingFinalIngredients.Clear();
         GameManager.Instance.PendingExcludeRequest.Clear();
         GameManager.Instance.PendingIncludeRequest.Clear();
-
+        GameManager.Instance.PendingIsDeliverySuccess.Clear();
         Debug.Log($"[DayFinishManager] 데이터 로드 완료. 총 주문 수: {this.FinalIngredients.Count}");
     }
     void Start()

@@ -57,7 +57,7 @@ public class ReadSpreadSheets : MonoBehaviour
     [Header("주문 관리")]
     public List<string> CurrentRequest_Include = new List<string>();
     public List<string> CurrentRequest_Exclude = new List<string>();
-    // [테스트용] 현재 손님이 요청한 메뉴 이름 (인스펙터에서 직접 입력하여 테스트)
+    // 내가 클릭한 것
     public List<string> currentRequestName = new List<string> { };
 
     [System.Serializable]
@@ -160,7 +160,7 @@ public class ReadSpreadSheets : MonoBehaviour
 
         if (mineral == null)
         {
-            Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
+            //Debug.Log("[ReadSpreadSheet] 미네랄 텍스트가 등록되어있지 않습니다.");
             mineral = GameObject.Find("money_txt").GetComponent<TextMeshProUGUI>();
         }
         timeManager = GameObject.Find("TimeManager").GetComponent<Button>();
@@ -457,6 +457,7 @@ public class ReadSpreadSheets : MonoBehaviour
     public bool ApplyPurchase()
     {
         // 1. 잔액 확인
+        print("실행함!00");
         if (money < usedMoney)
         {
             Debug.LogWarning("잔액 부족!");
@@ -469,6 +470,7 @@ public class ReadSpreadSheets : MonoBehaviour
                 if (material != null)
                 {
                     usedMoney -= material.cost;
+                    
                 }
                 last_name = string.Empty;
             }

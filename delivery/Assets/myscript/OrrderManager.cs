@@ -14,23 +14,21 @@ public class OrrderManager : MonoBehaviour
     public TextMeshProUGUI orderTextUI;
 
     [Header("Order Settings")]
-    public List<string> possibleOrders = new List<string>(){};
+    public List<string> possibleOrders = new List<string>() { };
     public List<string> activeOrders = new List<string>();
     private int currentViewIndex = 0;
     private void OnValidate()
     {
-        // 인스펙터 리스트가 비어있을 때만 코드의 값을 강제로 넣고 싶다면
-        if (possibleOrders == null || possibleOrders.Count == 0)
+       possibleOrders = new List<string>()
         {
-            possibleOrders = new List<string>()
-            {
                 "피클이랑 칠리 빼고 크라켄 샌드위치랑 눈알 스무디 주세요.",
                 "양배추 빼고 히드라 샌드위치 하나 주세요.",
                 "칠리 빼고 마녀 샌드위치랑 은하수 스무디랑 불가사리 쿠키 주세요.",
                 "불사조 샌드위치랑 불꽃 쿠키 주세요.",
-                "머스타드 빼고 해파리 샌드위치 주세요."
-            };
-        }
+                "머스타드 빼고 해파리 샌드위치 주세요.",
+                "머스타드랑 칠리랑 피클 빼고 행성 샌드위치 주세요.",
+                "양배추 빼고 해파리 샌드위치랑 불가사리 쿠키 주세요."
+        };
     }
     void Start()
     {
@@ -198,71 +196,64 @@ public class OrrderManager : MonoBehaviour
             }
         }
 
-        // 4. 찾은 아이템들을 문장에 나타난 순서대로 정렬
-        foundItems.Sort((a, b) => a.index.CompareTo(b.index));
+        // 결과 저장용 임시 리스트
+        HashSet<string> finalInclude = new HashSet<string>();
+        HashSet<string> finalExclude = new HashSet<string>();
 
-        // 5. 포함 / 제외 분류 로직 (한국어 문맥 파악)
+        // 3. 1차 분류: 문맥에 따라 Include/Exclude 나누기
         foreach (var item in foundItems)
         {
             bool isExclude = false;
-            int closestExcludeIdx = -1;
-            int minDistance = int.MaxValue;
-
             foreach (int exIdx in excludeIndexes)
             {
-                if (exIdx > item.index && (exIdx - item.index) < minDistance)
+                // 단어 바로 뒤(15자 이내)에 "빼고" 등의 키워드가 있는지 확인
+                if (exIdx > item.index && (exIdx - item.index) < 15)
                 {
-                    minDistance = exIdx - item.index;
-                    closestExcludeIdx = exIdx;
+                    isExclude = true;
+                    break;
                 }
             }
 
-            if (closestExcludeIdx != -1 && minDistance < 15) isExclude = true;
+            if (isExclude) finalExclude.Add(item.engID);
+            else finalInclude.Add(item.engID);
+        }
 
-            if (isExclude)
+        // 4. 샌드위치 기본 재료 추가
+        bool hasSandwich = false;
+        foreach (var item in foundItems)
+        {
+            if (item.name.Contains("샌드위치")) { hasSandwich = true; break; }
+        }
+
+        if (hasSandwich)
+        {
+            string[] defaultIngredients = { "chili", "cabbage", "pickle", "mustard" };
+            foreach (string ing in defaultIngredients)
             {
-                ReadSpreadSheets.Instance.CurrentRequest_Exclude.Add(item.engID);
-                Debug.Log($"[제외] {item.name} ({item.engID})");
-            }
-            else
-            {
-                // 만약 샌드위치를 주문했다면, 기본 재료들을 Include에 자동 추가
-                if (item.name.Contains("샌드위치"))
+                // 사용자가 명시적으로 "빼달라"고 한 게 아니라면 포함 리스트에 추가
+                if (!finalExclude.Contains(ing))
                 {
-                    // 샌드위치 본체 ID 추가
-                    ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
-
-                    // 기본 재료 리스트
-                    string[] defaultIngredients = { "chili", "cabbage", "pickle", "mustard" };
-
-                    foreach (string ing in defaultIngredients)
-                    {
-                        // 이번 주문에서 '빼달라고 한(Exclude)' 재료가 아닐 때만 Include에 추가
-                        bool isRequiredToExclude = false;
-                        foreach (var exItem in foundItems)
-                        {
-                            if (exItem.engID == ing && sentence.Contains(exItem.name + " 빼고"))
-                            {
-                                isRequiredToExclude = true;
-                                break;
-                            }
-                        }
-
-                        if (!isRequiredToExclude)
-                        {
-                            ReadSpreadSheets.Instance.CurrentRequest_Include.Add(ing);
-                        }
-                    }
+                    finalInclude.Add(ing);
                 }
-                else
-                {
-                    // 샌드위치가 아닌 단품(쿠키, 스무디 등) 추가
-                    ReadSpreadSheets.Instance.CurrentRequest_Include.Add(item.engID);
-                }
-                Debug.Log($"[포함] {item.name} ({item.engID})");
             }
         }
 
-        Debug.Log($"[최종 파싱 완료] 포함: {ReadSpreadSheets.Instance.CurrentRequest_Include.Count}개 / 제외: {ReadSpreadSheets.Instance.CurrentRequest_Exclude.Count}개");
+        // 5. 최종 데이터 적용 (중복 제거 및 Exclude 반영)
+        ReadSpreadSheets.Instance.CurrentRequest_Include.Clear();
+        ReadSpreadSheets.Instance.CurrentRequest_Exclude.Clear();
+
+        foreach (var id in finalInclude)
+        {
+            // 포함 리스트에 있더라도 제외 리스트에 있으면 넣지 않음
+            if (!finalExclude.Contains(id))
+                ReadSpreadSheets.Instance.CurrentRequest_Include.Add(id);
+        }
+
+        foreach (var id in finalExclude)
+        {
+            ReadSpreadSheets.Instance.CurrentRequest_Exclude.Add(id);
+        }
+
+        Debug.Log($"[파싱완료] 포함: {string.Join(",", finalInclude)} / 제외: {string.Join(",", finalExclude)}");
     }
 }

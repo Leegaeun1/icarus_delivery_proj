@@ -26,7 +26,7 @@ public class TimeManager : MonoBehaviour
     public int date = 1;
     private float gameTime = 0f;
 
-    private float gameSpeed = 60f;
+    private float gameSpeed = 150f;
     private const int secondsPerDay = 3 * 3600;
 
     // 하루가 끝났는지 체크하는 플래그
